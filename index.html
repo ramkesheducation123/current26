@@ -589,7 +589,7 @@ font-family:kadwa;
 <div class="news-container" id="newsContainer"></div>
 
 <div id="noLikesBox" style="
-  display:none; text-align:center; padding:40px 10px;
+  display:none; text-align:center; margin-top:40px; padding:40px 10px;
   color:#666; font-size:16px;">
   
   <svg width="80" height="80" viewBox="0 0 24 24" fill="none"
@@ -608,6 +608,8 @@ font-family:kadwa;
 
   <div style="margin-top:12px; font-weight:600;">
      कोई पसंद की गई फ़ीड नहीं मिली
+     <br><br><br>
+     <button style="background:red; border:none; border-radius:5px; padding:5px 10px; font-weight:700; font-size:12px; color:#fff;" onclick="selectFeed(0)">करेंट अफेयर्स पढ़ें</button>
   </div>
 </div>
 
@@ -617,7 +619,7 @@ let startY = 0, endY = 0, startX = 0, endX = 0;
 let lastTouchY = 0;
 let currentIndex = 0;
 let articles = []; // आपका articles array loadNews() भरता है
-let totalSlidesBeforeRefresh = 2;
+let totalSlidesBeforeRefresh = 12;
 const MIN_SWIPE = 60; // swipe threshold
 
 // touch events (mobile)
@@ -1281,7 +1283,7 @@ loadNews();
 
 <div id="tabWrapper">
   <div id="tabs" class="tabs">
-    <button onclick="selectFeed(0)">देश/विदेश करेंट अफेयर्स</button>
+    <button onclick="selectFeed(0)">डेली करेंट अफेयर्स</button>
     <button onclick="selectFeed(2)">📌 My Saved Feed</button>
   </div>
   <div id="toggleTabs" onclick="toggleTabs()">
