@@ -70,30 +70,71 @@ overflow-x: hidden;
             overflow: hidden;
             align-items: center;
             user-select: none;
-      transition: transform 0.8s ease, opacity 0.2s ease;
-    will-change: transform, opacity;
+      transform-origin: bottom right;
     backface-visibility: hidden;
     transform-style: preserve-3d;
 }
 
-/* ✅ Flip-up animation */
 .news-flip-up {
-  animation: flipUp 0.6s ease both;
-}
-.news-flip-down {
-  animation: flipDown 0.6s ease both;
+    animation: pageFlipUp 0.65s ease forwards;
 }
 
-@keyframes flipUp {
-  0% { transform: rotateX(0deg) scale(1); }
-  50% { transform: rotateX(60deg) scale(0.85); opacity: 0.6; }
-  100% { transform: rotateX(0deg) scale(1); opacity: 1; }
+@keyframes pageFlipUp {
+    0% {
+        transform: rotateX(0deg) rotateZ(0deg) translateY(0);
+        opacity: 1;
+    }
+    50% {
+        transform: rotateX(-55deg) rotateZ(4deg) translateY(-20px);
+        opacity: 0.7;
+    }
+    100% {
+        transform: rotateX(-90deg) rotateZ(8deg) translateY(-100px);
+        opacity: 0;
+    }
 }
-@keyframes flipDown {
-  0% { transform: rotateX(0deg) scale(1); }
-  50% { transform: rotateX(-90deg) scale(0.45); opacity: 0.6; }
-  100% { transform: rotateX(0deg) scale(1); opacity: 1; }
+
+/* Swipe DOWN → Previous Page */
+.news-flip-down {
+    animation: pageFlipDown 0.65s ease forwards;
 }
+
+@keyframes pageFlipDown {
+    0% {
+        transform: rotateX(0deg) rotateZ(0deg) translateY(0);
+        opacity: 1;
+    }
+    50% {
+        transform: rotateX(45deg) rotateZ(-4deg) translateY(20px);
+        opacity: 0.7;
+    }
+    100% {
+        transform: rotateX(90deg) rotateZ(-8deg) translateY(100px);
+        opacity: 0;
+    }
+}
+
+/* Next page appearing from UNDER */
+.news-appear {
+    animation: pageAppear 0.45s ease forwards;
+    opacity: 0;
+}
+
+@keyframes pageAppear {
+    0% {
+        transform: rotateX(65deg) rotateZ(-5deg) translateY(40px);
+        opacity: 0.3;
+    }
+    80% {
+        transform: rotateX(10deg) rotateZ(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: rotateX(0deg);
+        opacity: 1;
+    }
+}
+
       
          img {
             max-width: 100% !important;
@@ -380,7 +421,7 @@ overflow-x: hidden;
 
     .tab.middle {
       transform: translateY(-24px);
-      margin-left:0px;
+      margin-left:0.5px;
       z-index: 2;
     }
 
@@ -507,7 +548,7 @@ font-family:kadwa;
     <span>Current Affairs</span>
   </div>
   <div class="tab middle" data-url="go:cmagazine" data-code="add">
-  <i class="fas fa-book-open" style="color:#fff;"><span style="color:#fff; font-weight:700; margin-top:7px; letter-spacing:1px; font-size:10px;">PYP</span></i>
+  <i class="fas fa-book-open" style="color:#fff;"><span style="color:#fff; letter-spacing:1.5px; font-weight:700; margin-top:6px; font-size:10px;">PYP</span></i>
 </div>
   <div class="tab" data-url="go:quiz" data-code="quiz">
     <i class="fas fa-clipboard-question"></i>
@@ -545,18 +586,41 @@ font-family:kadwa;
   </div>
 </div>
 
-
 <div class="news-container" id="newsContainer"></div>
+
+<div id="noLikesBox" style="
+  display:none; text-align:center; padding:40px 10px;
+  color:#666; font-size:16px;">
+  
+  <svg width="80" height="80" viewBox="0 0 24 24" fill="none"
+     xmlns="http://www.w3.org/2000/svg"
+     stroke="#d23f3f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+
+  <!-- Heart shape -->
+  <path d="M12 21s-6-4.35-9-8.5C-1.8 8.4 1.4 3 6 3
+           c2.1 0 4 1.2 5 3c1-1.8 2.9-3 5-3
+           c4.6 0 7.8 5.4 3 9.5
+           c-3 4.15-9 8.5-9 8.5z"/>
+  <!-- Slash line -->
+  <line x1="3" y1="3" x2="21" y2="21" />
+</svg>
+
+
+  <div style="margin-top:12px; font-weight:600;">
+     कोई पसंद की गई फ़ीड नहीं मिली
+  </div>
+</div>
 
     <script>
 
 let startY = 0, endY = 0, startX = 0, endX = 0;
-let currentIndex = 0;
-let articles = [];
-let totalSlidesBeforeRefresh = 12;
-
-// ✅ Touch events (for mobile)
 let lastTouchY = 0;
+let currentIndex = 0;
+let articles = []; // आपका articles array loadNews() भरता है
+let totalSlidesBeforeRefresh = 2;
+const MIN_SWIPE = 60; // swipe threshold
+
+// touch events (mobile)
 document.addEventListener("touchstart", e => {
   const t = e.touches[0];
   startY = t.clientY;
@@ -572,103 +636,129 @@ document.addEventListener("touchmove", e => {
 document.addEventListener("touchend", e => {
   const t = e.changedTouches[0];
   endY = lastTouchY || t.clientY;
-  endX = t.clientX;
-  handleSwipe();
-}, { passive: true });
+  endX = t.clientX || startX;
+  handleVerticalSwipe(); // नया नाम ताकि कोई डुप्लीकेट फंक्शन न ओवरराइड करे
+});
 
-// ✅ Mouse/Trackpad scroll
-document.addEventListener("wheel", handleScroll, { passive: true });
+// mouse support (desktop): capture mousedown to set start, mouseup to set end
+document.addEventListener("mousedown", e => {
+  startY = e.clientY;
+  startX = e.clientX;
+});
+document.addEventListener("mouseup", e => {
+  endY = e.clientY;
+  endX = e.clientX;
+  handleVerticalSwipe();
+});
 
-// ✅ Swipe handling
-function handleSwipe() {
-  const card = document.querySelectorAll(".news-card")[currentIndex];
-  if (!card) return;
+// horizontal swipe open (optional) — अलग फंक्शन अगर चाहें
+function handleHorizontalOpen() {
+  const dx = endX - startX;
+  if (dx < -100 && articles[currentIndex] && articles[currentIndex].link) {
+    window.open(articles[currentIndex].link, "_blank");
+  }
+}
 
-  const deltaY = endY - startY;
-  const deltaX = endX - startX;
-  const absY = Math.abs(deltaY);
-  const absX = Math.abs(deltaX);
+// Unified vertical swipe handler (up / down)
+function handleVerticalSwipe() {
+  // अगर कोई active card न हो तो exit
+  const activeCard = document.querySelector(".news-card.active");
+  if (!activeCard) return;
 
-  if (Math.max(absY, absX) < 35) return;
+  const diff = endY - startY;
+  const abs = Math.abs(diff);
 
-  // Horizontal swipe (open article)
-  if (absX > absY) {
-    if (deltaX < -35 && articles[currentIndex] && articles[currentIndex].link) {
-      window.open(articles[currentIndex].link, "_blank");
-    }
+  // ignore small moves
+  if (abs < MIN_SWIPE) {
+    // छोटा horizontal भी चेक कर लें
+    const dx = Math.abs(endX - startX);
+    if (dx > 100) handleHorizontalOpen();
     return;
   }
 
-  // Vertical swipe
-  if (deltaY < -50) {
-    triggerFlipAnimation("up");
-    nextSlide();
-  } else if (deltaY > 50) {
-    triggerFlipAnimation("down");
-    if (currentIndex === 0 && deltaY > 120) {
-      refreshNewsFeed();
-    } else {
-      prevSlide();
-  }
+  if (diff < 0) {
+    // swipe up => next
+    showNextFlip();
+  } else {
+    // swipe down => prev
+    showPrevFlip();
   }
 }
 
-// ✅ Scroll handling (desktop)
-function handleScroll(e) {
-  const card = document.querySelectorAll(".news-card")[currentIndex];
-  if (!card) return;
+/* Flip functions — make sure these match the CSS animation durations (here 700ms) */
+function showNextFlip() {
+  if (currentIndex >= articles.length - 1) return;
 
-  const delta = e.deltaY;
-  if (delta > 20) {
-    triggerFlipAnimation("up");
-    nextSlide();
-  } else if (delta < -20) {
-    triggerFlipAnimation("down");
-    prevSlide();
-  }
-}
+  const oldCard = document.querySelector(".news-card.active");
+  const nextCard = document.querySelector(`.news-card[data-index="${currentIndex + 1}"]`);
 
-// ✅ Flip animation trigger (unified for mobile + desktop)
-function triggerFlipAnimation(direction) {
-  const card = document.querySelectorAll(".news-card")[currentIndex];
-  if (!card) return;
-  const animClass = direction === "up" ? "news-flip-up" : "news-flip-down";
-  card.classList.add(animClass);
-  setTimeout(() => card.classList.remove(animClass), 600);
-}
+  if (!oldCard || !nextCard) return;
 
-// ✅ Slides logic
-function nextSlide() {
-  if (currentIndex < articles.length - 1) {
-    currentIndex++;
+  // set transform origins for nicer corner roll
+  oldCard.style.transformOrigin = 'bottom right';
+  nextCard.style.transformOrigin = 'bottom right';
+
+  // animate old card folding up (away)
+  oldCard.classList.remove("active");
+  oldCard.classList.add("news-flip-up");
+
+  // prepare next card to appear from under with "paper" effect
+  nextCard.style.opacity = "0";
+  nextCard.classList.add("active", "news-appear");
+
+  // increment index immediately so updateSlide repositions to the new index after animation
+  currentIndex++;
+
+  // cleanup after animation
+  setTimeout(() => {
+    oldCard.classList.remove("news-flip-up");
+    nextCard.classList.remove("news-appear");
+    nextCard.style.opacity = "1";
     updateSlide();
-  }
-  if (currentIndex >= totalSlidesBeforeRefresh) {
-    showRefreshPopup();
-  }
+    if (currentIndex >= totalSlidesBeforeRefresh) showRefreshPopup();
+  }, 700);
 }
 
-function prevSlide() {
-  if (currentIndex > 0) {
-    currentIndex--;
+function showPrevFlip() {
+  if (currentIndex <= 0) return;
+
+  const oldCard = document.querySelector(".news-card.active");
+  const prevCard = document.querySelector(`.news-card[data-index="${currentIndex - 1}"]`);
+
+  if (!oldCard || !prevCard) return;
+
+  // set transform origins for nicer corner roll (prev comes from top)
+  oldCard.style.transformOrigin = 'top right';
+  prevCard.style.transformOrigin = 'top right';
+
+  // animate old card folding down (away)
+  oldCard.classList.remove("active");
+  oldCard.classList.add("news-flip-down");
+
+  // prepare prev card to appear from under
+  prevCard.style.opacity = "0";
+  prevCard.classList.add("active", "news-appear");
+
+  // decrement index immediately so updateSlide repositions after animation
+  currentIndex--;
+
+  // cleanup after animation
+  setTimeout(() => {
+    oldCard.classList.remove("news-flip-down");
+    prevCard.classList.remove("news-appear");
+    prevCard.style.opacity = "1";
     updateSlide();
-  }
+  }, 700);
 }
 
+/* updateSlide() — यह आपके पुराने logic को reuse करता है */
 function updateSlide() {
   const cards = document.querySelectorAll(".news-card");
   cards.forEach((card, index) => {
+    card.style.transition = 'transform 0.5s ease';
     card.style.transform = `translateY(${(index - currentIndex) * 100}%)`;
   });
 }
-
-// ✅ Trigger scroll events on mobile too
-window.addEventListener("touchmove", () => {
-  window.dispatchEvent(new Event("scroll"));
-});
-window.addEventListener("touchstart", () => {
-  window.dispatchEvent(new Event("scroll"));
-});
 
 document.addEventListener("DOMContentLoaded", () => {
   updateTabUI();
@@ -748,10 +838,27 @@ async function loadNews() {
 
   if (selectedFeedIndex === 2) {
     articles = JSON.parse(localStorage.getItem("likedFeeds") || "[]");
-    articles.sort((a, b) => new Date(b.likedAt || 0) - new Date(a.likedAt || 0));
+
+    const noLikes = document.getElementById("noLikesBox");
+    const container = document.getElementById("newsContainer");
+
+    if (articles.length === 0) {
+
+        // ⭐ न्यूज़ कंटेनर खाली करो
+        container.innerHTML = "";
+
+        // ⭐ No Likes Box केवल कंटेनर के अंदर दिखाओ
+        container.appendChild(noLikes);
+        noLikes.style.display = "block";
+
+        return;
+    } else {
+        noLikes.style.display = "none";
+    }
+
     displayNews();
     return;
-  }
+}
 
   const urls = rssFeeds[selectedFeedIndex].urls;
   document.getElementById("skeletonLoader").style.display = "block";
@@ -840,17 +947,20 @@ function insertCustomCards() {
 
 
 function displayNews() {
-    const container = document.getElementById('newsContainer');
-    container.innerHTML = '';
+  const container = document.getElementById('newsContainer');
+  container.innerHTML = '';
 
-    articles.forEach((article, index) => {
-        let newsCard = document.createElement('div');
-        newsCard.className = 'news-card';
-        
-        newsCard.style.transform = `translateY(${index * 100}%)`;
+  articles.forEach((article, index) => {
+    let newsCard = document.createElement('div');
+    newsCard.className = 'news-card';
+    newsCard.setAttribute('data-index', index);        // जरूरी: index attribute
+    if (index === 0) {
+      newsCard.classList.add('active');               // पहला card active होना चाहिए
+    }
+    newsCard.style.transform = `translateY(${index * 100}%)`;
 
-        let titleHTML = article.title ? `<h2>${article.title}</h2>` : '';
-        let descriptionHTML = article.description ? `<p>${article.description}</p>` : '';
+    let titleHTML = article.title ? `<h2>${article.title}</h2>` : '';
+    let descriptionHTML = article.description ? `<p>${article.description}</p>` : '';
 
         const customImages = [
   
@@ -862,23 +972,26 @@ if (customImages.includes(article.image)) {
 }
 
         
-        let imageHTML = `<img src="${article.image}" onclick="window.open('${article.link}', '_blank')" style="cursor:pointer;">`;
+        let img = article.image ? `<img src="${article.image}" onclick="window.open('${article.link}', '_blank')" style="cursor:pointer;">` : '';
 
         newsCard.innerHTML = `
-  ${titleHTML}
-  ${descriptionHTML}
-  ${imageHTML}
-  <div class="publish-time">${getTimeAgo(article.pubDate)}</div>
-  <div class="like-btn" onclick="toggleLike(${index})">
- <i class="fas ${isLiked(article.link) ? 'fa-heart' : 'fa-heart-circle-plus'}"></i> <span class="save-text"> ${isLiked(article.link) ? 'Saved' : 'Save'}</span>
-  </div>
-`;
+      ${titleHTML}
+      ${descriptionHTML}
+      ${img}
+      <div class="publish-time">${getTimeAgo(article.pubDate)}</div>
+      <div class="like-btn" onclick="toggleLike(${index})">
+        <i class="fas ${isLiked(article.link) ? 'fa-heart' : 'fa-heart-circle-plus'}"></i>
+        <span class="save-text"> ${isLiked(article.link) ? 'Saved' : 'Save'}</span>
+      </div>
+    `;
 
-        newsCard.setAttribute("data-url", article.link);
-        container.appendChild(newsCard);
-    });
+    newsCard.setAttribute("data-url", article.link || '');
+    container.appendChild(newsCard);
+  });
 
-    currentIndex = 0;
+  // Reset index & position after render
+  currentIndex = 0;
+  updateSlide();
 }
 
 function isLiked(link) {
@@ -1206,26 +1319,6 @@ document.addEventListener('click', function (event) {
 window.onload = () => {
   autoHideTabs();
 };
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  const images = document.querySelectorAll(".lazy-img");
-
-  const observer = new IntersectionObserver((entries, obs) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const img = entry.target;
-        img.src = img.dataset.src;
-        img.classList.remove("lazy-img");
-        obs.unobserve(img);
-      }
-    });
-  }, {
-    rootMargin: "100px"
-  });
-
-  images.forEach(img => observer.observe(img));
-});
 </script>
 
   </div>
