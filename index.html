@@ -1322,6 +1322,63 @@ window.onload = () => {
   autoHideTabs();
 };
 </script>
+<script>
+if ("serviceWorker" in navigator) {
+
+  const swCode = `
+    const CACHE_NAME = "auto-cache-v1";
+
+    self.addEventListener("install", e => {
+      self.skipWaiting();
+    });
+
+    self.addEventListener("activate", e => {
+      e.waitUntil(
+        caches.keys().then(keys => {
+          return Promise.all(
+            keys.map(k => {
+              if (k !== CACHE_NAME) return caches.delete(k);
+            })
+          );
+        })
+      );
+      self.clients.claim();
+    });
+
+    self.addEventListener("fetch", e => {
+      const req = e.request;
+
+      // ❌ IMPORTANT FIX → NEVER CACHE HTML
+      if (req.headers.get("accept").includes("text/html")) {
+        return; // HTML always from network
+      }
+
+      // Cache only images, css, js, icons
+      if (
+        req.destination === "image" ||
+        req.destination === "style" ||
+        req.destination === "script" ||
+        req.url.includes("icon")
+      ) {
+        e.respondWith(
+          caches.match(req).then(res => {
+            return res || fetch(req).then(netRes => {
+              return caches.open(CACHE_NAME).then(cache => {
+                cache.put(req, netRes.clone());
+                return netRes;
+              });
+            });
+          })
+        );
+      }
+    });
+  `;
+
+  const blob = new Blob([swCode], { type: "application/javascript" });
+  const swURL = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swURL);
+}
+</script>
 
   </div>
 </div>  </div>
