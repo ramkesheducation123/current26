@@ -148,6 +148,7 @@ overflow-x: hidden;
         h2 {
             margin: 0;
             width:100%;
+            font-size:16px;
             color:#1C6BFF;
             background:#fff;
             font-weight:700;
@@ -159,7 +160,8 @@ overflow-x: hidden;
             z-index:3;
         }
         p {
-            color: #000; 
+            color: #000;
+            font-size:14.5px;
             width:92%;
             z-index:1;
             padding:10px 20px;
@@ -1473,7 +1475,7 @@ window.onload = () => {
 if ("serviceWorker" in navigator) {
 
   const swCode = `
-    const CACHE_NAME = "auto-cache-v5";
+    const CACHE_NAME = "auto-cache-v6";
 
     self.addEventListener("install", e => {
       self.skipWaiting();
