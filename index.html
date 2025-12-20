@@ -27,7 +27,7 @@ overflow-x: hidden;
 }
 
         body {
-            font-family: kadwa;
+            font-family:Noto Serif Devanagari !important;
             background:#E3EDF7;
             user-select:none;
             -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; box-sizing: border-box; content: none;
@@ -62,6 +62,7 @@ overflow-x: hidden;
              border-radius: 10px 10px 5px 5px ; 
             position: absolute;
             background:white;
+            font-family:Noto Serif Devanagari !important;
              padding: 12px;
             text-align: left;
             display: flex;
@@ -145,23 +146,28 @@ overflow-x: hidden;
             border-radius: 0px;
         }
         h2 {
-            font-size: 15px;
+            font-size: 14.5px;
             margin: 0;
             width:100%;
-            color:#EB5406;
+            color:#1C6BFF;
             background:#fff;
-            padding:12px 10px 10px 10px;
+            font-weight:700;
+            border-bottom:2px dotted #000;
+            font-family:Noto Serif Devanagari !important;
+            padding:12px 10px 10px 12px;
             border-radius: 10px 10px 0px 0px;
             margin-top:0px;
             z-index:3;
         }
         p {
-            color: #3B2F2F;
-            font-size:14px;
+            color: #000;
+            font-size:13.5px;
+            width:92%;
             z-index:1;
             padding:10px 20px;
             background:white;
-            font-family:kadwa;
+            line-height:1.6;
+            font-family:Noto Serif Devanagari !important;
             margin-top:-14px;
 
       }
@@ -513,8 +519,55 @@ overflow-x: hidden;
 font-size:10px;
 font-family:kadwa;
 }
+
+.custom-test-feed {
+    padding: 14px;
+}
+
+.test-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.test-item {
+    background: #f7f9fb;
+    border-radius: 10px;
+    border:1px solid rgb(0,0,0,0.3);
+    padding: 10px;
+    text-align: center;
+}
+
+.test-item h4 {
+    font-size: 13px;
+    color:deeppink;
+    margin: 0 0 4px;
+}
+
+.test-item p1 {
+    font-size: 11px;
+    opacity: 0.8;
+}
+
+.test-item button {
+    margin-top: 6px;
+    width: 100%;
+    padding: 8px;
+    font-weight:700;
+    border: none;
+    border-radius: 8px;
+    background: #007bff;
+    color: #fff;
+    font-size: 11px;
+}
+
+.test-item button:disabled {
+    background: gray;
+}
+
     </style>
     <link href='https://fonts.googleapis.com/css?family=Kadwa' rel='stylesheet'>
+    <link href='https://fonts.googleapis.com/css?family=Noto Serif Devanagari' rel='stylesheet'>
 </head>
 <body>
 
@@ -569,11 +622,11 @@ font-family:kadwa;
     <script src="script.js"></script>
  <div class="popup2-container" id="popup2">
         <div class="popup2">
-            <h2>Instructions</h2>
+            <h1 style="font-size:17px; color:red;">Instructions</h1>
            <ol><li> डेली करेंट अफेयर्स की <strong>अगली फीड</strong> को पढ़ने के लिए <strong>"ऊपर सरकाएं"</strong></li>
             <li> डेली करेंट अफेयर्स की <strong>पिछली फीड</strong> को पढ़ने के लिए <strong>"नीचे सरकाएं"</strong></li>
-            <li> पसंदीदा फीड को Save करने के लिए <i Style="color:red;" class="fas fa-heart-circle-plus"></i> icon पर क्लिक करें</li>
-            <li> TRENDING, देश/विदेश एवं मध्यप्रदेश की टॉप करेंट अफेयर्स पढ़ें एक ही जगह विशेष तथ्यों के साथ</li></ol>
+            <li> पसंदीदा फीड को Save करने के लिए <i Style="color:red;" class="fas fa-heart-circle-plus"></i> icon पर Tap करें</li></ol>
+        <p style=" font-size:13px; margin-top:10px; background:rgb(0,0,0,0.3); padding:5px 10px; border-radius:5px;">सभी प्रतियोगी परीक्षाओं (UPSC, MPPSC, SSC, बैंकिंग, रेलवे, पुलिस, शिक्षक पात्रता परीक्षा (TET) आदि) के लिए सम्पूर्ण करेंट अफेयर्स पढ़ें एक ही जगह विशेष तथ्यों के साथ</p>
          <div class="popup2-footer">
                 <input type="checkbox" id="consentCheckbox">
                 <label for="consentCheckbox" id="consentLabel">हम समझ गए</label>
@@ -710,7 +763,6 @@ function showNextFlip() {
 
   // increment index immediately so updateSlide repositions to the new index after animation
   currentIndex++;
-
   // cleanup after animation
   setTimeout(() => {
     oldCard.classList.remove("news-flip-up");
@@ -821,7 +873,6 @@ let selectedLanguage = localStorage.getItem("selectedLanguage") || "en"; // 🔸
 // Tabs पर क्लिक करने पर फीड लोड करें
 function selectFeed(index) {
   selectedFeedIndex = index;
-  localStorage.setItem("selectedFeed", index);
   updateTabUI();
   refreshNewsFeed();
 }
@@ -929,6 +980,12 @@ function insertCustomCards() {
             pubDate: new Date()
         },
         
+        {
+            image: 'https://m2.getsitecontrol.com/images/273034/37619d33c732a9cea79d8bdaed235303_341477550.png',
+            link: 'go:cmagazine',
+            pubDate: new Date()
+        },
+        
         
     ];
 
@@ -938,7 +995,7 @@ function insertCustomCards() {
         customCards.forEach(card => {
             let randomIndex;
             do {
-                randomIndex = Math.floor(Math.random() * 35) + 1; // 1 से 10 के बीच रैंडम नंबर
+                randomIndex = Math.floor(Math.random() * 25) + 1; // 1 से 10 के बीच रैंडम नंबर
             } while (insertedIndexes.has(randomIndex)); // पहले से इस्तेमाल किया गया इंडेक्स ना हो
 
             insertedIndexes.add(randomIndex);
@@ -947,10 +1004,26 @@ function insertCustomCards() {
     }
 }
 
+function injectTestFeedOnce() {
+    if (articles.some(a => a.type === "test-feed")) return;
+
+    const min = 5;
+    const max = Math.min(15, articles.length - 1);
+
+    if (max < min) return;
+
+    const randomIndex = Math.floor(Math.random() * (max - min + 1)) + min;
+
+    articles.splice(randomIndex, 0, {
+        type: "test-feed",
+        pubDate: new Date()
+    });
+}
 
 function displayNews() {
   const container = document.getElementById('newsContainer');
   container.innerHTML = '';
+  injectTestFeedOnce();
 
   articles.forEach((article, index) => {
     let newsCard = document.createElement('div');
@@ -964,15 +1037,39 @@ function displayNews() {
     let titleHTML = article.title ? `<h2>${article.title}</h2>` : '';
     let descriptionHTML = article.description ? `<p>${article.description}</p>` : '';
 
-        const customImages = [
-  
-    "https://m2.getsitecontrol.com/images/273034/327d83aa6b1ddc025e023f3aaadcb1cc_345712304.png"
+        const customImages = [  "https://m2.getsitecontrol.com/images/273034/327d83aa6b1ddc025e023f3aaadcb1cc_345712304.png",
+        "https://m2.getsitecontrol.com/images/273034/37619d33c732a9cea79d8bdaed235303_341477550.png",
+        
+       
 ];
 
 if (customImages.includes(article.image)) {
-    newsCard.classList.add("custom-card");
+  newsCard.classList.add("custom-card");
+  newsCard.innerHTML = `
+    <img src="${article.image}"
+         onclick="window.open('${article.link}', '_blank')"
+         style="width:100%;height:100%;display:block;cursor:pointer;">
+  `;
+  container.appendChild(newsCard);
+  return; // ⛔ IMPORTANT: normal layout apply नहीं होगा
 }
 
+if (article.type === "test-feed") {
+      newsCard.classList.add("custom-test-feed");
+      newsCard.innerHTML = `
+        <img class="test-banner"
+             src="https://m2.getsitecontrol.com/images/273034/ed3a5d71ad3285f65a2c0bb54a78809a_346160416.png"><br>
+
+        <div class="test-grid">
+          ${renderTestCard("Weekly Current Affairs","01 से 08 जनवरी, 2026","2026-1-8","https://ramkesheducation123.github.io/test1/")}
+          ${renderTestCard("Weekly Current Affairs","08 से 14 जनवरी, 2026","2026-1-14","https://ramkesheducation123.github.io/test2/")}
+          ${renderTestCard("Weekly Current Affairs","15 से 22 जनवरी, 2026","2026-1-22","https://ramkesheducation123.github.io/test3/")}
+          ${renderTestCard("Weekly Current Affairs","23 से 31 जनवरी, 2026","2026-1-31","https://ramkesheducation123.github.io/test4/")}
+        </div>
+      `;
+      container.appendChild(newsCard);
+      return;
+    }
         
         let img = article.image ? `<img src="${article.image}" onclick="window.open('${article.link}', '_blank')" style="cursor:pointer;">` : '';
 
@@ -990,11 +1087,63 @@ if (customImages.includes(article.image)) {
     newsCard.setAttribute("data-url", article.link || '');
     container.appendChild(newsCard);
   });
+  
+  // ✅ countdown start AFTER DOM render
+  initAllCountdowns();
 
   // Reset index & position after render
   currentIndex = 0;
   updateSlide();
 }
+
+function renderTestCard(title, desc, unlockDate, url) {
+  const id = "btn_" + Math.random().toString(36).substr(2, 6);
+  return `
+    <div class="test-item">
+      <h4>${title}</h4>
+      <p1>${desc}</p1>
+      <button id="${id}"
+              data-date="${unlockDate}"
+              data-url="${url}"
+              disabled>
+        Loading…
+      </button>
+    </div>
+  `;
+}
+
+function initAllCountdowns() {
+  document.querySelectorAll('.test-item button').forEach(btn => {
+    startCountdown(
+      btn.dataset.date,
+      btn.id,
+      btn.dataset.url
+    );
+  });
+}
+
+function startCountdown(dateStr, btnId, url) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+
+  const target = new Date(dateStr).getTime();
+  const timer = setInterval(() => {
+    const diff = target - Date.now();
+
+    if (diff <= 0) {
+      clearInterval(timer);
+      btn.disabled = false;
+      btn.textContent = "Start Test";
+      btn.onclick = () => window.open(url, "");
+      return;
+    }
+
+    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    btn.textContent = `Test Live in ${d}d ${h}h`;
+  }, 1000);
+}
+
 
 function isLiked(link) {
     const liked = JSON.parse(localStorage.getItem("likedFeeds") || "[]");
@@ -1326,7 +1475,7 @@ window.onload = () => {
 if ("serviceWorker" in navigator) {
 
   const swCode = `
-    const CACHE_NAME = "auto-cache-v1";
+    const CACHE_NAME = "auto-cache-v3";
 
     self.addEventListener("install", e => {
       self.skipWaiting();
