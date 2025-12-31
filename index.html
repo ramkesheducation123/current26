@@ -522,12 +522,15 @@ font-family:kadwa;
 
 .custom-test-feed {
     padding: 14px;
+    background-image:url('https://files.cdn-files-a.com/uploads/10456964/normal_6954b0343e075.png');
+    background-size:100%;
 }
 
 .test-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
+    margin-top:10px;
 }
 
 .test-item {
@@ -972,30 +975,34 @@ async function loadNews() {
 function insertCustomCards() {
     const customCards = [
         
-        
-        
         {
-            image: 'https://m2.getsitecontrol.com/images/273034/327d83aa6b1ddc025e023f3aaadcb1cc_345712304.png',
-            link: 'go:cmagazine',
+            image: 'https://m2.getsitecontrol.com/images/273034/d14691ad787f18ca188ad40f0f327711_328022818.jpg',
+            link: '#',
             pubDate: new Date()
         },
         
         {
-            image: 'https://m2.getsitecontrol.com/images/273034/37619d33c732a9cea79d8bdaed235303_341477550.png',
-            link: 'go:cmagazine',
+            image: 'https://m2.getsitecontrol.com/images/273034/327d83aa6b1ddc025e023f3aaadcb1cc_345712304.png',
+            link: 'https://www.myexamguruji.in/p/e-book-store.html',
+            pubDate: new Date()
+        },
+        
+        {
+            image: 'https://files.cdn-files-a.com/uploads/10456964/normal_69535f33277ed.png',
+            link: 'https://www.myexamguruji.in/p/e-book-store.html',
             pubDate: new Date()
         },
         
         
     ];
 
-    if (articles.length > 40) {
+    if (articles.length > 30) {
         let insertedIndexes = new Set(); // पहले से इस्तेमाल किए गए इंडेक्स को स्टोर करने के लिए
 
         customCards.forEach(card => {
             let randomIndex;
             do {
-                randomIndex = Math.floor(Math.random() * 25) + 1; // 1 से 10 के बीच रैंडम नंबर
+                randomIndex = Math.floor(Math.random() * 15) + 1; // 1 से 10 के बीच रैंडम नंबर
             } while (insertedIndexes.has(randomIndex)); // पहले से इस्तेमाल किया गया इंडेक्स ना हो
 
             insertedIndexes.add(randomIndex);
@@ -1008,7 +1015,7 @@ function injectTestFeedOnce() {
     if (articles.some(a => a.type === "test-feed")) return;
 
     const min = 5;
-    const max = Math.min(15, articles.length - 1);
+    const max = Math.min(10, articles.length - 1);
 
     if (max < min) return;
 
@@ -1038,7 +1045,8 @@ function displayNews() {
     let descriptionHTML = article.description ? `<p>${article.description}</p>` : '';
 
         const customImages = [  "https://m2.getsitecontrol.com/images/273034/327d83aa6b1ddc025e023f3aaadcb1cc_345712304.png",
-        "https://m2.getsitecontrol.com/images/273034/37619d33c732a9cea79d8bdaed235303_341477550.png",
+"https://m2.getsitecontrol.com/images/273034/d14691ad787f18ca188ad40f0f327711_328022818.jpg",
+        "https://files.cdn-files-a.com/uploads/10456964/normal_69535f33277ed.png",
         
        
 ];
@@ -1097,7 +1105,7 @@ if (article.type === "test-feed") {
 }
 
 function renderTestCard(title, desc, unlockDate, url) {
-  const id = "btn_" + Math.random().toString(36).substr(2, 6);
+  const id = "btn_" + Math.random().toString(10).substr(1, 6);
   return `
     <div class="test-item">
       <h4>${title}</h4>
@@ -1475,7 +1483,7 @@ window.onload = () => {
 if ("serviceWorker" in navigator) {
 
   const swCode = `
-    const CACHE_NAME = "auto-cache-v6";
+    const CACHE_NAME = "auto-cache-v7";
 
     self.addEventListener("install", e => {
       self.skipWaiting();
