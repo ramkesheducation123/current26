@@ -530,7 +530,7 @@ font-family:kadwa;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
-    margin-top:10px;
+    margin-top:-25px;
 }
 
 .test-item {
@@ -977,12 +977,12 @@ function insertCustomCards() {
         
         {
             image: 'https://m2.getsitecontrol.com/images/273034/d14691ad787f18ca188ad40f0f327711_328022818.jpg',
-            link: '#',
+            link: 'go:cumagazine',
             pubDate: new Date()
         },
         
         {
-            image: 'https://m2.getsitecontrol.com/images/273034/327d83aa6b1ddc025e023f3aaadcb1cc_345712304.png',
+            image: 'https://m2.getsitecontrol.com/images/273034/fdc9cb8882f0dfba8f9689b01f2c79c5_347140695.png',
             link: 'go:cumagazine',
             pubDate: new Date()
         },
@@ -1044,7 +1044,7 @@ function displayNews() {
     let titleHTML = article.title ? `<h2>${article.title}</h2>` : '';
     let descriptionHTML = article.description ? `<p>${article.description}</p>` : '';
 
-        const customImages = [  "https://m2.getsitecontrol.com/images/273034/327d83aa6b1ddc025e023f3aaadcb1cc_345712304.png",
+        const customImages = [  "https://m2.getsitecontrol.com/images/273034/fdc9cb8882f0dfba8f9689b01f2c79c5_347140695.png",
 "https://m2.getsitecontrol.com/images/273034/d14691ad787f18ca188ad40f0f327711_328022818.jpg",
         "https://files.cdn-files-a.com/uploads/10456964/normal_69535f33277ed.png",
         
@@ -1483,7 +1483,7 @@ window.onload = () => {
 if ("serviceWorker" in navigator) {
 
   const swCode = `
-    const CACHE_NAME = "auto-cache-v8";
+    const CACHE_NAME = "auto-cache-v9";
 
     self.addEventListener("install", e => {
       self.skipWaiting();
