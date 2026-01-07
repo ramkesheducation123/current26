@@ -530,20 +530,22 @@ font-family:kadwa;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
-    margin-top:-25px;
+    margin-top:-15px;
 }
 
 .test-item {
-    background: #f7f9fb;
+    background: #fff;
     border-radius: 10px;
     border:1px solid rgb(0,0,0,0.3);
-    padding: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5), 0 0 0 2px #fff inset;
+    padding: 12px;
     text-align: center;
 }
 
 .test-item h4 {
-    font-size: 13px;
-    color:deeppink;
+    font-size: 12.5px;
+    font-weight:700;
+    color:#077aff;
     margin: 0 0 4px;
 }
 
@@ -980,13 +982,7 @@ function insertCustomCards() {
             link: 'go:cumagazine',
             pubDate: new Date()
         },
-        
-        {
-            image: 'https://m2.getsitecontrol.com/images/273034/fdc9cb8882f0dfba8f9689b01f2c79c5_347140695.png',
-            link: 'go:cumagazine',
-            pubDate: new Date()
-        },
-        
+                
         {
             image: 'https://files.cdn-files-a.com/uploads/10456964/normal_69535f33277ed.png',
             link: 'https://www.myexamguruji.in/p/e-book-store.html',
@@ -1044,7 +1040,7 @@ function displayNews() {
     let titleHTML = article.title ? `<h2>${article.title}</h2>` : '';
     let descriptionHTML = article.description ? `<p>${article.description}</p>` : '';
 
-        const customImages = [  "https://m2.getsitecontrol.com/images/273034/fdc9cb8882f0dfba8f9689b01f2c79c5_347140695.png",
+        const customImages = [  
 "https://m2.getsitecontrol.com/images/273034/d14691ad787f18ca188ad40f0f327711_328022818.jpg",
         "https://files.cdn-files-a.com/uploads/10456964/normal_69535f33277ed.png",
         
@@ -1066,10 +1062,10 @@ if (article.type === "test-feed") {
       newsCard.classList.add("custom-test-feed");
       newsCard.innerHTML = `
         <img class="test-banner"
-             src="https://m2.getsitecontrol.com/images/273034/ed3a5d71ad3285f65a2c0bb54a78809a_346160416.png"><br>
+             src="https://m2.getsitecontrol.com/images/273034/3de624c53f3b4086e659276fe5ad67d5_347741674.png"><br>
 
         <div class="test-grid">
-          ${renderTestCard("Weekly Current Affairs","01 से 08 जनवरी, 2026","2026-1-8","https://ramkesheducation123.github.io/test1/")}
+          ${renderTestCard("Weekly Current Affairs","01 से 08 जनवरी, 2026","2026-1-8","go:8jan")}
           ${renderTestCard("Weekly Current Affairs","08 से 14 जनवरी, 2026","2026-1-14","https://ramkesheducation123.github.io/test2/")}
           ${renderTestCard("Weekly Current Affairs","15 से 22 जनवरी, 2026","2026-1-22","https://ramkesheducation123.github.io/test3/")}
           ${renderTestCard("Weekly Current Affairs","23 से 31 जनवरी, 2026","2026-1-31","https://ramkesheducation123.github.io/test4/")}
@@ -1483,7 +1479,7 @@ window.onload = () => {
 if ("serviceWorker" in navigator) {
 
   const swCode = `
-    const CACHE_NAME = "auto-cache-v9";
+    const CACHE_NAME = "auto-cache-v10";
 
     self.addEventListener("install", e => {
       self.skipWaiting();
