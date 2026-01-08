@@ -1051,8 +1051,8 @@ if (customImages.includes(article.image)) {
   newsCard.classList.add("custom-card");
   newsCard.innerHTML = `
     <img src="${article.image}"
-         onclick="window.open('${article.link}', '_blank')"
-         style="width:100%;height:100%;display:block;cursor:pointer;">
+     onclick="location.href='${article.link}'"
+     style="width:100%;height:100%;display:block;cursor:pointer;">
   `;
   container.appendChild(newsCard);
   return; // ⛔ IMPORTANT: normal layout apply नहीं होगा
@@ -1075,7 +1075,7 @@ if (article.type === "test-feed") {
       return;
     }
         
-        let img = article.image ? `<img src="${article.image}" onclick="window.open('${article.link}', '_blank')" style="cursor:pointer;">` : '';
+        let img = article.image ? `<img src="${article.image}" onclick="location.href='${article.link}', '_blank')" style="cursor:pointer;">` : '';
 
         newsCard.innerHTML = `
       ${titleHTML}
@@ -1109,6 +1109,13 @@ function renderTestCard(title, desc, unlockDate, url) {
       <button id="${id}"
               data-date="${unlockDate}"
               data-url="${url}"
+              onclick="
+                if('${url}'.startsWith('go:') || '${url}'.startsWith('https://go:')){
+                  location.href='${url}';
+                }else{
+                  window.open('${url}','_blank');
+                }
+              "
               disabled>
         Loading…
       </button>
@@ -1479,7 +1486,7 @@ window.onload = () => {
 if ("serviceWorker" in navigator) {
 
   const swCode = `
-    const CACHE_NAME = "auto-cache-v11";
+    const CACHE_NAME = "auto-cache-v12";
 
     self.addEventListener("install", e => {
       self.skipWaiting();
