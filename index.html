@@ -985,7 +985,7 @@ function insertCustomCards() {
                 
         {
             image: 'https://files.cdn-files-a.com/uploads/10456964/normal_69535f33277ed.png',
-            link: 'https://www.myexamguruji.in/p/e-book-store.html',
+            link: 'go:cumagazine',
             pubDate: new Date()
         },
         
@@ -1103,19 +1103,20 @@ if (article.type === "test-feed") {
 function renderTestCard(title, desc, unlockDate, url) {
   const id = "btn_" + Math.random().toString(10).substr(1, 6);
   return `
-    <div class="test-item">
+    <div class="test-item"
+         onclick="
+           const btn=this.querySelector('button');
+           if(btn.disabled) return;
+           location.href='${url}';
+         "
+         style="cursor:pointer;">
+         
       <h4>${title}</h4>
       <p1>${desc}</p1>
+      
       <button id="${id}"
               data-date="${unlockDate}"
               data-url="${url}"
-              onclick="
-                if('${url}'.startsWith('go:') || '${url}'.startsWith('https://go:')){
-                  location.href='${url}';
-                }else{
-                  window.open('${url}','_blank');
-                }
-              "
               disabled>
         Loading…
       </button>
@@ -1486,7 +1487,7 @@ window.onload = () => {
 if ("serviceWorker" in navigator) {
 
   const swCode = `
-    const CACHE_NAME = "auto-cache-v12";
+    const CACHE_NAME = "auto-cache-v13";
 
     self.addEventListener("install", e => {
       self.skipWaiting();
