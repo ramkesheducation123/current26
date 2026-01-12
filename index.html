@@ -978,12 +978,6 @@ function insertCustomCards() {
     const customCards = [
         
         {
-            image: 'https://m2.getsitecontrol.com/images/273034/ada022817ef1218e7516fa2410489e51_347739052.png',
-            link: 'go:8jan',
-            pubDate: new Date()
-        },
-                
-        {
             image: 'https://files.cdn-files-a.com/uploads/10456964/normal_69535f33277ed.png',
             link: 'go:cumagazine',
             pubDate: new Date()
@@ -1041,7 +1035,7 @@ function displayNews() {
     let descriptionHTML = article.description ? `<p>${article.description}</p>` : '';
 
         const customImages = [  
-"https://m2.getsitecontrol.com/images/273034/ada022817ef1218e7516fa2410489e51_347739052.png",
+
         "https://files.cdn-files-a.com/uploads/10456964/normal_69535f33277ed.png",
         
        
@@ -1487,7 +1481,7 @@ window.onload = () => {
 if ("serviceWorker" in navigator) {
 
   const swCode = `
-    const CACHE_NAME = "auto-cache-v14";
+    const CACHE_NAME = "auto-cache-v15";
 
     self.addEventListener("install", e => {
       self.skipWaiting();
