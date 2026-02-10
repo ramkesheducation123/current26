@@ -520,56 +520,6 @@ font-size:10px;
 font-family:kadwa;
 }
 
-.custom-test-feed {
-    padding: 14px;
-    background-image:url('https://files.cdn-files-a.com/uploads/10456964/normal_6954b0343e075.png');
-    background-size:100%;
-}
-
-.test-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    margin-top:-15px;
-}
-
-.test-item {
-    background: #fff;
-    border-radius: 10px;
-    border:1px solid rgb(0,0,0,0.3);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.5), 0 0 0 2px #fff inset;
-    padding: 12px;
-    text-align: center;
-}
-
-.test-item h4 {
-    font-size: 12.5px;
-    font-weight:700;
-    color:#077aff;
-    margin: 0 0 4px;
-}
-
-.test-item p1 {
-    font-size: 11px;
-    opacity: 0.8;
-}
-
-.test-item button {
-    margin-top: 6px;
-    width: 100%;
-    padding: 8px;
-    font-weight:700;
-    border: none;
-    border-radius: 8px;
-    background: #007bff;
-    color: #fff;
-    font-size: 11px;
-}
-
-.test-item button:disabled {
-    background: gray;
-}
-
     </style>
     <link href='https://fonts.googleapis.com/css?family=Kadwa' rel='stylesheet'>
     <link href='https://fonts.googleapis.com/css?family=Noto Serif Devanagari' rel='stylesheet'>
@@ -1001,27 +951,9 @@ function insertCustomCards() {
     }
 }
 
-function injectTestFeedOnce() {
-    if (articles.some(a => a.type === "test-feed")) return;
-
-    const min = 5;
-    const max = Math.min(10, articles.length - 1);
-
-    if (max < min) return;
-
-    const randomIndex = Math.floor(Math.random() * (max - min + 1)) + min;
-
-    articles.splice(randomIndex, 0, {
-        type: "test-feed",
-        pubDate: new Date()
-    });
-}
-
 function displayNews() {
   const container = document.getElementById('newsContainer');
   container.innerHTML = '';
-  injectTestFeedOnce();
-
   articles.forEach((article, index) => {
     let newsCard = document.createElement('div');
     newsCard.className = 'news-card';
@@ -1051,24 +983,7 @@ if (customImages.includes(article.image)) {
   container.appendChild(newsCard);
   return; // ⛔ IMPORTANT: normal layout apply नहीं होगा
 }
-
-if (article.type === "test-feed") {
-      newsCard.classList.add("custom-test-feed");
-      newsCard.innerHTML = `
-        <img class="test-banner"
-             src="https://m2.getsitecontrol.com/images/273034/3de624c53f3b4086e659276fe5ad67d5_347741674.png"><br>
-
-        <div class="test-grid">
-          ${renderTestCard("Weekly Current Affairs","01 से 08 जनवरी, 2026","2026-1-8","go:8jan")}
-          ${renderTestCard("Weekly Current Affairs","15 से 22 जनवरी, 2026","2026-1-23","go:21jan")}
-          ${renderTestCard("Weekly Current Affairs","08 से 14 जनवरी, 2026","2026-1-14","go:14jan")}
-          ${renderTestCard("Weekly Current Affairs","23 से 31 जनवरी, 2026","2026-1-31","go:31jan")}
-        </div>
-      `;
-      container.appendChild(newsCard);
-      return;
-    }
-        
+    
         let img = article.image ? `<img src="${article.image}" onclick="location.href='${article.link}', '_blank')" style="cursor:pointer;">` : '';
 
         newsCard.innerHTML = `
@@ -1086,70 +1001,10 @@ if (article.type === "test-feed") {
     container.appendChild(newsCard);
   });
   
-  // ✅ countdown start AFTER DOM render
-  initAllCountdowns();
-
   // Reset index & position after render
   currentIndex = 0;
   updateSlide();
 }
-
-function renderTestCard(title, desc, unlockDate, url) {
-  const id = "btn_" + Math.random().toString(10).substr(1, 6);
-  return `
-    <div class="test-item"
-         onclick="
-           const btn=this.querySelector('button');
-           if(btn.disabled) return;
-           location.href='${url}';
-         "
-         style="cursor:pointer;">
-         
-      <h4>${title}</h4>
-      <p1>${desc}</p1>
-      
-      <button id="${id}"
-              data-date="${unlockDate}"
-              data-url="${url}"
-              disabled>
-        Loading…
-      </button>
-    </div>
-  `;
-}
-
-function initAllCountdowns() {
-  document.querySelectorAll('.test-item button').forEach(btn => {
-    startCountdown(
-      btn.dataset.date,
-      btn.id,
-      btn.dataset.url
-    );
-  });
-}
-
-function startCountdown(dateStr, btnId, url) {
-  const btn = document.getElementById(btnId);
-  if (!btn) return;
-
-  const target = new Date(dateStr).getTime();
-  const timer = setInterval(() => {
-    const diff = target - Date.now();
-
-    if (diff <= 0) {
-      clearInterval(timer);
-      btn.disabled = false;
-      btn.textContent = "Start Test";
-      btn.onclick = () => window.open(url, "");
-      return;
-    }
-
-    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    btn.textContent = `Test Live in ${d}d ${h}h`;
-  }, 1000);
-}
-
 
 function isLiked(link) {
     const liked = JSON.parse(localStorage.getItem("likedFeeds") || "[]");
