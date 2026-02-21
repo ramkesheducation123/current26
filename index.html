@@ -150,25 +150,26 @@ overflow-x: hidden;
             width:100%;
             font-size:16px;
             color:#1C6BFF;
-            background:#fff;
+            background:rgba(255, 247, 161, 0.95);
             font-weight:700;
             border-bottom:2px dotted #000;
             font-family:Noto Serif Devanagari !important;
-            padding:12px 10px 10px 12px;
+            padding:12px 14px 30px 12px;
             border-radius: 10px 10px 0px 0px;
-            margin-top:0px;
-            z-index:3;
+            margin-top:20px;
+            z-index:1;
         }
         p {
             color: #000;
-            font-size:14.5px;
+            font-size:14.7px;
             width:92%;
             z-index:1;
             padding:10px 20px;
+            z-index:100000;
             background:white;
             line-height:1.6;
             font-family:Noto Serif Devanagari !important;
-            margin-top:-14px;
+            margin-top:-20px;
 
       }
       
@@ -434,7 +435,7 @@ overflow-x: hidden;
     .tab.middle i {
       font-size: 15px;
       font-weight:700;
-      background: deeppink;
+      background: #fff;
       width:24px;
       height:33px;
       border:1px solid rgb(0,0,0,0.4);
@@ -815,6 +816,13 @@ const rssFeeds = [
        "https://242310604.hs-sites-na2.com/tag/national/rss.xml"
     ]
   },
+  
+  {
+    name: "देश/विदेश",
+    urls: [
+      "https://timesofindia.indiatimes.com/rssfeedstopstories.cms"
+    ]
+  },
  
   {
     name: "Saved Feed",
@@ -894,9 +902,19 @@ async function loadNews() {
         pubDate: item.querySelector("pubDate") ? new Date(item.querySelector("pubDate").textContent) : new Date(0),
         image: item.querySelector("enclosure")?.getAttribute("url") || ""
       }));
+      
+        // 🌍 चुनी भाषा में ट्रांसलेट करें
+      const translatableSources = [
+        "https://242310604.hs-sites-na2.com",
+        "https://timesofindia.indiatimes.com"
+        
+      ];
 
       // ✅ ALL FEEDS TRANSLATE (NO DOMAIN LIMIT)
-      if (selectedLanguage !== "en") {
+       if (translatableSources.some(src => rssUrl.includes(src))) {
+        console.log("🌐 Translating feed to:", selectedLanguage);
+        showTranslatingMessage();
+        
         items = await Promise.all(
           items.map(async item => {
             item.title = await getCachedTranslation(item.title, selectedLanguage);
@@ -904,10 +922,12 @@ async function loadNews() {
             return item;
           })
         );
+        
+        hideTranslatingMessage();
       }
 
     
-      allItems.push(...items);
+      allItems = allItems.concat(items);
     }
 
     allItems.sort((a, b) => b.pubDate - a.pubDate);
@@ -923,6 +943,293 @@ async function loadNews() {
     document.getElementById("newsContainer").style.display = "block";
   }
 }
+
+// 🔁 Cached Translation System
+async function getCachedTranslation(text, lang) {
+  if (!text || text.trim() === "") return "";
+
+  // ❌ LocalStorage cache हटाया गया
+  const translated = await googleTranslate(text, lang);
+  return translated || text;
+}
+
+// 🌐 Google Translate Wrapper
+async function googleTranslate(text, lang) {
+  try {
+    const apiUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${lang}&dt=t&q=${encodeURIComponent(text)}`;
+    const res = await fetch(apiUrl);
+    const data = await res.json();
+    let translated = data[0].map(x => x[0]).join(" ");
+
+    translated = translated
+      .replace(/'/g, "'")
+      .replace(/"/g, '"')
+      .replace(/undefined/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    if (translated.split(" ").length < 3) {
+      translated = await backupTranslate(text, lang);
+    }
+
+    return translated;
+  } catch (err) {
+    console.error("Translate Error:", err);
+    return text;
+  }
+}
+
+// 🧭 Backup Translator
+async function backupTranslate(text, lang) {
+  try {
+    const res = await fetch("https://translate.terraprint.co/translate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        q: text,
+        source: "auto",
+        target: lang,
+        format: "text"
+      })
+    });
+    const data = await res.json();
+    return data.translatedText || text;
+  } catch (e) {
+    console.error("Backup translation failed:", e);
+    return text;
+  }
+}
+
+// 🌐 Translate Icon जोड़ें
+function addTranslateIcon() {
+  const icon = document.createElement("div");
+
+  // 🌍 SVG Translate Icon (Google-style)
+  icon.innerHTML = `
+   <svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 55 54"
+     width="35" height="35" role="img" aria-label="Translate"><img loading="lazy" src="https://m2.getsitecontrol.com/images/273034/79851f7ccb43a040a7f8b132d2e46e5a_345123768.png" style="width: 40px;" />
+`;
+  icon.style.position = "fixed";
+  icon.style.bottom = "38px";
+  icon.style.right = "45%";
+  icon.style.display = "flex";
+  icon.style.alignItems = "center";
+  icon.style.justifyContent = "center";
+  icon.style.borderRadius = "50%";
+  icon.style.zIndex = "999999";
+  icon.title = "Change Language";
+  icon.onclick = showLanguagePopup;
+  document.body.appendChild(icon);
+}
+
+
+// 🌐 Popup दिखाएँ
+function showLanguagePopup() {
+  // पहले से खुला popup हो तो remove करें
+  const existing = document.getElementById("langOverlay");
+  if (existing) existing.remove();
+
+  // Overlay बनाएं
+  const overlay = document.createElement("div");
+  overlay.id = "langOverlay";
+  overlay.style = `
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.76);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.4s ease;
+  `;
+
+  // Popup content जोड़ें
+  const popup = document.createElement("div");
+  popup.innerHTML = `
+  <div id="langPopup" style="
+    position: relative;
+    background: linear-gradient(145deg, #ffffff, #f0f4ff);
+    padding: 25px 20px 22px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.18);
+    text-align: center;
+    animation: jelloIn 0.8s ease;
+    width: 280px;
+    backdrop-filter: blur(10px);
+    font-family: 'Segoe UI', sans-serif;
+  ">
+
+    <!-- Close Icon -->
+    <span id="closeLangPopup" style="
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #888;
+      cursor: pointer;
+      transition: 0.3s;
+    " onmouseover="this.style.color='#ff3b3b'" 
+       onmouseout="this.style.color='#888'">✕</span>
+      
+     <h3 style="
+      margin-bottom:18px;
+      font-size:18px;
+      font-weight:600;
+      background: linear-gradient(90deg,#007bff,#00c6ff);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      letter-spacing:0.5px;
+    ">
+      Select Language
+    </h3>
+
+    <!-- Buttons Container -->
+    <div style="display:flex; flex-direction:column; gap:12px;">
+
+      <button id="langHi" style="
+        background: linear-gradient(135deg,#007bff,#0056d2);
+        color:#fff;
+        border:none;
+        padding:10px;
+        border-radius:12px;
+        font-size:14px;
+        font-weight:600;
+        cursor:pointer;
+        transition:0.3s;
+        box-shadow:0 4px 12px rgba(0,123,255,0.3);
+      " 
+      onmouseover="this.style.transform='translateY(-2px)'" 
+      onmouseout="this.style.transform='translateY(0)'">
+        🇮🇳 हिंदी
+      </button>
+
+      <button id="langEn" style="
+        background: linear-gradient(135deg,#28a745,#1e7e34);
+        color:#fff;
+        border:none;
+        padding:10px;
+        border-radius:12px;
+        font-size:14px;
+        font-weight:600;
+        cursor:pointer;
+        transition:0.3s;
+        box-shadow:0 4px 12px rgba(40,167,69,0.3);
+      "
+      onmouseover="this.style.transform='translateY(-2px)'" 
+      onmouseout="this.style.transform='translateY(0)'">
+       🇦🇺 English
+      </button>
+
+    </div>
+
+    <!-- Current Language Info -->
+    <p style="
+      margin-top:16px;
+      font-size:12px;
+      color:#666;
+      background:#f5f7ff;
+      padding:6px 10px;
+      border-radius:8px;
+    ">
+      Current Language: 
+      <b style="color:#007bff;">
+        ${selectedLanguage === "hi" ? "Hindi" : "English"}
+      </b>
+    </p>
+
+  </div>
+`;
+
+  overlay.appendChild(popup);
+  document.body.appendChild(overlay);
+
+  // Close icon और overlay click पर popup बंद करें
+  const closePopup = () => {
+    const popupEl = document.getElementById("langPopup");
+    popupEl.style.animation = "jelloOut 0.6s ease";
+    overlay.style.animation = "fadeOut 0.4s ease";
+
+    setTimeout(() => overlay.remove(), 400);
+  };
+
+  document.getElementById("closeLangPopup").onclick = closePopup;
+  overlay.onclick = (e) => { if (e.target === overlay) closePopup(); };
+
+  // बटन इवेंट्स
+  document.getElementById("langHi").onclick = () => changeLanguage("hi", overlay);
+  document.getElementById("langEn").onclick = () => changeLanguage("en", overlay);
+
+  // ✨ CSS Animations inject करें (अगर पहले से नहीं हैं)
+  if (!document.getElementById("jelloAnimationStyle")) {
+    const style = document.createElement("style");
+    style.id = "jelloAnimationStyle";
+    style.textContent = `
+      @keyframes jelloIn {
+        0% { transform: scale(0.8) rotate(0deg); opacity: 0; }
+        25% { transform: scale(1.1) rotate(2deg); opacity: 1; }
+        50% { transform: scale(0.95) rotate(-2deg); }
+        75% { transform: scale(1.05) rotate(1deg); }
+        100% { transform: scale(1) rotate(0deg); }
+      }
+
+      @keyframes jelloOut {
+        0% { transform: scale(1) rotate(0deg); opacity: 1; }
+        25% { transform: scale(1.05) rotate(-2deg); }
+        50% { transform: scale(0.9) rotate(2deg); }
+        100% { transform: scale(0.7) rotate(0deg); opacity: 0; }
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+}
+
+
+// 🈳 भाषा बदलें
+function changeLanguage(lang, popup) {
+  localStorage.setItem("selectedLanguage", lang);
+  selectedLanguage = lang;
+  popup.remove();
+  showTranslatingMessage();
+  setTimeout(() => {
+    loadNews();
+  }, 500);
+}
+
+// 🕐 Translating Message
+function showTranslatingMessage() {
+  let msg = document.createElement("div");
+  msg.style.position = "fixed";
+  msg.style.background = "transparent";
+  msg.style.color = "#fff";
+  document.body.appendChild(msg);
+}
+
+function hideTranslatingMessage() {
+  const msg = document.getElementById("translatingMsg");
+  if (msg) msg.remove();
+}
+
+// --------------------------
+// 🌟 Initialization
+// --------------------------
+document.addEventListener("DOMContentLoaded", () => {
+  addTranslateIcon();
+  loadNews(); // चुनी गई भाषा में लोड करें
+});
+
 
 function insertCustomCards() {
     const customCards = [
@@ -1301,7 +1608,8 @@ loadNews();
 <div id="tabWrapper">
   <div id="tabs" class="tabs">
     <button onclick="selectFeed(0)">डेली करेंट अफेयर्स</button>
-    <button onclick="selectFeed(2)">📌 My Saved Feed</button>
+    <button onclick="selectFeed(1)">The Hindu (Daily Analysis)</button>
+    <button onclick="selectFeed(2)"><i Style="color:red; font-size:20px;" class="fas fa-heart-circle-plus"></i></button>
   </div>
   <div id="toggleTabs" onclick="toggleTabs()">
     <span id="toggleIcon">«</span>
@@ -1325,7 +1633,7 @@ function autoHideTabs() {
   clearTimeout(hideTimeout);
   hideTimeout = setTimeout(() => {
     tabWrapper.classList.add('tab-hidden');
-  }, 2600); // Auto-hide after 4 seconds
+  }, 5000); // Auto-hide after 4 seconds
 }
 
 document.addEventListener('click', function (event) {
@@ -1343,7 +1651,7 @@ window.onload = () => {
 if ("serviceWorker" in navigator) {
 
   const swCode = `
-    const CACHE_NAME = "auto-cache-v15";
+    const CACHE_NAME = "auto-cache-v16";
 
     self.addEventListener("install", e => {
       self.skipWaiting();
