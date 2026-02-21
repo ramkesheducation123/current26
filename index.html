@@ -148,7 +148,7 @@ overflow-x: hidden;
         h2 {
             margin: 0;
             width:100%;
-            font-size:16px;
+            font-size:15.3px;
             color:#1C6BFF;
             background:rgba(255, 247, 161, 0.95);
             font-weight:700;
@@ -156,12 +156,12 @@ overflow-x: hidden;
             font-family:Noto Serif Devanagari !important;
             padding:12px 14px 30px 12px;
             border-radius: 10px 10px 0px 0px;
-            margin-top:20px;
+            margin-top:-10px;
             z-index:1;
         }
         p {
             color: #000;
-            font-size:14.7px;
+            font-size:14px !important;
             width:92%;
             z-index:1;
             padding:10px 20px;
@@ -170,7 +170,13 @@ overflow-x: hidden;
             line-height:1.6;
             font-family:Noto Serif Devanagari !important;
             margin-top:-20px;
-
+            
+            }
+            
+            span {
+            color: #000;
+            font-size:14px !important;
+            font-family:Noto Serif Devanagari !important;
       }
       
         .publish-time {
@@ -412,7 +418,7 @@ overflow-x: hidden;
       color: #ccc;
     }
 
-    .tab span {
+    .tab span111 {
       display: block;
       font-size: 9px;
       font-family:kadwa;
@@ -422,7 +428,7 @@ overflow-x: hidden;
     }
 
     .tab.active i,
-    .tab.active span {
+    .tab.active span111 {
       color: orange;
     }
 
@@ -550,23 +556,23 @@ font-family:kadwa;
 <div class="bottom-bar">
   <div class="tab active default-tab" data-url="go:home" data-code="home">
     <i class="fas fa-home"></i>
-    <span>Home</span>
+    <span111>Home</span111>
   </div>
   <div class="tab" data-url="GO:may" data-code="ca">
     <i class="fas fa-newspaper"></i>
-    <span>Current Affairs</span>
+    <span111>Current Affairs</span111>
   </div>
   <div class="tab middle" data-url="go:cmagazine" data-code="add">
-  <i class="fas fa-book-open" style="color:#fff;"><span style="color:#fff; letter-spacing:1.5px; font-weight:700; margin-top:6px; font-size:10px;">PYP</span></i>
+  <i class="fas fa-book-open" style="color:#fff;"><span111 style="color:#fff; letter-spacing:1.5px; font-weight:700; margin-top:6px; font-size:10px;">PYP</span111></i>
 </div>
   <div class="tab" data-url="go:quiz" data-code="quiz">
     <i class="fas fa-clipboard-question"></i>
-    <span>GK Quiz</span>
+    <span111>GK Quiz</span111>
   </div>
   <div class="tab" data-url="go:purchase" data-code="store">
   <i class="fas fa-cart-shopping"></i>
   <i class="fas fa-check fa-stack-1x" style="color:#000; font-size:10px;"></i>
-    <span>My Purchase</span>
+    <span111>My Purchase</span111>
   </div>
 </div>
 
@@ -1062,7 +1068,7 @@ function showLanguagePopup() {
   ">
 
     <!-- Close Icon -->
-    <span id="closeLangPopup" style="
+    <span111 id="closeLangPopup" style="
       position: absolute;
       top: 12px;
       right: 16px;
@@ -1072,7 +1078,7 @@ function showLanguagePopup() {
       cursor: pointer;
       transition: 0.3s;
     " onmouseover="this.style.color='#ff3b3b'" 
-       onmouseout="this.style.color='#888'">✕</span>
+       onmouseout="this.style.color='#888'">✕</span111>
       
      <h3 style="
       margin-bottom:18px;
@@ -1307,7 +1313,7 @@ if (customImages.includes(article.image)) {
       <div class="publish-time">${getTimeAgo(article.pubDate)}</div>
       <div class="like-btn" onclick="toggleLike(${index})">
         <i class="fas ${isLiked(article.link) ? 'fa-heart' : 'fa-heart-circle-plus'}"></i>
-        <span class="save-text"> ${isLiked(article.link) ? 'Saved' : 'Save'}</span>
+        <span111 class="save-text"> ${isLiked(article.link) ? 'Saved' : 'Save'}</span111>
       </div>
     `;
 
@@ -1546,7 +1552,7 @@ loadNews();
   font-weight: bold;
   padding: 5px 14px;
   font-family:kadwa;
-  background: #f0f0f0;
+  background: gray;
   border: none;
   border-radius: 5px;
   font-size: 10px;
@@ -1609,10 +1615,10 @@ loadNews();
   <div id="tabs" class="tabs">
     <button onclick="selectFeed(0)">डेली करेंट अफेयर्स</button>
     <button onclick="selectFeed(1)">The Hindu (Daily Analysis)</button>
-    <button onclick="selectFeed(2)"><i Style="color:red; font-size:20px;" class="fas fa-heart-circle-plus"></i></button>
+    <button onclick="selectFeed(2)"><i Style="color:red; font-size:18px;" class="fas fa-heart"></i></button>
   </div>
   <div id="toggleTabs" onclick="toggleTabs()">
-    <span id="toggleIcon">«</span>
+    <span111 id="toggleIcon">«</span111>
   </div>
 </div>
 
@@ -1651,7 +1657,7 @@ window.onload = () => {
 if ("serviceWorker" in navigator) {
 
   const swCode = `
-    const CACHE_NAME = "auto-cache-v16";
+    const CACHE_NAME = "auto-cache-v17";
 
     self.addEventListener("install", e => {
       self.skipWaiting();
