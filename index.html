@@ -148,36 +148,34 @@ overflow-x: hidden;
         h2 {
             margin: 0;
             width:100%;
-            font-size:15.3px;
+            font-size: 15.5px;
             color:#1C6BFF;
-            background:rgba(255, 247, 161, 0.95);
+            background:linear-gradient(180deg,rgba(255, 251, 201, 0.85) 80%, rgba(255, 255, 255, 1) 100%);
             font-weight:700;
-            border-bottom:2px dotted #000;
             font-family:Noto Serif Devanagari !important;
-            padding:12px 14px 30px 12px;
+            padding:12px 18px 20px 12px;
             border-radius: 10px 10px 0px 0px;
             margin-top:-10px;
             z-index:1;
         }
+        
         p {
-            color: #000;
-            font-size:14px !important;
-            width:92%;
-            z-index:1;
-            padding:10px 20px;
-            z-index:100000;
-            background:white;
-            line-height:1.6;
-            font-family:Noto Serif Devanagari !important;
-            margin-top:-20px;
-            
-            }
-            
-            span {
-            color: #000;
-            font-size:14px !important;
-            font-family:Noto Serif Devanagari !important;
-      }
+    color: #000;
+    width: 92%;
+    background: linear-gradient(180deg,rgba(255, 249, 212, 0.74) 0%, rgba(255, 255, 255, 1) 0%);
+    line-height: 1.6;
+    font-family: 'Noto Serif Devanagari', serif !important;
+    padding:10px 10px 20px 12px;
+    margin-top:-15px;
+    z-index:100000;
+    align-items: center;
+}
+
+span {
+    color: #000;
+    padding:0px 0px 20px 0px;
+    font-family: 'Noto Serif Devanagari', serif !important;
+}
       
         .publish-time {
             font-size: 9px;
@@ -435,10 +433,10 @@ overflow-x: hidden;
     .tab.middle {
       transform: translateY(-24px);
       margin-left:0.5px;
-      z-index: 2;
+      z-index: 0;
     }
 
-    .tab.middle i {
+.tab.middle i {
       font-size: 15px;
       font-weight:700;
       background: #fff;
@@ -450,12 +448,7 @@ overflow-x: hidden;
       border-radius: 50%;
      box-shadow: 0 -3px 10px rgba(0,0,0,0.15);
     }
-
-    .tab.middle.active i {
-      background: #0056b3;
-    }
     
-
 .skeleton-container {
   padding: 14px;
   Margin-top:-20px;
@@ -527,6 +520,33 @@ font-size:10px;
 font-family:kadwa;
 }
 
+.unread-badge {
+  margin-left: -18px; /* थोड़ा दाएँ किया गया है ताकि आइकॉन न छुपे */
+  background: red;
+  color: white;
+  width:43px;
+  height:50px;
+  border-radius: 50%; /* गोल की जगह हल्का चौकोर */
+  padding: 5px 8px; 
+  flex-direction: column; /* टेक्स्ट को ऊपर-नीचे करने के लिए */
+  align-items: center;
+  text-align:center;
+  justify-content: center;
+  font-weight: bold;
+  box-shadow: 0 4px 8px rgba(255, 59, 59, 0.4);
+  border: 1px solid #fff; /* बॉर्डर थोड़ी पतली की गई है */
+  animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 10000000;
+  white-space: nowrap; /* टेक्स्ट को एक लाइन में रखने के लिए */
+}
+
+
+@keyframes bounceIn {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
     </style>
     <link href='https://fonts.googleapis.com/css?family=Kadwa' rel='stylesheet'>
     <link href='https://fonts.googleapis.com/css?family=Noto Serif Devanagari' rel='stylesheet'>
@@ -562,8 +582,11 @@ font-family:kadwa;
     <i class="fas fa-newspaper"></i>
     <span111>Current Affairs</span111>
   </div>
+  
   <div class="tab middle" data-url="go:cmagazine" data-code="add">
-  <i class="fas fa-book-open" style="color:#fff;"><span111 style="color:#fff; letter-spacing:1.5px; font-weight:700; margin-top:6px; font-size:10px;">PYP</span111></i>
+  <i class="fas fa-book-open" style="color:red;"><span111 style="font-size: 10px; font-weight: 700; margin-top: -27px;" id="unreadBadge" class="unread-badge" style="display: none;"><br><br>0</span111></i>
+  
+
 </div>
   <div class="tab" data-url="go:quiz" data-code="quiz">
     <i class="fas fa-clipboard-question"></i>
@@ -635,6 +658,8 @@ let lastTouchY = 0;
 let currentIndex = 0;
 let articles = []; // आपका articles array loadNews() भरता है
 let totalSlidesBeforeRefresh = 12;
+let readArticles = JSON.parse(localStorage.getItem('readNewsLinks') || '[]');
+let unreadCount = 0;
 const MIN_SWIPE = 60; // swipe threshold
 
 // touch events (mobile)
@@ -725,6 +750,7 @@ function showNextFlip() {
 
   // increment index immediately so updateSlide repositions to the new index after animation
   currentIndex++;
+  markAsRead(currentIndex);
   // cleanup after animation
   setTimeout(() => {
     oldCard.classList.remove("news-flip-up");
@@ -757,6 +783,7 @@ function showPrevFlip() {
 
   // decrement index immediately so updateSlide repositions after animation
   currentIndex--;
+  markAsRead(currentIndex);
 
   // cleanup after animation
   setTimeout(() => {
@@ -854,6 +881,51 @@ function updateTabUI() {
   });
 }
 
+function updateUnreadBadge() {
+    const badge = document.getElementById('unreadBadge');
+    if (!badge) return;
+    
+    if (unreadCount > 0) {
+        let countText = unreadCount > 99 ? '99+' : unreadCount;
+        
+        // काउंट के ऊपर "बिना पढ़ी" टेक्स्ट जोड़ें
+        badge.innerHTML = `<span112 style="font-size: 10px; font-weight: 700; margin-top: 8px;">बिना पढ़ी</span112><span112 style="font-size: 12px; margin-top:5px;">${countText}</span112>`;
+        
+        badge.style.display = 'flex';
+    } else {
+        badge.style.display = 'none';
+    }
+}
+
+function markAsRead(index) {
+    const article = articles[index];
+    
+    if (article && article.link && !article.link.startsWith('go:')) {
+        const link = article.link;
+        
+        // चेक करें कि क्या न्यूज़ पहले से पढ़ी जा चुकी है
+        if (!readArticles.includes(link)) {
+            readArticles.push(link);
+            
+            // मेमोरी बचाने के लिए 500 से ज्यादा पुरानी लिंक्स हटा दें
+            if(readArticles.length > 500) readArticles.shift();
+            localStorage.setItem('readNewsLinks', JSON.stringify(readArticles));
+            
+            // --- 24 घंटे वाला लॉजिक ---
+            const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+            const now = Date.now();
+            const pubTime = new Date(article.pubDate).getTime();
+            const isWithin24Hrs = (now - pubTime) <= ONE_DAY_MS;
+            
+            // अगर न्यूज़ 24 घंटे के अंदर की थी, तो काउंट कम करें
+            if (isWithin24Hrs && unreadCount > 0) {
+                unreadCount--;
+                updateUnreadBadge();
+            }
+        }
+    }
+}
+
 // 📰 फीड लोडिंग
 async function loadNews() {
   const container = document.getElementById('newsContainer');
@@ -865,7 +937,6 @@ async function loadNews() {
     const container = document.getElementById("newsContainer");
 
     if (articles.length === 0) {
-
         // ⭐ न्यूज़ कंटेनर खाली करो
         container.innerHTML = "";
 
@@ -877,10 +948,15 @@ async function loadNews() {
     } else {
         noLikes.style.display = "none";
     }
+    
+    // Saved Feed टैब पर Unread Badge नहीं दिखाना है
+    unreadCount = 0; 
+    updateUnreadBadge();
 
     displayNews();
+    setTimeout(autoFitText, 150);
     return;
-}
+  }
 
   const urls = rssFeeds[selectedFeedIndex].urls;
   document.getElementById("skeletonLoader").style.display = "block";
@@ -913,7 +989,6 @@ async function loadNews() {
       const translatableSources = [
         "https://242310604.hs-sites-na2.com",
         "https://timesofindia.indiatimes.com"
-        
       ];
 
       // ✅ ALL FEEDS TRANSLATE (NO DOMAIN LIMIT)
@@ -932,15 +1007,43 @@ async function loadNews() {
         hideTranslatingMessage();
       }
 
-    
       allItems = allItems.concat(items);
     }
 
     allItems.sort((a, b) => b.pubDate - a.pubDate);
     articles = allItems;
 
+    // --- NEW LOGIC: 24 घंटे के अंदर की Unread न्यूज़ गिनें ---
+    if (selectedFeedIndex === 0 || selectedFeedIndex === 1) {
+        const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+        const now = Date.now();
+        
+        unreadCount = articles.filter(a => {
+            // कस्टम कार्ड्स (go: links) को छोड़ दें
+            if (!a.link || a.link.startsWith('go:')) return false;
+            
+            // चेक करें कि क्या न्यूज़ पिछले 24 घंटे की है
+            const pubTime = new Date(a.pubDate).getTime();
+            const isWithin24Hrs = (now - pubTime) <= ONE_DAY_MS;
+            
+            // चेक करें कि क्या न्यूज़ अभी तक नहीं पढ़ी गई है
+            const isNotRead = typeof readArticles !== 'undefined' ? !readArticles.includes(a.link) : true;
+            
+            return isWithin24Hrs && isNotRead;
+        }).length;
+    } else {
+        unreadCount = 0; // अन्य टैब के लिए बैज न दिखाएं
+    }
+    
+    updateUnreadBadge();
+    
+    // पहली न्यूज़ जो सामने दिख रही है उसे तुरंत Read मार्क कर दें
+    setTimeout(() => { if(typeof markAsRead === 'function') markAsRead(0); }, 500);
+    // -----------------------------------------
+
     insertCustomCards();
     displayNews();
+    setTimeout(autoFitText, 150);
 
   } catch (error) {
     console.error("Error loading RSS Feeds", error);
@@ -1005,31 +1108,6 @@ async function backupTranslate(text, lang) {
     return text;
   }
 }
-
-// 🌐 Translate Icon जोड़ें
-function addTranslateIcon() {
-  const icon = document.createElement("div");
-
-  // 🌍 SVG Translate Icon (Google-style)
-  icon.innerHTML = `
-   <svg xmlns="http://www.w3.org/2000/svg"
-     viewBox="0 0 55 54"
-     width="35" height="35" role="img" aria-label="Translate"><img loading="lazy" src="https://m2.getsitecontrol.com/images/273034/79851f7ccb43a040a7f8b132d2e46e5a_345123768.png" style="width: 40px;" />
-`;
-  icon.style.position = "fixed";
-  icon.style.bottom = "38px";
-  icon.style.right = "45%";
-  icon.style.display = "flex";
-  icon.style.alignItems = "center";
-  icon.style.justifyContent = "center";
-  icon.style.borderRadius = "50%";
-  icon.style.zIndex = "999999";
-  icon.title = "Change Language";
-  icon.onclick = showLanguagePopup;
-  document.body.appendChild(icon);
-}
-
-
 // 🌐 Popup दिखाएँ
 function showLanguagePopup() {
   // पहले से खुला popup हो तो remove करें
@@ -1552,7 +1630,7 @@ loadNews();
   font-weight: bold;
   padding: 5px 14px;
   font-family:kadwa;
-  background: gray;
+  background: #e0e0e0;
   border: none;
   border-radius: 5px;
   font-size: 10px;
@@ -1564,33 +1642,17 @@ loadNews();
   background: #dcdcdc;
 }
 
-#toggleTabs {
-  padding: 10px;
-  cursor: pointer;
-  width: 12px;
-  height: 100%;
-  background: red;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.5), 0 0 0 1px #fff inset;
-  border-radius: 10px 0px 0px 10px;
-  right:-5px;
-  height:30px;
+/* Translate Button का Best UI स्टाइल */
+.translate-btn {
   display: flex;
-  position:fixed;
-  z-index:100000;
-  top:450px;
-  justify-content: center;
   align-items: center;
-  cursor: pointer;
-  color:#fff;
-  transition: background 0.3s, transform 0.4s ease;
-  user-select: none;
+  justify-content: center;
+  padding: 4px 10px !important;
+  background: #fff !important;
+  color: #333;
 }
-
-#toggleIcon {
-  font-size: 20px;
-  display: inline-block;
-  margin-left:5px;
-  transition: transform 0.4s ease;
+.translate-btn:hover {
+  background: #f0f0f0 !important;
 }
 
 /* जब tabs छुप जाएँ */
@@ -1605,27 +1667,69 @@ loadNews();
   background-color: #007bff;
 }
 
-/* toggleIcon का flip effect */
+/* Modern UI for Toggle Button */
+#toggleTabs {
+  position: fixed;
+  right: 0; /* स्क्रीन के बिल्कुल दाईं ओर चिपका हुआ */
+  top: 450px;
+  width: 28px; /* टैप करने के लिए बेहतर चौड़ाई */
+  height: 56px; /* टैप करने के लिए बेहतर ऊंचाई */
+  background: linear-gradient(135deg, #ff3b3b, #d90429); /* प्रीमियम रेड ग्रेडिएंट */
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px 0 0 12px; /* बायीं तरफ से स्मूथ गोल आकार */
+  box-shadow: -4px 0 12px rgba(217, 4, 41, 0.3), inset 1px 0 0 rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  z-index: 100000;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  user-select: none;
+}
+
+/* Hover इफ़ेक्ट - माउस ले जाने पर हल्का सा बाहर आएगा */
+#toggleTabs:hover {
+  width: 32px;
+  background: linear-gradient(135deg, #ff4f4f, #e60026);
+}
+
+#toggleIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* बाउंसिंग फ्लिप इफ़ेक्ट */
+}
+
+/* जब tabs छुप जाएँ, तो ऐरो (Arrow) घूम जाएगा */
 .tab-hidden #toggleIcon {
-  transform: rotate(180deg) translateX(5px);
+  transform: rotate(180deg);
 }
 </style>
 
 <div id="tabWrapper">
   <div id="tabs" class="tabs">
     <button onclick="selectFeed(0)">डेली करेंट अफेयर्स</button>
-    <button onclick="selectFeed(1)">The Hindu (Daily Analysis)</button>
+    <button onclick="selectFeed(1)">द हिन्दू | TOI</button>
     <button onclick="selectFeed(2)"><i Style="color:red; font-size:18px;" class="fas fa-heart"></i></button>
+    
+    <button class="translate-btn" onclick="showLanguagePopup()" title="Change Language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+        <path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
+      </svg>
+    </button>
   </div>
+  
   <div id="toggleTabs" onclick="toggleTabs()">
-    <span111 id="toggleIcon">«</span111>
-  </div>
+  <span111 id="toggleIcon">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M15 18l-6-6 6-6"/>
+    </svg>
+  </span111>
 </div>
 
 <script>
 let tabWrapper = document.getElementById('tabWrapper');
 let toggleIcon = document.getElementById('toggleIcon');
-let tab = document.getElementById('tab');
 let hideTimeout;
 
 function toggleTabs() {
@@ -1639,11 +1743,12 @@ function autoHideTabs() {
   clearTimeout(hideTimeout);
   hideTimeout = setTimeout(() => {
     tabWrapper.classList.add('tab-hidden');
-  }, 5000); // Auto-hide after 4 seconds
+  }, 5000); // Auto-hide after 5 seconds
 }
 
 document.addEventListener('click', function (event) {
-  const isClickInside = tabWrapper.contains(event.target);k=8
+  const isClickInside = tabWrapper.contains(event.target);
+  // k=8 नाम की टाइपो को यहाँ से हटा दिया गया है
   if (!isClickInside) {
     tabWrapper.classList.add('tab-hidden');
   }
@@ -1657,7 +1762,7 @@ window.onload = () => {
 if ("serviceWorker" in navigator) {
 
   const swCode = `
-    const CACHE_NAME = "auto-cache-v17";
+    const CACHE_NAME = "auto-cache-v18";
 
     self.addEventListener("install", e => {
       self.skipWaiting();
@@ -1709,6 +1814,55 @@ if ("serviceWorker" in navigator) {
   const swURL = URL.createObjectURL(blob);
   navigator.serviceWorker.register(swURL);
 }
+</script>
+
+<script>
+function autoFitText() {
+    const newsCards = document.querySelectorAll('.news-card');
+
+    newsCards.forEach(card => {
+        // पूरे कार्ड के अंदर मौजूद सभी p और span को चुनें (चाहे वे कहीं भी हों)
+        const paragraphs = card.querySelectorAll('p');
+        const spans = card.querySelectorAll('span');
+        
+        let maxSize = 16; 
+        let minSize = 10; // इससे छोटा फॉन्ट नहीं होगा
+        let currentSize = maxSize;
+
+        // एक छोटा फंक्शन जो p और span दोनों पर एक साथ फॉन्ट अप्लाई करेगा
+        const applyFontSize = (size) => {
+            paragraphs.forEach(p => p.style.setProperty('font-size', size + 'px', 'important'));
+            spans.forEach(span => span.style.setProperty('font-size', size + 'px', 'important'));
+        };
+
+        // 1. शुरुआत में सबसे बड़ा साइज सेट करें
+        applyFontSize(currentSize);
+
+        // ओवरफ्लो चेक करने का स्मार्ट तरीका
+        const checkOverflow = () => {
+            // चेक करें कि क्या पूरा कार्ड ओवरफ्लो हो रहा है
+            if (card.scrollHeight > card.clientHeight) return true;
+            
+            // या फिर चेक करें कि क्या कोई p टैग ओवरफ्लो हो रहा है
+            let isOverflowing = false;
+            paragraphs.forEach(p => {
+                if (p.scrollHeight > p.clientHeight) isOverflowing = true;
+            });
+            return isOverflowing;
+        };
+
+        // 2. ऑटो-श्रिंक लॉजिक: जब तक ओवरफ्लो है, फॉन्ट घटाते रहें
+        while (checkOverflow() && currentSize > minSize) {
+            currentSize -= 0.5; // फॉन्ट को 0.5px से कम करें
+            applyFontSize(currentSize);
+        }
+    });
+}
+
+// पेज लोड होने और रिसाइज़ होने पर फंक्शन चलाएं
+window.addEventListener('load', autoFitText);
+window.addEventListener('resize', autoFitText);
+setTimeout(autoFitText, 500); // फॉन्ट लोड होने के बाद एक बार और
 </script>
 
   </div>
