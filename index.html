@@ -3,552 +3,325 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
   
     <style>
-    
     A {text-decoration: none;}
- html {
-overflow: scroll;
-overflow-x: hidden;
-}
-::-webkit-scrollbar {
-    display: none;
-    scrollbar-width: 0px;
-}
-*::-webkit-scrollbar {
-            display: none; /* स्क्रॉल बार को पूरी तरह हटा देना */
-            width: 0px;
-            height: 0px;
-            /* remove scrollbar space /
-}
-/ optional: show position indicator in red */
-::-webkit-scrollbar-thumb 
-}
-
-        body {
-            font-family:Noto Serif Devanagari !important;
-            background:#E3EDF7;
-            user-select:none;
-            -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; box-sizing: border-box; content: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-       .news-container {
-            width: 100%;
-            box-shadow:
-      0 2px 10px rgba(0, 0, 0, 0.80),
-      2px 2px 10px rgba(150, 170, 190, 0.35),
-      inset 0 0 2px rgba(255, 255, 255, 0.3);
-
-            height: 95vh;
-            border-radius:10px;
-            margin:10px;
-            overflow: hidden;
-            position: relative;
-            background: white;
-            perspective: 1000px;
-           
-        }
-        .news-card {
-            width: auto;
-            height: 100%;
-             border-radius: 10px 10px 5px 5px ; 
-            position: absolute;
-            background:white;
-            font-family:Noto Serif Devanagari !important;
-             padding: 12px;
-            text-align: left;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            overflow: hidden;
-            align-items: center;
-            user-select: none;
-      transform-origin: bottom right;
-    backface-visibility: hidden;
-    transform-style: preserve-3d;
-}
-
-.news-flip-up {
-    animation: pageFlipUp 0.30s ease forwards;
-}
-
-@keyframes pageFlipUp {
-    0% {
-        transform: rotateX(0deg) rotateZ(0deg) translateY(0);
-        opacity: 1;
+    html {
+        overflow: scroll;
+        overflow-x: hidden;
     }
-    50% {
-        transform: rotateX(-55deg) rotateZ(4deg) translateY(-20px);
-        opacity: 0.7;
+    ::-webkit-scrollbar {
+        display: none;
+        scrollbar-width: 0px;
     }
-    100% {
-        transform: rotateX(-90deg) rotateZ(8deg) translateY(-100px);
-        opacity: 0;
+    *::-webkit-scrollbar {
+        display: none; 
+        width: 0px;
+        height: 0px;
     }
-}
 
-/* Swipe DOWN → Previous Page */
-.news-flip-down {
-    animation: pageFlipDown 0.30s ease forwards;
-}
-
-@keyframes pageFlipDown {
-    0% {
-        transform: rotateX(0deg) rotateZ(0deg) translateY(0);
-        opacity: 1;
+    body {
+        font-family:Noto Serif Devanagari !important;
+        background:#E3EDF7;
+        user-select:none;
+        -webkit-font-smoothing: antialiased; 
+        -webkit-tap-highlight-color: transparent; 
+        box-sizing: border-box; 
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
     }
-    50% {
-        transform: rotateX(45deg) rotateZ(-4deg) translateY(20px);
-        opacity: 0.7;
+
+    .news-container {
+        width: 100%;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.80), 2px 2px 10px rgba(150, 170, 190, 0.35), inset 0 0 2px rgba(255, 255, 255, 0.3);
+        height: 95vh;
+        border-radius:10px;
+        margin:10px;
+        overflow: hidden;
+        position: relative;
+        background: white;
+        perspective: 1000px;
     }
-    100% {
-        transform: rotateX(90deg) rotateZ(-8deg) translateY(100px);
-        opacity: 0;
+
+    .news-card {
+        width: 100%;
+        height: 100%;
+        border-radius: 10px 10px 5px 5px; 
+        position: absolute;
+        background: white;
+        font-family: Noto Serif Devanagari !important;
+        padding: 0px; 
+        text-align: left;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        user-select: none;
+        transform-origin: bottom right;
+        backface-visibility: hidden;
+        transform-style: preserve-3d;
+        will-change: transform, opacity; /* Hardware acceleration */
     }
-}
 
-/* Next page appearing from UNDER */
-.news-appear {
-    animation: pageAppear 0.15s ease forwards;
-    opacity: 0;
-}
-
-@keyframes pageAppear {
-    0% {
-        transform: rotateX(65deg) rotateZ(-5deg) translateY(40px);
-        opacity: 0.3;
+    /* --- नया टॉप सेक्शन (इमेज और टाइटल के लिए) --- */
+    .top-section {
+        position: relative;
+        width: 100%;
+        height: 28%; 
+        flex-shrink: 0;
+        overflow: hidden;
+        border-radius: 10px 10px 0 0;
     }
-    80% {
-        transform: rotateX(10deg) rotateZ(0deg);
-        opacity: 1;
+
+    .feed-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; 
+        display: block;
     }
-    100% {
-        transform: rotateX(0deg);
-        opacity: 1;
+
+    .feed-title {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        margin: 0;
+        box-sizing: border-box;
+        font-size: 16px;
+        line-height:1.6;
+        color: orange; 
+        text-shadow: 1px 1px 4px rgba(0,0,0,0.9);
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 1%, rgba(0, 0, 0, 0.75) 70%, transparent 100%);
+        font-weight: 700;
+        font-family: Noto Serif Devanagari !important;
+        padding: 25px 12px 10px 12px;
+        z-index: 2;
     }
-}
 
-      
-         img {
-            max-width: 100% !important;
-            top:0px;
-            z-index:-1;
-            position:absolute;
-            left:0;
-            border-radius: 0px;
-        }
-        h2 {
-            margin: 0;
-            width:100%;
-            font-size: 15.5px;
-            color:#FFD333;
-            background:linear-gradient(180deg,rgba(0, 0, 0, 0.90) 80%, rgba(255, 255, 255, 1) 100%);
-            font-weight:700;
-            font-family:Noto Serif Devanagari !important;
-            padding:12px 18px 20px 12px;
-            border-radius: 10px 10px 0px 0px;
-            margin-top:-10px;
-            z-index:1;
-        }
-        
-        p {
-    color: #000;
-    width: 92%;
-    background: linear-gradient(180deg,rgba(255, 249, 212, 0.74) 0%, rgba(255, 255, 255, 1) 0%);
-    line-height: 1.6;
-    font-family: Noto Serif Devanagari !important;
-    padding:10px 10px 20px 12px;
-    margin-top:-15px;
-    z-index:100000;
-    align-items: center;
-}
+    /* --- नया बॉटम सेक्शन (डिस्क्रिप्शन के लिए) --- */
+    .bottom-section {
+        flex: 1; 
+        width: 100%;
+        background: #fff;
+        padding: 20px 15px 105px 15px; 
+        box-sizing: border-box;
+        overflow: hidden; 
+    }
+    
+    .feed-desc {
+        color: #000;
+        margin: 0;
+        width: 100%;
+        height: 100%; 
+        line-height: 1.6;
+        font-family: Noto Serif Devanagari !important;
+        overflow: hidden;
+    }
 
-span {
-    color: #000;
-    padding:0px 0px 20px 0px;
-    font-family: Noto Serif Devanagari !important;
-}
-      
-        .publish-time {
-            font-size: 9px;
-            color: gray;
-            margin: 0px 0;
-            position: absolute;
-            bottom:90px;
-            right: 15px;
-            
-        }
-        
-         #loadingScreen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    visibility: hidden;
-}
+    .news-flip-up { animation: pageFlipUp 0.30s ease forwards; }
+    @keyframes pageFlipUp {
+        0% { transform: rotateX(0deg) rotateZ(0deg) translateY(0); opacity: 1; }
+        50% { transform: rotateX(-55deg) rotateZ(4deg) translateY(-20px); opacity: 0.7; }
+        100% { transform: rotateX(-90deg) rotateZ(8deg) translateY(-100px); opacity: 0; }
+    }
 
-.spinner {
-    border: 6px solid red;
-    border-top: 6px solid yellow;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    animation: spin 1s linear infinite;
-}        
- 
-.loader {
-    position: fixed;
-     top: 40%;
-     left: 43%;
-    width: 100%;
-    height: 100%;
-    background: transparent;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    font-family: sans-serif;
-}
+    .news-flip-down { animation: pageFlipDown 0.30s ease forwards; }
+    @keyframes pageFlipDown {
+        0% { transform: rotateX(0deg) rotateZ(0deg) translateY(0); opacity: 1; }
+        50% { transform: rotateX(45deg) rotateZ(-4deg) translateY(20px); opacity: 0.7; }
+        100% { transform: rotateX(90deg) rotateZ(-8deg) translateY(100px); opacity: 0; }
+    }
 
-.spinner {
-    width: 40px;
-    height: 40px;
-    border: 6px solid black;
-    border-top-color: orange;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 15px;
-}
+    .news-appear { animation: pageAppear 0.15s ease forwards; opacity: 0; }
+    @keyframes pageAppear {
+        0% { transform: rotateX(65deg) rotateZ(-5deg) translateY(40px); opacity: 0.3; }
+        80% { transform: rotateX(10deg) rotateZ(0deg); opacity: 1; }
+        100% { transform: rotateX(0deg); opacity: 1; }
+    }
 
-.loading-text {
-    font-size: 12px;
-    letter-spacing:1.5px;
-    margin-top:20px;
-    margin-left:-45px;
-    color: #333;
-}
+    .publish-time {
+        font-size: 9px;
+        color: gray;
+        margin: 0px 0;
+        position: absolute;
+        bottom: 82px;
+        right: 15px; 
+    }
 
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
+    #loadingScreen {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.8); display: flex;
+        justify-content: center; align-items: center;
+        z-index: 9999; visibility: hidden;
+    }
 
-.custom-card {
-    width: 100% !important;
-    height: 100%;
-    background: linear-gradient(135deg, #ff9800, #ff5722);
-    border-radius: 10px;
-    text-align: center;
-    padding:0px;
-    color: white;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
-}
+    .loader {
+        position: fixed; top: 40%; left: 43%; width: 100%; height: 100%;
+        background: transparent; display: flex; flex-direction: column;
+        align-items: center; justify-content: center; z-index: 9999;
+    }
 
-.custom-card img {
-    width: 100%;
-    height: 102%;
-    border-radius: 8px;
-    left:0px;
-    top: 0px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);
-}
+    .spinner {
+        width: 40px; height: 40px; border: 6px solid black;
+        border-top-color: orange; border-radius: 50%;
+        animation: spin 1s linear infinite; margin-bottom: 15px;
+    }
 
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-#refreshPopup {
-        position: fixed;
-        margin-bottom: 13px;
-        width:1px;
-        margin-left:-48px;
-        background: transparent;
-        color: white;
-        border-radius: 50%;
+    .custom-card {
+        width: 100% !important; height: 100%;
+        background: linear-gradient(135deg, #ff9800, #ff5722);
+        border-radius: 10px; text-align: center; padding:0px;
+        color: white; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    .custom-card img { width: 100%; height: 102%; border-radius: 8px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5); }
+
+    .action-bar {
+        position: absolute;
+        bottom: 68px;
+        gap:15px;
+        left: 15px; 
+        display: flex; font-size:10px;
+        background:#fff;
+        justify-content: space-around;
+        align-items: center;
+        padding: 3px 12px;
+        border-radius:5px;
+        box-sizing: border-box;
+        z-index: 100000000;
+    }
+    .action-btn {
+        display: flex; flex-direction: column; align-items: center;
+        cursor: pointer; color: #000; transition: transform 0.2s;
+    }
+    .action-btn i { font-size: 18px; margin-bottom: 5px; }
+    
+    .skeleton-container { padding: 14px; margin-top:-20px; }
+    .skeleton-card {
+        background: #fff; border-radius: 12px; padding: 10px;
+        width:310px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .skeleton-image { height:210px; border-radius: 8px; background: linear-gradient(-90deg, #f0f0f0 0%, #ccc 50%, #f0f0f0 100%); background-size: 400% 400%; animation: shimmer 1.2s infinite; margin-bottom: 12px; }
+    .skeleton-title { height: 28px; width: 70%; border-radius: 4px; background: linear-gradient(-90deg, #f0f0f0 0%, #ffb222 50%, #f0f0f0 100%); background-size: 400% 400%; animation: shimmer 1.2s infinite; margin-bottom: 10px; }
+    .skeleton-text { height: 12px; width: 90%; border-radius: 4px; background: linear-gradient(-90deg, #f0f0f0 0%, #ccc 50%, #fff 100%); background-size: 400% 400%; animation: shimmer 1.2s infinite; margin-bottom: 8px; }
+    .skeleton-text.short { width: 60%; }
+    @keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+
+    .bottom-bar {
+        position: fixed; bottom: 0; width: 100%; font-family:kadwa; height: 65px;
+        background: rgb(0,0,0,0.88); line-height:1.5; display: flex;
+        justify-content: space-around; align-items: center; box-shadow: 0 -3px 10px rgba(0,0,0,0.15);
+        border-top-left-radius: 18px; border-top-right-radius: 18px; z-index: 100000;
+    }
+    .bottom-bar::before {
+        content: ''; position: absolute; top: 0px; left: 50%; transform: translateX(-50%);
+        width: 60px; height: 40px; background: #f4f4f4; border-radius: 0 0 30px 30px ;
+        box-shadow: inset 0 10px 6px rgba(0, 0, 0, 0.1); z-index: -1;
+    }
+    .tab { text-align: center; flex: 1; padding: 6px 0; cursor: pointer; transition: all 0.3s ease; position: relative; }
+    .tab i { font-size: 20px; transition: transform 0.3s ease; color: #ccc; }
+    .tab span111 { display: block; font-size: 9px; font-family:kadwa; font-weight:600; color: #ccc; margin-top: 1px; }
+    .tab.active i, .tab.active span111 { color: orange; }
+    
+    .tab.middle { 
+        transform: translateY(-24px); 
+        position: relative; 
+        z-index: 10; 
+        display: flex; 
+        justify-content: center;
+        align-items: center;
+    }
+
+    .middle-circle {
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        cursor: pointer;
-        z-index: 1000000;
-        opacity: 0;
-        transition: bottom 0.3s ease-out, opacity 0.3s ease-out;
-    }
-    #refreshPopup button {
-        background: red;
-        color: white;
-        border: none;
-        cursor: pointer;
+        justify-content: center;
+        background: #fff;
+        width: 52px;
+        height: 52px;
+        border: 1px solid rgba(0,0,0,0.4);
         border-radius: 50%;
-    }
-   
-     .popup2-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-        }
-        .popup2 {
-            background: white;
-            width: auto;
-            padding: 20px;
-            margin:20px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        }
-        .popup2 h2 {
-            margin-top: 0;
-            color:red;
-        }
-        .popup2 li {
-            text-align: justify;
-            font-family:kadwa;
-            margin-left:-30px;
-            font-size:12px;
-        }
-        .popup2-footer {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-top: 20px;
-        }
-        .popup2-footer input {
-            margin-right: 10px;
-            transform: scale(1.2);
-        }
-        .popup2-footer label {
-            font-size: 13px;
-            font-weight:700;
-            margin-right: 15px;
-            color:blue;
-            font-family:kadwa;
-        }
-        .close-btn2 {
-            background: blue;
-            color: white;
-            padding: 8px 15px;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-left: 10px;
-            opacity: 0.5;
-        }
-        .close-btn2.active {
-            opacity: 1;
-            cursor: pointer;
-        }
-        /* 🔴 Checkbox और Consent Text Error (Shake & Red Border) */
-        .checkbox-error {
-            border: 2px solid red !important;
-            animation: shake 0.3s ease-in-out;
-        }
-        .text-error {
-            color: red !important;
-            animation: shake 0.3s ease-in-out;
-        }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            50% { transform: translateX(5px); }
-            75% { transform: translateX(-5px); }
-        }
-        
-    .bottom-bar {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      font-family:kadwa;
-      height: 65px;
-      background: rgb(0,0,0,0.88);
-      line-height:1.5;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      box-shadow: 0 -3px 10px rgba(0,0,0,0.15);
-      border-top-left-radius: 18px;
-      border-top-right-radius: 18px;
-      z-index: 100000;
+        box-shadow: 0 -3px 10px rgba(0,0,0,0.15);
+        transition: background 0.3s ease, border 0.3s ease;
     }
 
-    .bottom-bar::before {
-      content: '';
-      position: absolute;
-      top: 0px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 60px;
-      height: 40px;
-      background: #f4f4f4;
-      border-radius: 0 0 30px 30px ;
-      box-shadow: inset 0 10px 6px rgba(0, 0, 0, 0.1);
-      z-index: -1;
+    .middle-circle.unread-active {
+        background: linear-gradient(135deg, #ff416c, #ff4b2b);
+        border: 2px solid #fff;
+        box-shadow: 0 4px 10px rgba(255, 65, 108, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.4);
+        animation: bounceInPremium 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    .tab {
-      text-align: center;
-      flex: 1;
-      padding: 6px 0;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      position: relative;
+    @keyframes bounceInPremium {
+        0% { transform: scale(0.8); opacity: 0.5; }
+        50% { transform: scale(1.15); opacity: 1; }
+        100% { transform: scale(1); }
     }
 
-    .tab i {
-      font-size: 20px;
-      transition: transform 0.3s ease;
-      color: #ccc;
+    #tabWrapper { position: fixed; top: 0; width: 100%; z-index: 100000; display: flex; align-items: center; background: transparent; transition: top 0.4s ease-in-out; }
+    .tabs { display: flex; flex: 1; min-width:100%; background: yellow; margin-top:-4px; overflow:hidden; padding: 15px 0px; border-radius:0px 5px 5px 0px; gap: 13px; box-shadow: 0 2px 10px rgba(0,0,0,0.5), 0 0 0 1px #fff inset; justify-content: center; transition: transform 0.4s ease; }
+    .tabs button { box-shadow: 0 2px 10px rgba(0,0,0,0.5), 0 0 0 1px #fff inset; font-weight: bold; padding: 5px 14px; font-family:kadwa; background: #e0e0e0; border: none; border-radius: 5px; font-size: 10px; cursor: pointer; transition: background 0.3s; }
+    .tabs button:hover { background: #dcdcdc; }
+    .translate-btn { display: flex; align-items: center; justify-content: center; padding: 4px 10px !important; background: #fff !important; color: #333; }
+    .translate-btn:hover { background: #f0f0f0 !important; }
+    .tab-hidden .tabs { transform: translateY(-100%); opacity: 0; pointer-events: none; }
+    #tabs button.active { color: white; background-color: #007bff; }
+    #toggleTabs { position: fixed; right: -4px; top: 450px; width: 28px; height: 56px; background: linear-gradient(135deg, #ff3b3b, #d90429); color: #fff; display: flex; justify-content: center; align-items: center; border-radius: 12px 0 0 12px; box-shadow: -4px 0 12px rgba(217, 4, 41, 0.3), inset 1px 0 0 rgba(255, 255, 255, 0.2); cursor: pointer; z-index: 100000; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); user-select: none; }
+    #toggleTabs:hover { width: 32px; background: linear-gradient(135deg, #ff4f4f, #e60026); }
+    #toggleIcon { display: flex; align-items: center; justify-content: center; transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+    .tab-hidden #toggleIcon { transform: rotate(180deg); }
+
+    #refreshPopup { position: fixed; margin-bottom: 13px; width:1px; margin-left:-48px; background: transparent; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: space-between; cursor: pointer; z-index: 1000000; opacity: 0; transition: bottom 0.3s ease-out, opacity 0.3s ease-out; }
+    #refreshPopup button { background: red; color: white; border: none; cursor: pointer; border-radius: 50%; }
+    .popup2-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center; z-index: 10000; }
+    .popup2 { background: white; width: auto; padding: 20px; margin:20px; border-radius: 10px; text-align: center; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); }
+    .popup2 h2 { margin-top: 0; color:red; }
+    .popup2 li { text-align: justify; font-family:kadwa; margin-left:-30px; font-size:12px; }
+    .popup2-footer { display: flex; align-items: center; justify-content: center; margin-top: 20px; }
+    .popup2-footer input { margin-right: 10px; transform: scale(1.2); }
+    .popup2-footer label { font-size: 13px; font-weight:700; margin-right: 15px; color:blue; font-family:kadwa; }
+    .close-btn2 { background: blue; color: white; padding: 8px 15px; border: none; cursor: pointer; border-radius: 5px; margin-left: 10px; opacity: 0.5; }
+    .close-btn2.active { opacity: 1; cursor: pointer; }
+    .checkbox-error { border: 2px solid red !important; animation: shake 0.3s ease-in-out; }
+    .text-error { color: red !important; animation: shake 0.3s ease-in-out; }
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } }
+
+    /* 🌟 NEW: Network Status Toast UI 🌟 */
+    .network-toast {
+        position: fixed;
+        bottom: -60px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.85);
+        color: #fff;
+        padding: 8px 18px;
+        border-radius: 30px;
+        font-size: 11px;
+        font-family: 'Noto Serif Devanagari', sans-serif;
+        font-weight: bold;
+        z-index: 1000000000;
+        transition: bottom 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        white-space: nowrap;
+        pointer-events: none;
     }
-
-    .tab span111 {
-      display: block;
-      font-size: 9px;
-      font-family:kadwa;
-      font-weight:600;
-      color: #ccc;
-      margin-top: 1px;
-    }
-
-    .tab.active i,
-    .tab.active span111 {
-      color: orange;
-    }
-
-    .tab.middle {
-      transform: translateY(-24px);
-      margin-left:0.5px;
-      z-index: 0;
-    }
-
-.tab.middle i {
-      font-size: 15px;
-      font-weight:700;
-      background: #fff;
-      width:24px;
-      height:33px;
-      border:1px solid rgb(0,0,0,0.4);
-      color: #fff;
-      padding: 10px 14px;
-      border-radius: 50%;
-     box-shadow: 0 -3px 10px rgba(0,0,0,0.15);
-    }
-    
-.skeleton-container {
-  padding: 14px;
-  Margin-top:-20px;
-}
-
-.skeleton-card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 10px;
-  width:310px;
-  margin-bottom: 0px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.skeleton-image {
-  height:210px;
-  border-radius: 8px;
-  background: linear-gradient(-90deg, #f0f0f0 0%, #e0e0e0 50%, #f0f0f0 100%);
-  background-size: 400% 400%;
-  animation: shimmer 1.2s infinite;
-  margin-bottom: 12px;
-}
-
-.skeleton-title {
-  height: 28px;
-  width: 70%;
-  border-radius: 4px;
-  background: linear-gradient(-90deg, #f0f0f0 0%, #e0e0e0 50%, #f0f0f0 100%);
-  background-size: 400% 400%;
-  animation: shimmer 1.2s infinite;
-  margin-bottom: 10px;
-}
-
-.skeleton-text {
-  height: 12px;
-  width: 90%;
-  border-radius: 4px;
-  background: linear-gradient(-90deg, #f0f0f0 0%, #e0e0e0 50%, #f0f0f0 100%);
-  background-size: 400% 400%;
-  animation: shimmer 1.2s infinite;
-  margin-bottom: 8px;
-}
-
-.skeleton-text.short {
-  width: 60%;
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: 100% 0;
-  }
-  100% {
-    background-position: -100% 0;
-  }
-}
-
-.like-btn {
-  position: absolute;
-  bottom: 90px;
-  left: 20px;
-  color: #e74c3c;
-  font-size: 20px;
-  cursor: pointer;
-  z-index: 999999;
-}
-
-.save-text{
-font-size:10px;
-font-family:kadwa;
-}
-
-.unread-badge {
-  margin-left: -20px; /* थोड़ा दाएँ किया गया है ताकि आइकॉन न छुपे */
-  background: #000;
-  width:46px;
-  height:50px;
-  border-radius: 50%; /* गोल की जगह हल्का चौकोर */
-  padding: 5px 8px; 
-  flex-direction: column; /* टेक्स्ट को ऊपर-नीचे करने के लिए */
-  align-items: center;
-  text-align:center;
-  justify-content: center;
-  font-weight: bold;
-  box-shadow: 0 4px 8px rgba(255, 59, 59, 0.4);
-  border: 1px solid #fff; /* बॉर्डर थोड़ी पतली की गई है */
-  animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  z-index: 10000000;
-  white-space: nowrap; /* टेक्स्ट को एक लाइन में रखने के लिए */
-}
-
-
-@keyframes bounceIn {
-  0% { transform: scale(0); opacity: 0; }
-  50% { transform: scale(1.2); opacity: 1; }
-  100% { transform: scale(1); }
-}
-
+    .network-toast.show { bottom: 100px; }
     </style>
-    <link href='https://fonts.googleapis.com/css?family=Kadwa' rel='stylesheet'>
-    <link href='https://fonts.googleapis.com/css?family=Noto Serif Devanagari' rel='stylesheet'>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href='https://fonts.googleapis.com/css?family=Kadwa&display=swap' rel='stylesheet'>
+    <link href='https://fonts.googleapis.com/css?family=Noto+Serif+Devanagari&display=swap' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
 <body>
 
@@ -558,20 +331,12 @@ font-family:kadwa;
     <div class="skeleton-title"></div>
     <div class="skeleton-text"></div>
     <div class="skeleton-text"></div>
-    <div class="skeleton-text"></div>
     <div class="skeleton-text short"></div>
-    <div class="skeleton-text short"></div>
-    <div class="skeleton-text short"></div>
-    <div class="skeleton-text short"></div>
-    <div class="skeleton-text short"></div>
-    <div class="skeleton-text short"></div>
-    <div class="skeleton-text short"></div>
-  </div></div>
- 
+  </div>
+</div>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+<div id="networkToast" class="network-toast"><i class="fas fa-wifi"></i> <span>लोड हो रहा है...</span></div>
 
-<!-- Bottom Bar -->
 <div class="bottom-bar">
   <div class="tab active default-tab" data-url="go:home" data-code="home">
     <i class="fas fa-home"></i>
@@ -581,12 +346,24 @@ font-family:kadwa;
     <i class="fas fa-newspaper"></i>
     <span111>Current Affairs</span111>
   </div>
-  
-  <div class="tab middle" data-url="go:cmagazine" data-code="add">
-  <i class="fas fa-book-open" style="color:#000;"><br><span1 style="font-size: 10px; font-weight: 900;">PYP</span1><span111 style="font-size: 10px; font-weight: 700; color:#FFBFD6; margin-top: -42px;" id="unreadBadge" class="unread-badge" style="display: none;"><br><br>0</span111></i>
-  
+ <div class="tab middle" data-url="go:cmagazine" data-code="add">
+    
+    <div id="middleCircle" class="middle-circle">
+      
+      <div id="defaultContent" style="display: flex; flex-direction: column; align-items: center;">
+        <i class="fas fa-book-open" style="color:#000; font-size: 16px;"></i>
+        <span style="font-size: 10px; font-weight: 900; font-family: kadwa; color:#000; margin-top:3px;">PYP</span>
+      </div>
 
-</div>
+      <div id="unreadContent" style="display: none; flex-direction: column; align-items: center; justify-content: center; line-height: 1.6;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" style="width: 15px; height: 15px; fill: #fff; margin-bottom: 2px;">
+          <path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L525.6 386.7c39.6-40.6 66.4-86.1 79.9-118.4c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C465.5 68.8 400.8 32 320 32c-68.2 0-125 26.3-169.3 60.8L38.8 5.1zm151 118.3C226 97.7 269.5 80 320 80c65.2 0 118.8 29.6 159.9 67.7C518.4 183.5 545 226 558.6 256c-12.6 28-36.6 68.3-70.9 100.9l-53.8-42.2c9.1-17.6 14.2-37.5 14.2-58.7c0-70.7-57.3-128-128-128c-32.2 0-61.7 11.9-84.2 31.5l-46.1-36.1zM394.9 284.2l-81.5-63.9c4.2-8.5 6.6-18.2 6.6-28.3c0-35.3-28.7-64-64-64c-27.7 0-51.1 17.7-60.6 42.3l-45-35.3c15.8-32.9 49.3-55 89.6-55c53 0 96 43 96 96c0 15.6-3.8 30.3-10.4 43.1zM118.3 186.2l45.4 35.6c-21.4 20-39.7 44.5-54 68.1c-4.3 7.1-4.3 15.9 0 23.1c11.6 19.3 33.6 50.9 66.6 84.4l-42.4 35.3C90.2 388.6 57 334.7 42.2 301.7c-3.2-7.1-3.2-15 0-22.1c12.3-27.6 37.1-66.2 76.1-93.4zM256 384c-53 0-96-43-96-96c0-10.4 1.7-20.4 4.7-29.8L126.3 228.1c-16 23.3-29.4 48.7-39.5 73.6c14.6 34.6 45.4 85 91 127C224.2 469 288.1 504 368 504c35 0 68.5-9.3 99.2-25.2l-45.7-35.8c-49.8 26.6-105.7 41-165.5 41zm82.8-43.1l-61.8-48.4c-6.1 2.3-12.7 3.5-19.5 3.5c-35.3 0-64-28.7-64-64c0-5 .8-9.8 2.2-14.3l-59-46.2c-1.4 6.6-2.2 13.4-2.2 20.4c0 70.7 57.3 128 128 128c25.4 0 49.1-7.4 69.1-20l-12.8-10z"/>
+        </svg>
+        <span id="uCountText" style="font-size: 13px; font-weight: 900; color: #fff;">0</span>
+      </div>
+
+    </div>
+  </div>
   <div class="tab" data-url="go:quiz" data-code="quiz">
     <i class="fas fa-clipboard-question"></i>
     <span111>GK Quiz</span111>
@@ -598,70 +375,74 @@ font-family:kadwa;
   </div>
 </div>
 
-
 <div id="loadingScreen"><div style="color:white; position:absolute; letter-spacing:1.5px; font-size:9px; margin-top:115px;">Fetching Latest Feed</div>
     <div class="spinner"></div>
 </div>
-<meta charset="UTF-8">
-    <script src="script.js"></script>
- <div class="popup2-container" id="popup2">
-        <div class="popup2">
-            <h1 style="font-size:17px; color:red;">Instructions</h1>
-           <ol><li> डेली करेंट अफेयर्स की <strong>अगली फीड</strong> को पढ़ने के लिए <strong>"ऊपर सरकाएं"</strong></li>
-            <li> डेली करेंट अफेयर्स की <strong>पिछली फीड</strong> को पढ़ने के लिए <strong>"नीचे सरकाएं"</strong></li>
-            <li> पसंदीदा फीड को Save करने के लिए <i Style="color:red;" class="fas fa-heart-circle-plus"></i> icon पर Tap करें</li></ol>
-        <p style=" font-size:13px; margin-top:10px; background:rgb(0,0,0,0.3); padding:5px 10px; border-radius:5px;">सभी प्रतियोगी परीक्षाओं (UPSC, MPPSC, SSC, बैंकिंग, रेलवे, पुलिस, शिक्षक पात्रता परीक्षा (TET) आदि) के लिए सम्पूर्ण करेंट अफेयर्स पढ़ें एक ही जगह विशेष तथ्यों के साथ</p>
-         <div class="popup2-footer">
-                <input type="checkbox" id="consentCheckbox">
-                <label for="consentCheckbox" id="consentLabel">हम समझ गए</label>
-                <button class="close-btn2" id="closeBtn2">Close</button>
-            </div>
+
+<div class="popup2-container" id="popup2">
+    <div class="popup2">
+        <h1 style="font-size:17px; color:red;">Instructions</h1>
+        <ol><li> डेली करेंट अफेयर्स की <strong>अगली फीड</strong> को पढ़ने के लिए <strong>"ऊपर सरकाएं"</strong></li>
+        <li> डेली करेंट अफेयर्स की <strong>पिछली फीड</strong> को पढ़ने के लिए <strong>"नीचे सरकाएं"</strong></li>
+        <li> पसंदीदा फीड को Save करने के लिए <i Style="color:red;" class="fas fa-heart-circle-plus"></i> icon पर Tap करें</li></ol>
+        <p style=" font-size:13px; margin-top:10px; background:rgb(0,0,0,0.3); padding:5px 10px; border-radius:5px;">सभी प्रतियोगी परीक्षाओं (UPSC, MPPSC, SSC, बैंकिंग, रेलवे, पुलिस, शिक्षक पात्रता परीक्षा (TET) आदि) के लिए सम्पूर्ण करेंट अफेयर्स पढ़ें एक ही जगह विशेष तथ्यों के साथ</p>
+        <div class="popup2-footer">
+            <input type="checkbox" id="consentCheckbox">
+            <label for="consentCheckbox" id="consentLabel">हम समझ गए</label>
+            <button class="close-btn2" id="closeBtn2">Close</button>
         </div>
     </div>
-<div id="loader" class="loader">
 </div>
-  </div>
-</div>
+
+<div id="loader" class="loader"></div>
 
 <div class="news-container" id="newsContainer"></div>
 
-<div id="noLikesBox" style="
-  display:none; text-align:center; margin-top:40px; padding:40px 10px;
-  color:#666; font-size:16px;">
-  
-  <svg width="80" height="80" viewBox="0 0 24 24" fill="none"
-     xmlns="http://www.w3.org/2000/svg"
-     stroke="#d23f3f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-
-  <!-- Heart shape -->
-  <path d="M12 21s-6-4.35-9-8.5C-1.8 8.4 1.4 3 6 3
-           c2.1 0 4 1.2 5 3c1-1.8 2.9-3 5-3
-           c4.6 0 7.8 5.4 3 9.5
-           c-3 4.15-9 8.5-9 8.5z"/>
-  <!-- Slash line -->
+<div id="noLikesBox" style="display:none; text-align:center; margin-top:40px; padding:40px 10px; color:#666; font-size:16px;">
+  <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#d23f3f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M12 21s-6-4.35-9-8.5C-1.8 8.4 1.4 3 6 3 c2.1 0 4 1.2 5 3c1-1.8 2.9-3 5-3 c4.6 0 7.8 5.4 3 9.5 c-3 4.15-9 8.5-9 8.5z"/>
   <line x1="3" y1="3" x2="21" y2="21" />
-</svg>
-
-
+  </svg>
   <div style="margin-top:12px; font-weight:600;">
      कोई पसंद की गई फ़ीड नहीं मिली
      <br><br><br>
-     <button style="background:red; border:none; border-radius:5px; padding:5px 10px; font-weight:700; font-size:12px; color:#fff;" onclick="selectFeed(0)">करेंट अफेयर्स पढ़ें</button>
+     <button style="background:red; border:none; border-radius:5px; padding:5px 10px; font-weight:700; font-size:12px; color:#fff;" onclick="selectFeed(0)">करेंट अफेयर्स पढ़ें</button>
   </div>
 </div>
 
-    <script>
+<div id="tabWrapper">
+  <div id="tabs" class="tabs">
+    <button onclick="selectFeed(0)">डेली करेंट अफेयर्स</button>
+    <button onclick="selectFeed(1)">द हिन्दू | TOI</button>
+    <button onclick="selectFeed(2)"><i Style="color:red; font-size:18px;" class="fas fa-heart"></i></button>
+    
+   <button class="translate-btn" onclick="showLanguagePopup()" title="Change Language" style="display: flex; align-items: center; justify-content: center; gap: 5px;">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style="display: block;">
+    <path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
+  </svg>
+  <span style="font-size: 11px; font-weight: bold; line-height: 1; padding-top: 1px;">भाषा बदलें</span>
+</button>
+  </div>
+  
+  <div id="toggleTabs" onclick="toggleTabs()">
+  <span111 id="toggleIcon">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M15 18l-6-6 6-6"/>
+    </svg>
+  </span111>
+  </div>
+</div>
 
+<script>
 let startY = 0, endY = 0, startX = 0, endX = 0;
 let lastTouchY = 0;
 let currentIndex = 0;
-let articles = []; // आपका articles array loadNews() भरता है
-let totalSlidesBeforeRefresh = 12;
+let articles = []; 
+let totalSlidesBeforeRefresh = 20;
 let readArticles = JSON.parse(localStorage.getItem('readNewsLinks') || '[]');
 let unreadCount = 0;
-const MIN_SWIPE = 60; // swipe threshold
+const MIN_SWIPE = 60; 
 
-// touch events (mobile)
 document.addEventListener("touchstart", e => {
   const t = e.touches[0];
   startY = t.clientY;
@@ -678,10 +459,9 @@ document.addEventListener("touchend", e => {
   const t = e.changedTouches[0];
   endY = lastTouchY || t.clientY;
   endX = t.clientX || startX;
-  handleVerticalSwipe(); // नया नाम ताकि कोई डुप्लीकेट फंक्शन न ओवरराइड करे
+  handleVerticalSwipe(); 
 });
 
-// mouse support (desktop): capture mousedown to set start, mouseup to set end
 document.addEventListener("mousedown", e => {
   startY = e.clientY;
   startX = e.clientX;
@@ -692,7 +472,6 @@ document.addEventListener("mouseup", e => {
   handleVerticalSwipe();
 });
 
-// horizontal swipe open (optional) — अलग फंक्शन अगर चाहें
 function handleHorizontalOpen() {
   const dx = endX - startX;
   if (dx < -100 && articles[currentIndex] && articles[currentIndex].link) {
@@ -700,33 +479,26 @@ function handleHorizontalOpen() {
   }
 }
 
-// Unified vertical swipe handler (up / down)
 function handleVerticalSwipe() {
-  // अगर कोई active card न हो तो exit
   const activeCard = document.querySelector(".news-card.active");
   if (!activeCard) return;
 
   const diff = endY - startY;
   const abs = Math.abs(diff);
 
-  // ignore small moves
   if (abs < MIN_SWIPE) {
-    // छोटा horizontal भी चेक कर लें
     const dx = Math.abs(endX - startX);
     if (dx > 100) handleHorizontalOpen();
     return;
   }
 
   if (diff < 0) {
-    // swipe up => next
     showNextFlip();
   } else {
-    // swipe down => prev
     showPrevFlip();
   }
 }
 
-/* Flip functions — make sure these match the CSS animation durations (here 700ms) */
 function showNextFlip() {
   if (currentIndex >= articles.length - 1) return;
 
@@ -735,28 +507,26 @@ function showNextFlip() {
 
   if (!oldCard || !nextCard) return;
 
-  // set transform origins for nicer corner roll
   oldCard.style.transformOrigin = 'bottom right';
   nextCard.style.transformOrigin = 'bottom right';
-
-  // animate old card folding up (away)
   oldCard.classList.remove("active");
   oldCard.classList.add("news-flip-up");
 
-  // prepare next card to appear from under with "paper" effect
   nextCard.style.opacity = "0";
   nextCard.classList.add("active", "news-appear");
 
-  // increment index immediately so updateSlide repositions to the new index after animation
   currentIndex++;
   markAsRead(currentIndex);
-  // cleanup after animation
+  
   setTimeout(() => {
     oldCard.classList.remove("news-flip-up");
     nextCard.classList.remove("news-appear");
     nextCard.style.opacity = "1";
     updateSlide();
     if (currentIndex >= totalSlidesBeforeRefresh) showRefreshPopup();
+    
+    if (typeof isAudioPlaying !== 'undefined' && isAudioPlaying) playCurrentNewsAudio();
+    else if (typeof updateAudioUI === 'function') updateAudioUI();
   }, 700);
 }
 
@@ -768,32 +538,28 @@ function showPrevFlip() {
 
   if (!oldCard || !prevCard) return;
 
-  // set transform origins for nicer corner roll (prev comes from top)
   oldCard.style.transformOrigin = 'top right';
   prevCard.style.transformOrigin = 'top right';
-
-  // animate old card folding down (away)
   oldCard.classList.remove("active");
   oldCard.classList.add("news-flip-down");
 
-  // prepare prev card to appear from under
   prevCard.style.opacity = "0";
   prevCard.classList.add("active", "news-appear");
 
-  // decrement index immediately so updateSlide repositions after animation
   currentIndex--;
   markAsRead(currentIndex);
 
-  // cleanup after animation
   setTimeout(() => {
     oldCard.classList.remove("news-flip-down");
     prevCard.classList.remove("news-appear");
     prevCard.style.opacity = "1";
     updateSlide();
+    
+    if (typeof isAudioPlaying !== 'undefined' && isAudioPlaying) playCurrentNewsAudio();
+    else if (typeof updateAudioUI === 'function') updateAudioUI();
   }, 700);
 }
 
-/* updateSlide() — यह आपके पुराने logic को reuse करता है */
 function updateSlide() {
   const cards = document.querySelectorAll(".news-card");
   cards.forEach((card, index) => {
@@ -807,11 +573,8 @@ document.addEventListener("DOMContentLoaded", () => {
   loadNews();
 });
 
-
 function refreshNewsFeed() {
     hideRefreshPopup();
-
-    // Loader दिखाएं
     document.getElementById("loadingScreen")?.style.setProperty("visibility", "visible");
     document.getElementById("loader")?.style.setProperty("display", "block");
 
@@ -824,21 +587,11 @@ function refreshNewsFeed() {
         articles = [];
         loadNews().then(() => {
             container.style.transform = 'translateY(0%)';
-
-            // Loader छुपाएं
             document.getElementById("loadingScreen")?.style.setProperty("visibility", "hidden");
             document.getElementById("loader")?.style.setProperty("display", "none");
         });
     }, 500);
 }
-
-// Loader दिखाएं
-document.getElementById("loader").style.display = "block";
-
-loadNews().then(() => {
-    // Loader हटाएं
-    document.getElementById("loader").style.display = "none";
-});
 
 const rssFeeds = [
   {
@@ -848,14 +601,12 @@ const rssFeeds = [
        "https://242310604.hs-sites-na2.com/tag/national/rss.xml"
     ]
   },
-  
   {
     name: "देश/विदेश",
     urls: [
       "https://timesofindia.indiatimes.com/rssfeedstopstories.cms"
     ]
   },
- 
   {
     name: "Saved Feed",
     urls: []
@@ -863,16 +614,14 @@ const rssFeeds = [
 ];
 
 let selectedFeedIndex = parseInt(localStorage.getItem("selectedFeed")) || 0;
-let selectedLanguage = localStorage.getItem("selectedLanguage") || "en"; // 🔸 डिफ़ॉल्ट अंग्रेज़ी
+let selectedLanguage = localStorage.getItem("selectedLanguage") || "en"; 
 
-// Tabs पर क्लिक करने पर फीड लोड करें
 function selectFeed(index) {
   selectedFeedIndex = index;
   updateTabUI();
   refreshNewsFeed();
 }
 
-// Tab UI अपडेट करें
 function updateTabUI() {
   const buttons = document.querySelectorAll("#tabs button");
   buttons.forEach((btn, idx) => {
@@ -881,74 +630,96 @@ function updateTabUI() {
 }
 
 function updateUnreadBadge() {
-    const badge = document.getElementById('unreadBadge');
-    if (!badge) return;
+    const circle = document.getElementById('middleCircle');
+    const defaultContent = document.getElementById('defaultContent');
+    const unreadContent = document.getElementById('unreadContent');
+    const uCountText = document.getElementById('uCountText');
+    
+    if (!circle || !defaultContent || !unreadContent) return;
     
     if (unreadCount > 0) {
         let countText = unreadCount > 99 ? '99+' : unreadCount;
-        
-        // काउंट के ऊपर "बिना पढ़ी" टेक्स्ट जोड़ें
-        badge.innerHTML = `<span112 style="font-size: 10px; font-weight: 700; margin-top: 8px;">बिना पढ़ी</span112><span112 style="font-size: 12px; margin-top:5px;">${countText}</span112>`;
-        
-        badge.style.display = 'flex';
+        uCountText.textContent = countText;
+        defaultContent.style.display = 'none';
+        unreadContent.style.display = 'flex';
+        circle.classList.add('unread-active');
+        circle.style.animation = 'none';      
+        void circle.offsetWidth;              
+        circle.style.animation = 'bounceInPremium 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)'; 
     } else {
-        badge.style.display = 'none';
+        circle.classList.remove('unread-active');
+        unreadContent.style.display = 'none';
+        defaultContent.style.display = 'flex';
+        circle.style.animation = 'none';
     }
 }
 
 function markAsRead(index) {
+    if (!articles || articles.length === 0 || !articles[index]) return;
     const article = articles[index];
     
-    if (article && article.link && !article.link.startsWith('go:')) {
-        const link = article.link;
-        
-        // चेक करें कि क्या न्यूज़ पहले से पढ़ी जा चुकी है
-        if (!readArticles.includes(link)) {
-            readArticles.push(link);
-            
-            // मेमोरी बचाने के लिए 500 से ज्यादा पुरानी लिंक्स हटा दें
-            if(readArticles.length > 500) readArticles.shift();
+    if (article.link && !article.link.startsWith('go:')) {
+        if (!readArticles.includes(article.link)) {
+            readArticles.push(article.link);
+            if (readArticles.length > 500) readArticles.shift();
             localStorage.setItem('readNewsLinks', JSON.stringify(readArticles));
             
-            // --- 24 घंटे वाला लॉजिक ---
             const ONE_DAY_MS = 24 * 60 * 60 * 1000;
             const now = Date.now();
             const pubTime = new Date(article.pubDate).getTime();
             const isWithin24Hrs = (now - pubTime) <= ONE_DAY_MS;
             
-            // अगर न्यूज़ 24 घंटे के अंदर की थी, तो काउंट कम करें
             if (isWithin24Hrs && unreadCount > 0) {
                 unreadCount--;
-                updateUnreadBadge();
+                requestAnimationFrame(() => updateUnreadBadge());
             }
         }
     }
 }
 
-// 📰 फीड लोडिंग
+// 🌟 NEW: Network Status Function 🌟
+function checkNetworkAndShowToast() {
+    const toast = document.getElementById("networkToast");
+    const span = toast.querySelector("span");
+    const icon = toast.querySelector("i");
+    
+    if (!navigator.onLine) {
+        span.innerText = "आप ऑफ़लाइन हैं। सेव की गई न्यूज़ दिखा रहे हैं।";
+        icon.className = "fas fa-wifi-slash";
+        icon.style.color = "#ff4d4d";
+    } else {
+        const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        if (conn && (conn.effectiveType === 'slow-2g' || conn.effectiveType === '2g')) {
+            span.innerText = "धीमा इंटरनेट कनेक्शन...";
+            icon.className = "fas fa-spinner fa-spin";
+            icon.style.color = "#f39c12";
+        } else {
+            span.innerText = "ताज़ा ख़बरें सिंक हो रही हैं...";
+            icon.className = "fas fa-bolt";
+            icon.style.color = "#2ecc71";
+        }
+    }
+    
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 3500);
+}
+
 async function loadNews() {
   const container = document.getElementById('newsContainer');
 
   if (selectedFeedIndex === 2) {
     articles = JSON.parse(localStorage.getItem("likedFeeds") || "[]");
-
     const noLikes = document.getElementById("noLikesBox");
-    const container = document.getElementById("newsContainer");
 
     if (articles.length === 0) {
-        // ⭐ न्यूज़ कंटेनर खाली करो
         container.innerHTML = "";
-
-        // ⭐ No Likes Box केवल कंटेनर के अंदर दिखाओ
         container.appendChild(noLikes);
         noLikes.style.display = "block";
-
         return;
     } else {
         noLikes.style.display = "none";
     }
     
-    // Saved Feed टैब पर Unread Badge नहीं दिखाना है
     unreadCount = 0; 
     updateUnreadBadge();
 
@@ -958,110 +729,135 @@ async function loadNews() {
   }
 
   const urls = rssFeeds[selectedFeedIndex].urls;
-  document.getElementById("skeletonLoader").style.display = "block";
-  document.getElementById("newsContainer").style.display = "none";
+  
+  // 🌟 NEW: INSTANT CACHE LOAD 🌟
+  let loadedFromCache = false;
+  const cachedData = localStorage.getItem(`cachedFeeds_${selectedFeedIndex}`);
+  if (cachedData) {
+      try {
+          articles = JSON.parse(cachedData);
+          document.getElementById("skeletonLoader").style.display = "none";
+          document.getElementById("newsContainer").style.display = "block";
+          insertCustomCards();
+          displayNews();
+          setTimeout(autoFitText, 150);
+          loadedFromCache = true;
+          checkNetworkAndShowToast();
+      } catch (e) { console.error("Cache read error", e); }
+  } else {
+      document.getElementById("skeletonLoader").style.display = "block";
+      document.getElementById("newsContainer").style.display = "none";
+  }
 
+  // 🌟 NEW: PARALLEL FETCHING API FOR 2x SPEED 🌟
   try {
     let allItems = [];
+    
+    const fetchPromises = urls.map(async (rssUrl) => {
+        const proxyUrl = `https://sweet-base-34f7.kgfads100.workers.dev/?url=${encodeURIComponent(rssUrl)}`;
+        const response = await fetch(proxyUrl);
+        const text = await response.text();
+        const parser = new DOMParser();
+        const xml = parser.parseFromString(text, "text/xml");
 
-    // ✅ 3 LEVEL DUPLICATE PROTECTION
-    let uniqueLinks = new Set();
-    let uniqueDescriptions = new Set();
-    let uniqueImages = new Set();
+        let items = Array.from(xml.querySelectorAll("item")).map(item => {
+            let title = item.querySelector("title")?.textContent || "";
+            let link = item.querySelector("link")?.textContent || "";
+            let pubDate = item.querySelector("pubDate") ? new Date(item.querySelector("pubDate").textContent) : new Date(0);
+            
+            let descRaw = item.querySelector("description")?.textContent || "";
+            let contentRaw = item.querySelector("content\\:encoded, encoded")?.textContent || "";
+            let fullHtml = descRaw + " " + contentRaw;
 
-    for (const rssUrl of urls) {
-      const proxyUrl = `https://sweet-base-34f7.kgfads100.workers.dev/?url=${encodeURIComponent(rssUrl)}`;
-      const response = await fetch(proxyUrl);
-      const text = await response.text();
-      const parser = new DOMParser();
-      const xml = parser.parseFromString(text, "text/xml");
+            let image = item.querySelector("enclosure")?.getAttribute("url") || "";
+            if (!image) image = item.querySelector("media\\:content, content")?.getAttribute("url") || "";
+            if (!image) {
+                const imgMatch = fullHtml.match(/<img[^>]+src="([^">]+)"/i);
+                if (imgMatch && imgMatch[1]) image = imgMatch[1];
+            }
 
-      let items = Array.from(xml.querySelectorAll("item")).map(item => ({
-        title: item.querySelector("title")?.textContent || "",
-        description: item.querySelector("description")?.textContent || "",
-        link: item.querySelector("link")?.textContent || "",
-        pubDate: item.querySelector("pubDate") ? new Date(item.querySelector("pubDate").textContent) : new Date(0),
-        image: item.querySelector("enclosure")?.getAttribute("url") || ""
-      }));
-      
-        // 🌍 चुनी भाषा में ट्रांसलेट करें
-      const translatableSources = [
-        "https://242310604.hs-sites-na2.com",
-        "https://timesofindia.indiatimes.com"
-      ];
+            let tempDiv = document.createElement("div");
+            tempDiv.innerHTML = descRaw;
+            let cleanDesc = tempDiv.textContent || tempDiv.innerText || "";
+            if (!cleanDesc.trim()) {
+                tempDiv.innerHTML = contentRaw;
+                cleanDesc = tempDiv.textContent || tempDiv.innerText || "";
+            }
+            cleanDesc = cleanDesc.replace(/\s+/g, ' ').trim();
 
-      // ✅ ALL FEEDS TRANSLATE (NO DOMAIN LIMIT)
-       if (translatableSources.some(src => rssUrl.includes(src))) {
-        console.log("🌐 Translating feed to:", selectedLanguage);
-        showTranslatingMessage();
+            return { title, description: cleanDesc, link, pubDate, image };
+        });
         
-        items = await Promise.all(
-          items.map(async item => {
-            item.title = await getCachedTranslation(item.title, selectedLanguage);
-            item.description = await getCachedTranslation(item.description, selectedLanguage);
-            return item;
-          })
-        );
-        
-        hideTranslatingMessage();
-      }
+        const translatableSources = ["https://242310604.hs-sites-na2.com", "https://timesofindia.indiatimes.com"];
+        if (translatableSources.some(src => rssUrl.includes(src))) {
+            if(!loadedFromCache) showTranslatingMessage();
+            items = await Promise.all(
+                items.map(async item => {
+                    item.title = await getCachedTranslation(item.title, selectedLanguage);
+                    item.description = await getCachedTranslation(item.description, selectedLanguage);
+                    return item;
+                })
+            );
+            hideTranslatingMessage();
+        }
+        return items;
+    });
 
-      allItems = allItems.concat(items);
-    }
+    const results = await Promise.all(fetchPromises);
+    results.forEach(items => allItems = allItems.concat(items));
 
-    allItems.sort((a, b) => b.pubDate - a.pubDate);
+    allItems.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
     articles = allItems;
+    
+    // 🌟 NEW: Update Cache Background 🌟
+    localStorage.setItem(`cachedFeeds_${selectedFeedIndex}`, JSON.stringify(articles.slice(0, 40)));
 
-    // --- NEW LOGIC: 24 घंटे के अंदर की Unread न्यूज़ गिनें ---
     if (selectedFeedIndex === 0 || selectedFeedIndex === 1) {
         const ONE_DAY_MS = 24 * 60 * 60 * 1000;
         const now = Date.now();
+        const isFirstVisit = !localStorage.getItem("hasVisitedBefore");
         
         unreadCount = articles.filter(a => {
-            // कस्टम कार्ड्स (go: links) को छोड़ दें
             if (!a.link || a.link.startsWith('go:')) return false;
-            
-            // चेक करें कि क्या न्यूज़ पिछले 24 घंटे की है
-            const pubTime = new Date(a.pubDate).getTime();
-            const isWithin24Hrs = (now - pubTime) <= ONE_DAY_MS;
-            
-            // चेक करें कि क्या न्यूज़ अभी तक नहीं पढ़ी गई है
             const isNotRead = typeof readArticles !== 'undefined' ? !readArticles.includes(a.link) : true;
-            
-            return isWithin24Hrs && isNotRead;
+            if (isFirstVisit) return isNotRead;
+            else {
+                const pubTime = new Date(a.pubDate).getTime();
+                const isWithin24Hrs = (now - pubTime) <= ONE_DAY_MS;
+                return isWithin24Hrs && isNotRead;
+            }
         }).length;
+
+        if (isFirstVisit && articles.length > 0) localStorage.setItem("hasVisitedBefore", "true");
     } else {
-        unreadCount = 0; // अन्य टैब के लिए बैज न दिखाएं
+        unreadCount = 0; 
     }
     
     updateUnreadBadge();
-    
-    // पहली न्यूज़ जो सामने दिख रही है उसे तुरंत Read मार्क कर दें
     setTimeout(() => { if(typeof markAsRead === 'function') markAsRead(0); }, 500);
-    // -----------------------------------------
 
-    insertCustomCards();
-    displayNews();
-    setTimeout(autoFitText, 150);
+    // Re-render only if we didn't load from cache initially (or if we want to seamlessly update)
+    if (!loadedFromCache) {
+        insertCustomCards();
+        displayNews();
+        setTimeout(autoFitText, 150);
+    }
 
   } catch (error) {
     console.error("Error loading RSS Feeds", error);
+    if (!loadedFromCache) checkNetworkAndShowToast(); // Show error if completely failed and no cache
   } finally {
     document.getElementById("skeletonLoader").style.display = "none";
     document.getElementById("newsContainer").style.display = "block";
   }
 }
 
-// 🔁 Cached Translation System
 async function getCachedTranslation(text, lang) {
   if (!text || text.trim() === "") return "";
-
-  // ❌ LocalStorage cache हटाया गया
   const translated = await googleTranslate(text, lang);
   return translated || text;
 }
 
-// 🌐 Google Translate Wrapper
 async function googleTranslate(text, lang) {
   try {
     const apiUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${lang}&dt=t&q=${encodeURIComponent(text)}`;
@@ -1069,231 +865,79 @@ async function googleTranslate(text, lang) {
     const data = await res.json();
     let translated = data[0].map(x => x[0]).join(" ");
 
-    translated = translated
-      .replace(/'/g, "'")
-      .replace(/"/g, '"')
-      .replace(/undefined/g, "")
-      .replace(/\s+/g, " ")
-      .trim();
+    translated = translated.replace(/'/g, "'").replace(/"/g, '"').replace(/undefined/g, "").replace(/\s+/g, " ").trim();
 
-    if (translated.split(" ").length < 3) {
-      translated = await backupTranslate(text, lang);
-    }
-
+    if (translated.split(" ").length < 3) translated = await backupTranslate(text, lang);
     return translated;
-  } catch (err) {
-    console.error("Translate Error:", err);
-    return text;
-  }
+  } catch (err) { return text; }
 }
 
-// 🧭 Backup Translator
 async function backupTranslate(text, lang) {
   try {
     const res = await fetch("https://translate.terraprint.co/translate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        q: text,
-        source: "auto",
-        target: lang,
-        format: "text"
-      })
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ q: text, source: "auto", target: lang, format: "text" })
     });
     const data = await res.json();
     return data.translatedText || text;
-  } catch (e) {
-    console.error("Backup translation failed:", e);
-    return text;
-  }
+  } catch (e) { return text; }
 }
-// 🌐 Popup दिखाएँ
+
 function showLanguagePopup() {
-  // पहले से खुला popup हो तो remove करें
   const existing = document.getElementById("langOverlay");
   if (existing) existing.remove();
 
-  // Overlay बनाएं
   const overlay = document.createElement("div");
   overlay.id = "langOverlay";
-  overlay.style = `
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.76);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    animation: fadeIn 0.4s ease;
-  `;
+  overlay.style = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.76); display: flex; align-items: center; justify-content: center; z-index: 9999; animation: fadeIn 0.4s ease;`;
 
-  // Popup content जोड़ें
   const popup = document.createElement("div");
   popup.innerHTML = `
-  <div id="langPopup" style="
-    position: relative;
-    background: linear-gradient(145deg, #ffffff, #f0f4ff);
-    padding: 25px 20px 22px;
-    border-radius: 20px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.18);
-    text-align: center;
-    animation: jelloIn 0.8s ease;
-    width: 280px;
-    backdrop-filter: blur(10px);
-    font-family: 'Segoe UI', sans-serif;
-  ">
-
-    <!-- Close Icon -->
-    <span111 id="closeLangPopup" style="
-      position: absolute;
-      top: 12px;
-      right: 16px;
-      font-size: 18px;
-      font-weight: 600;
-      color: #888;
-      cursor: pointer;
-      transition: 0.3s;
-    " onmouseover="this.style.color='#ff3b3b'" 
-       onmouseout="this.style.color='#888'">✕</span111>
-      
-     <h3 style="
-      margin-bottom:18px;
-      font-size:18px;
-      font-weight:600;
-      background: linear-gradient(90deg,#007bff,#00c6ff);
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
-      letter-spacing:0.5px;
-    ">
-      Select Language
-    </h3>
-
-    <!-- Buttons Container -->
+  <div id="langPopup" style="position: relative; background: linear-gradient(145deg, #ffffff, #f0f4ff); padding: 25px 20px 22px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.18); text-align: center; animation: jelloIn 0.8s ease; width: 280px; backdrop-filter: blur(10px); font-family: 'Segoe UI', sans-serif;">
+    <span111 id="closeLangPopup" style="position: absolute; top: 12px; right: 16px; font-size: 18px; font-weight: 600; color: #888; cursor: pointer; transition: 0.3s;" onmouseover="this.style.color='#ff3b3b'" onmouseout="this.style.color='#888'">✕</span111>
+     <h3 style="margin-bottom:18px; font-size:18px; font-weight:600; background: linear-gradient(90deg,#007bff,#00c6ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; letter-spacing:0.5px;">Select Language</h3>
     <div style="display:flex; flex-direction:column; gap:12px;">
-
-      <button id="langHi" style="
-        background: linear-gradient(135deg,#007bff,#0056d2);
-        color:#fff;
-        border:none;
-        padding:10px;
-        border-radius:12px;
-        font-size:14px;
-        font-weight:600;
-        cursor:pointer;
-        transition:0.3s;
-        box-shadow:0 4px 12px rgba(0,123,255,0.3);
-      " 
-      onmouseover="this.style.transform='translateY(-2px)'" 
-      onmouseout="this.style.transform='translateY(0)'">
-        🇮🇳 हिंदी
-      </button>
-
-      <button id="langEn" style="
-        background: linear-gradient(135deg,#28a745,#1e7e34);
-        color:#fff;
-        border:none;
-        padding:10px;
-        border-radius:12px;
-        font-size:14px;
-        font-weight:600;
-        cursor:pointer;
-        transition:0.3s;
-        box-shadow:0 4px 12px rgba(40,167,69,0.3);
-      "
-      onmouseover="this.style.transform='translateY(-2px)'" 
-      onmouseout="this.style.transform='translateY(0)'">
-       🇦🇺 English
-      </button>
-
+      <button id="langHi" style="background: linear-gradient(135deg,#007bff,#0056d2); color:#fff; border:none; padding:10px; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer; transition:0.3s; box-shadow:0 4px 12px rgba(0,123,255,0.3);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">🇮🇳 हिंदी</button>
+      <button id="langEn" style="background: linear-gradient(135deg,#28a745,#1e7e34); color:#fff; border:none; padding:10px; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer; transition:0.3s; box-shadow:0 4px 12px rgba(40,167,69,0.3);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">🇦🇺 English</button>
     </div>
-
-    <!-- Current Language Info -->
-    <p style="
-      margin-top:16px;
-      font-size:12px;
-      color:#666;
-      background:#f5f7ff;
-      padding:6px 10px;
-      border-radius:8px;
-    ">
-      Current Language: 
-      <b style="color:#007bff;">
-        ${selectedLanguage === "hi" ? "Hindi" : "English"}
-      </b>
-    </p>
-
+    <p style="margin-top:16px; font-size:12px; color:#666; background:#f5f7ff; padding:6px 10px; border-radius:8px;">Current Language: <b style="color:#007bff;">${selectedLanguage === "hi" ? "Hindi" : "English"}</b></p>
   </div>
 `;
 
   overlay.appendChild(popup);
   document.body.appendChild(overlay);
 
-  // Close icon और overlay click पर popup बंद करें
   const closePopup = () => {
     const popupEl = document.getElementById("langPopup");
     popupEl.style.animation = "jelloOut 0.6s ease";
     overlay.style.animation = "fadeOut 0.4s ease";
-
     setTimeout(() => overlay.remove(), 400);
   };
 
   document.getElementById("closeLangPopup").onclick = closePopup;
   overlay.onclick = (e) => { if (e.target === overlay) closePopup(); };
-
-  // बटन इवेंट्स
   document.getElementById("langHi").onclick = () => changeLanguage("hi", overlay);
   document.getElementById("langEn").onclick = () => changeLanguage("en", overlay);
 
-  // ✨ CSS Animations inject करें (अगर पहले से नहीं हैं)
   if (!document.getElementById("jelloAnimationStyle")) {
     const style = document.createElement("style");
     style.id = "jelloAnimationStyle";
-    style.textContent = `
-      @keyframes jelloIn {
-        0% { transform: scale(0.8) rotate(0deg); opacity: 0; }
-        25% { transform: scale(1.1) rotate(2deg); opacity: 1; }
-        50% { transform: scale(0.95) rotate(-2deg); }
-        75% { transform: scale(1.05) rotate(1deg); }
-        100% { transform: scale(1) rotate(0deg); }
-      }
-
-      @keyframes jelloOut {
-        0% { transform: scale(1) rotate(0deg); opacity: 1; }
-        25% { transform: scale(1.05) rotate(-2deg); }
-        50% { transform: scale(0.9) rotate(2deg); }
-        100% { transform: scale(0.7) rotate(0deg); opacity: 0; }
-      }
-
-      @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-      }
-
-      @keyframes fadeOut {
-        from { opacity: 1; }
-        to { opacity: 0; }
-      }
-    `;
+    style.textContent = `@keyframes jelloIn { 0% { transform: scale(0.8) rotate(0deg); opacity: 0; } 25% { transform: scale(1.1) rotate(2deg); opacity: 1; } 50% { transform: scale(0.95) rotate(-2deg); } 75% { transform: scale(1.05) rotate(1deg); } 100% { transform: scale(1) rotate(0deg); } } @keyframes jelloOut { 0% { transform: scale(1) rotate(0deg); opacity: 1; } 25% { transform: scale(1.05) rotate(-2deg); } 50% { transform: scale(0.9) rotate(2deg); } 100% { transform: scale(0.7) rotate(0deg); opacity: 0; } } @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } } @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }`;
     document.head.appendChild(style);
   }
 }
 
-
-// 🈳 भाषा बदलें
 function changeLanguage(lang, popup) {
   localStorage.setItem("selectedLanguage", lang);
   selectedLanguage = lang;
   popup.remove();
   showTranslatingMessage();
-  setTimeout(() => {
-    loadNews();
-  }, 500);
+  setTimeout(() => { loadNews(); }, 500);
 }
 
-// 🕐 Translating Message
 function showTranslatingMessage() {
   let msg = document.createElement("div");
+  msg.id = "translatingMsg";
   msg.style.position = "fixed";
   msg.style.background = "transparent";
   msg.style.color = "#fff";
@@ -1305,44 +949,21 @@ function hideTranslatingMessage() {
   if (msg) msg.remove();
 }
 
-// --------------------------
-// 🌟 Initialization
-// --------------------------
-document.addEventListener("DOMContentLoaded", () => {
-  addTranslateIcon();
-  loadNews(); // चुनी गई भाषा में लोड करें
-});
-
-
 function insertCustomCards() {
     const customCards = [
-        
-        {
-            image: 'https://files.cdn-files-a.com/uploads/10456964/normal_69535f33277ed.png',
-            link: 'go:cumagazine',
-            pubDate: new Date()
-        },
-        
-         {
-            image: 'https://m2.getsitecontrol.com/images/273034/08fa5e9b171cf9fb5f7ce513fa1b8c4f_351164357.png',
-            link: 'go:cuseries',
-            pubDate: new Date()
-        },
-        
-        
+        { image: 'https://files.cdn-files-a.com/uploads/10456964/normal_69535f33277ed.png', link: 'go:cumagazine', pubDate: new Date() },
+        { image: 'https://m2.getsitecontrol.com/images/273034/08fa5e9b171cf9fb5f7ce513fa1b8c4f_351164357.png', link: 'go:cuseries', pubDate: new Date() }
     ];
 
     if (articles.length > 30) {
-        let insertedIndexes = new Set(); // पहले से इस्तेमाल किए गए इंडेक्स को स्टोर करने के लिए
-
+        let insertedIndexes = new Set(); 
         customCards.forEach(card => {
             let randomIndex;
             do {
-                randomIndex = Math.floor(Math.random() * 15) + 1; // 1 से 10 के बीच रैंडम नंबर
-            } while (insertedIndexes.has(randomIndex)); // पहले से इस्तेमाल किया गया इंडेक्स ना हो
-
+                randomIndex = Math.floor(Math.random() * 15) + 1; 
+            } while (insertedIndexes.has(randomIndex)); 
             insertedIndexes.add(randomIndex);
-            articles.splice(randomIndex, 0, card); // रैंडम स्थान पर कार्ड ऐड करें
+            articles.splice(randomIndex, 0, card); 
         });
     }
 }
@@ -1353,44 +974,46 @@ function displayNews() {
   articles.forEach((article, index) => {
     let newsCard = document.createElement('div');
     newsCard.className = 'news-card';
-    newsCard.setAttribute('data-index', index);        // जरूरी: index attribute
+    newsCard.setAttribute('data-index', index);
     if (index === 0) {
-      newsCard.classList.add('active');               // पहला card active होना चाहिए
+      newsCard.classList.add('active');
     }
     newsCard.style.transform = `translateY(${index * 100}%)`;
 
-    let titleHTML = article.title ? `<h2>${article.title}</h2>` : '';
-    let descriptionHTML = article.description ? `<p>${article.description}</p>` : '';
-
-        const customImages = [  
-
+    const customImages = [  
         "https://files.cdn-files-a.com/uploads/10456964/normal_69535f33277ed.png",
-        "https://m2.getsitecontrol.com/images/273034/08fa5e9b171cf9fb5f7ce513fa1b8c4f_351164357.png",
-        
-       
-];
+        "https://m2.getsitecontrol.com/images/273034/08fa5e9b171cf9fb5f7ce513fa1b8c4f_351164357.png"
+    ];
 
-if (customImages.includes(article.image)) {
-  newsCard.classList.add("custom-card");
-  newsCard.innerHTML = `
-    <img src="${article.image}"
-     onclick="location.href='${article.link}'"
-     style="width:100%;height:100%;display:block;cursor:pointer;">
-  `;
-  container.appendChild(newsCard);
-  return; // ⛔ IMPORTANT: normal layout apply नहीं होगा
-}
+    if (customImages.includes(article.image)) {
+      newsCard.classList.add("custom-card");
+      newsCard.innerHTML = `<img src="${article.image}" onclick="location.href='${article.link}'" style="width:100%;height:100%;display:block;cursor:pointer;">`;
+      container.appendChild(newsCard);
+      return; 
+    }
     
-        let img = article.image ? `<img src="${article.image}" onclick="location.href='${article.link}', '_blank')" style="cursor:pointer;">` : '';
+let imgHTML = article.image ? `<img class="feed-img" src="${article.image}" loading="lazy">` : '';
+    let titleHTML = article.title ? `<h2 class="feed-title">${article.title}</h2>` : '';
+    let descriptionHTML = article.description ? `<p class="feed-desc">${article.description}</p>` : '';
 
-        newsCard.innerHTML = `
-      ${titleHTML}
-      ${descriptionHTML}
-      ${img}
+    newsCard.innerHTML = `
+      <div class="top-section">
+        ${imgHTML}
+        ${titleHTML}
+      </div>
+      <div class="bottom-section">
+        ${descriptionHTML}
+      </div>
       <div class="publish-time">${getTimeAgo(article.pubDate)}</div>
-      <div class="like-btn" onclick="toggleLike(${index})">
-        <i class="fas ${isLiked(article.link) ? 'fa-heart' : 'fa-heart-circle-plus'}"></i>
-        <span111 class="save-text"> ${isLiked(article.link) ? 'Saved' : 'Save'}</span111>
+    <div class="action-bar">
+        <div class="action-btn" onclick="shareToWhatsApp(${index})">
+          <i class="fab fa-whatsapp" style="color: #25D366;"></i>
+          <span1 style="font-size:9px;">Share</span1>
+        </div>
+        <div class="action-btn" onclick="toggleLike(${index})">
+          <i class="fas ${isLiked(article.link) ? 'fa-heart' : 'fa-heart-circle-plus'}" style="color: #e74c3c;"></i>
+          <span1 class="save-text" style="font-size:9px;"">${isLiked(article.link) ? 'Saved' : 'Save'}</span1>
+        </div>
       </div>
     `;
 
@@ -1398,36 +1021,37 @@ if (customImages.includes(article.image)) {
     container.appendChild(newsCard);
   });
   
-  // Reset index & position after render
   currentIndex = 0;
   updateSlide();
 }
 
 function isLiked(link) {
+    if (!link) return false;
     const liked = JSON.parse(localStorage.getItem("likedFeeds") || "[]");
     return liked.some(item => item.link === link);
 }
 
 function toggleLike(index) {
     const article = articles[index];
-    let liked = JSON.parse(localStorage.getItem("likedFeeds") || "[]");
+    if (!article || !article.link) return;
 
+    let liked = JSON.parse(localStorage.getItem("likedFeeds") || "[]");
     const exists = liked.find(item => item.link === article.link);
 
     if (exists) {
         liked = liked.filter(item => item.link !== article.link);
     } else {
         const newArticle = { ...article, likedAt: new Date().toISOString() };
-        liked.unshift(newArticle); // हाल ही में पसंद की गई फीड सबसे ऊपर
+        liked.unshift(newArticle); 
     }
 
     localStorage.setItem("likedFeeds", JSON.stringify(liked));
 
-    // ✅ आइकन और टेक्स्ट अपडेट करें
-    const newsCard = document.querySelectorAll('.news-card')[index];
+    const newsCard = document.querySelector(`.news-card[data-index="${index}"]`);
+    
     if (newsCard) {
-        const iconEl = newsCard.querySelector('.like-btn i');
-        const textEl = newsCard.querySelector('.like-btn .save-text');
+        const iconEl = newsCard.querySelector('.action-btn i.fa-heart, .action-btn i.fa-heart-circle-plus');
+        const textEl = newsCard.querySelector('.save-text');
 
         if (iconEl && textEl) {
             if (exists) {
@@ -1441,408 +1065,187 @@ function toggleLike(index) {
             }
         }
     }
-}
 
+    if (selectedFeedIndex === 2 && exists) {
+        setTimeout(() => { selectFeed(2); }, 300);
+    }
+}
 
 function getTimeAgo(dateString) {
     const now = new Date();
     const publishedDate = new Date(dateString);
     const secondsAgo = Math.floor((now - publishedDate) / 1000);
 
-    const intervals = {
-        year: 31536000,
-        month: 2592000,
-        week: 604800,
-        day: 86400,
-        hour: 3600,
-        minute: 60,
-        second: 1
-    };
-
+    const intervals = { year: 31536000, month: 2592000, week: 604800, day: 86400, hour: 3600, minute: 60, second: 1 };
     for (let key in intervals) {
         const interval = Math.floor(secondsAgo / intervals[key]);
-        if (interval >= 1) {
-            return `${interval} ${key}${interval > 1 ? 's' : ''} ago`;
-        }
+        if (interval >= 1) return `${interval} ${key}${interval > 1 ? 's' : ''} ago`;
     }
-
     return "just now";
 }
 
-
-// **Swipe Left करने पर लिंक ओपन**
-function handleSwipe() {
-    if (endX < startX - 50) {
-        window.open(articles[currentIndex].link, '_blank');
-    } else if (endY < startY - 50) {
-        nextSlide();
-    } else if (endY > startY + 50) {
-        prevSlide();
-    }
-}
-
-//  **Refresh Popup Function**
-<!-- Refresh Popup Function -->
 function showRefreshPopup() {
     let popup = document.getElementById("refreshPopup");
     if (!popup) {
         popup = document.createElement('div');
         popup.id = "refreshPopup";
-        popup.innerHTML = `
-            <div class="popup-box">
-  <button onclick="refreshNewsFeed()" style="font-size: 15px; padding: 16px 17px;">
-    <i class="fas fa-arrows-rotate"></i>
-  </button>
-</div>
-        `;
+        popup.innerHTML = `<div class="popup-box"><button onclick="refreshNewsFeed()" style="font-size: 15px; padding: 16px 17px;"><i class="fas fa-arrows-rotate"></i></button></div>`;
         document.body.appendChild(popup);
-
-        // Slide-up animation trigger
-        setTimeout(() => {
-            popup.style.bottom = "20px";
-            popup.style.opacity = "1";
-        }, 20);
+        setTimeout(() => { popup.style.bottom = "20px"; popup.style.opacity = "1"; }, 20);
     }
 }
 
-// Hide Refresh Popup
 function hideRefreshPopup() {
     let popup = document.getElementById("refreshPopup");
     if (popup) {
         popup.style.opacity = "0";
-        popup.style.bottom = "-50px"; // Slide down before removal
+        popup.style.bottom = "-50px"; 
         setTimeout(() => popup.remove(), 300);
     }
 }
 
+document.addEventListener("DOMContentLoaded", function () {
+    const popup = document.getElementById("popup2");
+    const checkbox = document.getElementById("consentCheckbox");
+    const consentLabel = document.getElementById("consentLabel");
+    const closeBtn = document.getElementById("closeBtn2");
 
-loadNews();
+    if (localStorage.getItem("popup2Closed")) {
+        popup.style.display = "none";
+    }
 
-    </script>
-   
-</body>
-</html>
-
-<script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const popup = document.getElementById("popup2");
-            const checkbox = document.getElementById("consentCheckbox");
-            const consentLabel = document.getElementById("consentLabel");
-            const closeBtn = document.getElementById("closeBtn2");
-
-            // पहले चेक करें कि popup पहले ही बंद किया गया है या नहीं
-            if (localStorage.getItem("popup2Closed")) {
-                popup.style.display = "none";
-            }
-
-            // चेकबॉक्स चेक करने पर बटन को एक्टिव करें
-            checkbox.addEventListener("change", function () {
-                if (this.checked) {
-                    closeBtn.classList.add("active");
-                } else {
-                    closeBtn.classList.remove("active");
-                }
-            });
-
-            // Close बटन पर क्लिक इवेंट
-            closeBtn.addEventListener("click", function () {
-                if (checkbox.checked) {
-                    popup.style.display = "none";
-                    localStorage.setItem("popup2Closed", "true"); // लोकल स्टोरेज में सेट करें
-                } else {
-                    checkbox.classList.add("checkbox-error"); // रेड बॉर्डर और शेक करें
-                    consentLabel.classList.add("text-error"); // कंसेंट टेक्स्ट भी रेड करें
-                    setTimeout(() => {
-                        checkbox.classList.remove("checkbox-error"); // 1 सेकंड बाद हटाएँ
-                        consentLabel.classList.remove("text-error"); // 1 सेकंड बाद हटाएँ
-                    }, 2000);
-                }
-            });
-        });
-    </script>
-    <script>
-  const tabs = document.querySelectorAll('.tab');
-  const persistentTabCode = 'ca'; // हमेशा active रहने वाला tab
-
-  // शुरू में 'ca' tab को active रखें
-  window.addEventListener('DOMContentLoaded', () => {
-    tabs.forEach(tab => {
-      const code = tab.getAttribute('data-code');
-      if (code === persistentTabCode) {
-        tab.classList.add('active');
-      } else {
-        tab.classList.remove('active');
-      }
+    checkbox.addEventListener("change", function () {
+        if (this.checked) closeBtn.classList.add("active");
+        else closeBtn.classList.remove("active");
     });
-  });
 
-  // क्लिक पर 3 सेकंड के लिए animation और redirection
+    closeBtn.addEventListener("click", function () {
+        if (checkbox.checked) {
+            popup.style.display = "none";
+            localStorage.setItem("popup2Closed", "true"); 
+        } else {
+            checkbox.classList.add("checkbox-error"); 
+            consentLabel.classList.add("text-error"); 
+            setTimeout(() => {
+                checkbox.classList.remove("checkbox-error"); 
+                consentLabel.classList.remove("text-error"); 
+            }, 2000);
+        }
+    });
+});
+
+const tabs = document.querySelectorAll('.tab');
+const persistentTabCode = 'ca'; 
+
+window.addEventListener('DOMContentLoaded', () => {
   tabs.forEach(tab => {
     const code = tab.getAttribute('data-code');
-    
-    if (code !== persistentTabCode) {
-      tab.addEventListener('click', () => {
-        tab.classList.add('active');
-
-        // 3 सेकंड बाद remove
-        setTimeout(() => {
-          tab.classList.remove('active');
-        }, 3000);
-
-        const url = tab.getAttribute('data-url');
-        setTimeout(() => {
-          window.location.href = url;
-        }, 100);
-      });
-    }
+    if (code === persistentTabCode) tab.classList.add('active');
+    else tab.classList.remove('active');
   });
-</script>
-<style>
-#tabWrapper {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 100000;
-  display: flex;
-  align-items: center;
-  background: transparent;
-  transition: top 0.4s ease-in-out;
-}
+});
 
-.tabs {
-  display: flex;
-  flex: 1;
-  min-width:100%;
-  background: yellow;
-  margin-top:-4px;
-  overflow:hidden;
-  padding: 15px 0px;
-  border-radius:0px 5px 5px 0px;
-  gap: 13px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.5), 0 0 0 1px #fff inset;
-  justify-content: center;
-  transition: transform 0.4s ease;
-}
+tabs.forEach(tab => {
+  const code = tab.getAttribute('data-code');
+  if (code !== persistentTabCode) {
+    tab.addEventListener('click', () => {
+      tab.classList.add('active');
+      setTimeout(() => { tab.classList.remove('active'); }, 3000);
+      const url = tab.getAttribute('data-url');
+      setTimeout(() => { window.location.href = url; }, 100);
+    });
+  }
+});
 
-.tabs button {
-  box-shadow: 0 2px 10px rgba(0,0,0,0.5), 0 0 0 1px #fff inset;
-  font-weight: bold;
-  padding: 5px 14px;
-  font-family:kadwa;
-  background: #e0e0e0;
-  border: none;
-  border-radius: 5px;
-  font-size: 10px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.tabs button:hover {
-  background: #dcdcdc;
-}
-
-/* Translate Button का Best UI स्टाइल */
-.translate-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px 10px !important;
-  background: #fff !important;
-  color: #333;
-}
-.translate-btn:hover {
-  background: #f0f0f0 !important;
-}
-
-/* जब tabs छुप जाएँ */
-.tab-hidden .tabs {
-  transform: translateY(-100%);
-  opacity: 0;
-  pointer-events: none;
-}
-
-#tabs button.active {
-  color: white;
-  background-color: #007bff;
-}
-
-/* Modern UI for Toggle Button */
-#toggleTabs {
-  position: fixed;
-  right: -4px; /* स्क्रीन के बिल्कुल दाईं ओर चिपका हुआ */
-  top: 450px;
-  width: 28px; /* टैप करने के लिए बेहतर चौड़ाई */
-  height: 56px; /* टैप करने के लिए बेहतर ऊंचाई */
-  background: linear-gradient(135deg, #ff3b3b, #d90429); /* प्रीमियम रेड ग्रेडिएंट */
-  color: #fff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 12px 0 0 12px; /* बायीं तरफ से स्मूथ गोल आकार */
-  box-shadow: -4px 0 12px rgba(217, 4, 41, 0.3), inset 1px 0 0 rgba(255, 255, 255, 0.2);
-  cursor: pointer;
-  z-index: 100000;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  user-select: none;
-}
-
-/* Hover इफ़ेक्ट - माउस ले जाने पर हल्का सा बाहर आएगा */
-#toggleTabs:hover {
-  width: 32px;
-  background: linear-gradient(135deg, #ff4f4f, #e60026);
-}
-
-#toggleIcon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* बाउंसिंग फ्लिप इफ़ेक्ट */
-}
-
-/* जब tabs छुप जाएँ, तो ऐरो (Arrow) घूम जाएगा */
-.tab-hidden #toggleIcon {
-  transform: rotate(180deg);
-}
-</style>
-
-<div id="tabWrapper">
-  <div id="tabs" class="tabs">
-    <button onclick="selectFeed(0)">डेली करेंट अफेयर्स</button>
-    <button onclick="selectFeed(1)">द हिन्दू | TOI</button>
-    <button onclick="selectFeed(2)"><i Style="color:red; font-size:18px;" class="fas fa-heart"></i></button>
-    
-    <button class="translate-btn" onclick="showLanguagePopup()" title="Change Language">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-        <path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
-      </svg>
-    </button>
-  </div>
-  
-  <div id="toggleTabs" onclick="toggleTabs()">
-  <span111 id="toggleIcon">
-    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M15 18l-6-6 6-6"/>
-    </svg>
-  </span111>
-</div>
-
-<script>
 let tabWrapper = document.getElementById('tabWrapper');
-let toggleIcon = document.getElementById('toggleIcon');
 let hideTimeout;
 
 function toggleTabs() {
   tabWrapper.classList.toggle('tab-hidden');
-  if (!tabWrapper.classList.contains('tab-hidden')) {
-    autoHideTabs();
-  }
+  if (!tabWrapper.classList.contains('tab-hidden')) autoHideTabs();
 }
 
 function autoHideTabs() {
   clearTimeout(hideTimeout);
-  hideTimeout = setTimeout(() => {
-    tabWrapper.classList.add('tab-hidden');
-  }, 5000); // Auto-hide after 5 seconds
+  hideTimeout = setTimeout(() => { tabWrapper.classList.add('tab-hidden'); }, 5000); 
 }
 
 document.addEventListener('click', function (event) {
   const isClickInside = tabWrapper.contains(event.target);
-  // k=8 नाम की टाइपो को यहाँ से हटा दिया गया है
-  if (!isClickInside) {
-    tabWrapper.classList.add('tab-hidden');
-  }
+  if (!isClickInside) tabWrapper.classList.add('tab-hidden');
 });
 
-window.onload = () => {
-  autoHideTabs();
-};
-</script>
-<script>
-if ("serviceWorker" in navigator) {
+window.onload = () => { autoHideTabs(); };
 
+if ("serviceWorker" in navigator) {
   const swCode = `
     const CACHE_NAME = "auto-cache-v20";
-
-    self.addEventListener("install", e => {
-      self.skipWaiting();
-    });
-
+    self.addEventListener("install", e => { self.skipWaiting(); });
     self.addEventListener("activate", e => {
-      e.waitUntil(
-        caches.keys().then(keys => {
-          return Promise.all(
-            keys.map(k => {
-              if (k !== CACHE_NAME) return caches.delete(k);
-            })
-          );
-        })
-      );
+      e.waitUntil(caches.keys().then(keys => {
+        return Promise.all(keys.map(k => { if (k !== CACHE_NAME) return caches.delete(k); }));
+      }));
       self.clients.claim();
     });
-
     self.addEventListener("fetch", e => {
       const req = e.request;
-
-      // ❌ IMPORTANT FIX → NEVER CACHE HTML
-      if (req.headers.get("accept").includes("text/html")) {
-        return; // HTML always from network
-      }
-
-      // Cache only images, css, js, icons
-      if (
-        req.destination === "image" ||
-        req.destination === "style" ||
-        req.destination === "script" ||
-        req.url.includes("icon")
-      ) {
-        e.respondWith(
-          caches.match(req).then(res => {
-            return res || fetch(req).then(netRes => {
-              return caches.open(CACHE_NAME).then(cache => {
-                cache.put(req, netRes.clone());
-                return netRes;
-              });
+      if (req.headers.get("accept").includes("text/html")) return; 
+      if (req.destination === "image" || req.destination === "style" || req.destination === "script" || req.url.includes("icon")) {
+        e.respondWith(caches.match(req).then(res => {
+          return res || fetch(req).then(netRes => {
+            return caches.open(CACHE_NAME).then(cache => {
+              cache.put(req, netRes.clone());
+              return netRes;
             });
-          })
-        );
+          });
+        }));
       }
     });
   `;
-
   const blob = new Blob([swCode], { type: "application/javascript" });
   const swURL = URL.createObjectURL(blob);
   navigator.serviceWorker.register(swURL);
 }
-</script>
 
-<script>
+function shareToWhatsApp(index) {
+    const article = articles[index];
+    if (!article) return;
+    const myAppLink = "https://cutt.ly/OrKg4bdu"; 
+    
+    let tempDiv = document.createElement("div");
+    tempDiv.innerHTML = article.description || "";
+    let cleanDesc = tempDiv.textContent || tempDiv.innerText || "";
+
+    const shareMessage = `*${article.title || ""}*\n\n${cleanDesc.substring(0, 200)}...\n\n📲 *पूरी खबर पढ़ने के लिए ऐप डाउनलोड करें:*\n${myAppLink}`;
+    window.location.href = `whatsapp://send?text=${encodeURIComponent(shareMessage)}`;
+} 
+
+// 🌟 NEW: Optimized DOM Reflow 🌟
 function autoFitText() {
-    const newsCards = document.querySelectorAll('.news-card');
+    const activeCard = document.querySelector('.news-card.active');
+    if (!activeCard) return;
 
-    newsCards.forEach(card => {
-        // पूरे कार्ड के अंदर मौजूद सभी p और span को चुनें (चाहे वे कहीं भी हों)
+    const cardsToProcess = [activeCard];
+    const nextCard = activeCard.nextElementSibling;
+    if (nextCard && nextCard.classList.contains('news-card')) cardsToProcess.push(nextCard);
+
+    cardsToProcess.forEach(card => {
         const paragraphs = card.querySelectorAll('p');
         const spans = card.querySelectorAll('span');
         
-        let maxSize = 15; 
-        let minSize = 10; // इससे छोटा फॉन्ट नहीं होगा
+        let maxSize = 19; 
+        let minSize = 10; 
         let currentSize = maxSize;
 
-        // एक छोटा फंक्शन जो p और span दोनों पर एक साथ फॉन्ट अप्लाई करेगा
         const applyFontSize = (size) => {
             paragraphs.forEach(p => p.style.setProperty('font-size', size + 'px', 'important'));
             spans.forEach(span => span.style.setProperty('font-size', size + 'px', 'important'));
         };
 
-        // 1. शुरुआत में सबसे बड़ा साइज सेट करें
         applyFontSize(currentSize);
 
-        // ओवरफ्लो चेक करने का स्मार्ट तरीका
         const checkOverflow = () => {
-            // चेक करें कि क्या पूरा कार्ड ओवरफ्लो हो रहा है
             if (card.scrollHeight > card.clientHeight) return true;
-            
-            // या फिर चेक करें कि क्या कोई p टैग ओवरफ्लो हो रहा है
             let isOverflowing = false;
             paragraphs.forEach(p => {
                 if (p.scrollHeight > p.clientHeight) isOverflowing = true;
@@ -1850,22 +1253,17 @@ function autoFitText() {
             return isOverflowing;
         };
 
-        // 2. ऑटो-श्रिंक लॉजिक: जब तक ओवरफ्लो है, फॉन्ट घटाते रहें
         while (checkOverflow() && currentSize > minSize) {
-            currentSize -= 0.5; // फॉन्ट को 0.5px से कम करें
+            currentSize -= 0.5; 
             applyFontSize(currentSize);
         }
     });
 }
 
-// पेज लोड होने और रिसाइज़ होने पर फंक्शन चलाएं
 window.addEventListener('load', autoFitText);
 window.addEventListener('resize', autoFitText);
-setTimeout(autoFitText, 500); // फॉन्ट लोड होने के बाद एक बार और
+setTimeout(autoFitText, 500); 
 </script>
 
-  </div>
-</div>  </div>
-</div>  </div>
-</div>  </div>
-</div>
+</body>
+</html>
