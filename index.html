@@ -7,12 +7,13 @@
     <link rel="preconnect" href="https://sweet-base-34f7.kgfads100.workers.dev">
     <link rel="dns-prefetch" href="https://sweet-base-34f7.kgfads100.workers.dev">
 <script>
+    window.appStartTime = new Date().getTime();
     window.earlyFeeds = {};
     try {
         const proxyBase = "https://sweet-base-34f7.kgfads100.workers.dev/?url=";
         const u1 = "https://242310604.hs-sites-na2.com/tag/fact/rss.xml";
         const u2 = "https://242310604.hs-sites-na2.com/tag/national/rss.xml";
-        const ts = new Date().getTime(); // Origin Cache bypass
+        const ts = window.appStartTime; 
         window.earlyFeeds[u1] = fetch(proxyBase + encodeURIComponent(u1 + "?_t=" + ts), {cache: "no-store"}).then(r => r.text());
         window.earlyFeeds[u2] = fetch(proxyBase + encodeURIComponent(u2 + "?_t=" + ts), {cache: "no-store"}).then(r => r.text());
     } catch(e) {}
@@ -472,7 +473,16 @@ function showToast(msg, iconClass, color, duration = 3500) {
     toast.classList.add("show");
     
     if(window.toastTimeout) clearTimeout(window.toastTimeout);
-    window.toastTimeout = setTimeout(() => toast.classList.remove("show"), duration);
+    
+    // अगर duration 0 है, तो Toast तब तक रहेगा जब तक हम उसे खुद न हटाएँ
+    if (duration > 0) {
+        window.toastTimeout = setTimeout(() => toast.classList.remove("show"), duration);
+    }
+}
+
+function hideToast() {
+    const toast = document.getElementById("networkToast");
+    if (toast) toast.classList.remove("show");
 }
 
 document.addEventListener("touchstart", e => {
@@ -570,18 +580,16 @@ function showPrevFlip() {
       const activeTabBtn = document.querySelector('#tabs button.active');
       const tabName = activeTabBtn ? activeTabBtn.innerText : 'इस सेक्शन';
       
-      showToast(`${tabName} में नई ख़बरें खोज रहे हैं...`, "fas fa-sync fa-spin", "#3498db", 2000);
+      showToast(`${tabName} में नई ख़बरें खोज रहे हैं...`, "fas fa-sync fa-spin", "#3498db", 0); // Infinite Toast
 
-      fetchFeedsData().then(allItems => {
+      fetchFeedsData(false).then(allItems => {
           let existingLinks = new Set(articles.map(a => a.link));
           let newArticles = allItems.filter(a => !existingLinks.has(a.link) && a.link && !a.link.startsWith('go:'));
 
           if (newArticles.length > 0) {
               injectNewItems(newArticles);
           } else {
-              setTimeout(() => {
-                  showToast("कोई नई खबर नहीं मिली", "fas fa-info-circle", "#f1c40f", 3000);
-              }, 1500);
+              showToast("कोई नई खबर नहीं मिली", "fas fa-info-circle", "#f1c40f", 3000);
           }
       }).catch(e => {
           showToast("नेटवर्क त्रुटि", "fas fa-exclamation-triangle", "#ff4d4d", 3000);
@@ -656,6 +664,36 @@ function showOnlyUnread() {
 function restoreAllNews() {
     isShowingOnlyUnread = false;
     
+    // 🌟 Premium Success Sound Effect (No external file needed, instant play using Web Audio API)
+    try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) {
+            const ctx = new AudioContext();
+            const osc = ctx.createOscillator();
+            const gainNode = ctx.createGain();
+            
+            osc.connect(gainNode);
+            gainNode.connect(ctx.destination);
+            
+            osc.type = 'sine'; // Soft, clean tone
+            
+            // Ascending notes for a "Level Up / Success" feeling (C major arpeggio)
+            osc.frequency.setValueAtTime(523.25, ctx.currentTime);       // C5
+            osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.08); // E5
+            osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.16); // G5
+            osc.frequency.setValueAtTime(1046.50, ctx.currentTime + 0.24); // C6
+            
+            gainNode.gain.setValueAtTime(0, ctx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.03);
+            gainNode.gain.setValueAtTime(0.3, ctx.currentTime + 0.24);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+            
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.8);
+        }
+    } catch(e) { console.log("Audio play error", e); }
+    // ----------------------------------------------------
+
     const overlay = document.createElement("div");
     overlay.id = "successTickOverlay";
     overlay.style = `
@@ -757,6 +795,8 @@ function updateTopTabBadges() {
             if (cached) {
                 try {
                     let parsed = JSON.parse(cached);
+                    // 캐श की हुई तारीखों को Date में बदलें
+                    parsed.forEach(p => p.pubDate = new Date(p.pubDate));
                     count = calculateUnreadCount(parsed);
                 } catch(e){}
             }
@@ -829,16 +869,12 @@ function markAsRead(index) {
     }
 }
 
-function checkNetworkAndShowToast() {
+function checkNetworkAndShowToast(isSyncing = false) {
     if (!navigator.onLine) {
         showToast("आप ऑफ़लाइन हैं। सेव की गई न्यूज़ दिखा रहे हैं।", "fas fa-wifi-slash", "#ff4d4d");
-    } else {
-        const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-        if (conn && (conn.effectiveType === 'slow-2g' || conn.effectiveType === '2g')) {
-            showToast("धीमा इंटरनेट कनेक्शन...", "fas fa-spinner fa-spin", "#f39c12");
-        } else {
-            showToast("ताज़ा ख़बरें सिंक हो रही हैं...", "fas fa-bolt", "#2ecc71");
-        }
+    } else if (isSyncing) {
+        // यह तब तक दिखाएगा जब तक hideToast न चले या नया Toast न आए
+        showToast("नई खबर सिंक हो रही है...", "fas fa-sync fa-spin", "#f39c12", 0);
     }
 }
 
@@ -850,10 +886,14 @@ async function parseRSSItems(text, rssUrl) {
         let title = item.querySelector("title")?.textContent || "";
         let link = item.querySelector("link")?.textContent || "";
         
-        // सुरक्षित Date Parsing
+        // सुरक्षित Date Parsing (अगर Date न हो तो उसे 0 epoch मानें ताकि वो टॉप पर न कूदे)
         let pubDateNode = item.querySelector("pubDate") || item.getElementsByTagName("dc:date")[0] || item.getElementsByTagName("date")[0] || item.querySelector("updated");
-        let pubDateText = pubDateNode ? pubDateNode.textContent : "";
-        let pubDate = pubDateText ? new Date(pubDateText) : new Date();
+        let pubDateText = pubDateNode ? pubDateNode.textContent.trim() : "";
+        let pubDate = new Date(0); 
+        if(pubDateText) {
+            let parsed = new Date(pubDateText);
+            if(!isNaN(parsed.getTime())) pubDate = parsed;
+        }
         
         // सुरक्षित Content Parsing (DOMException से बचाने के लिए)
         let descRaw = item.querySelector("description")?.textContent || "";
@@ -890,7 +930,7 @@ async function parseRSSItems(text, rssUrl) {
             el.replaceWith(span);
         });
 
-        // 🌟 साफ़ HTML (ताकि ul, ol, li सुरक्षित रहें)
+        // साफ़ HTML 
         let cleanDescHTML = tempDiv.innerHTML.trim();
         cleanDescHTML = cleanDescHTML.replace(/<br\s*[\/]?>(\s*<br\s*[\/]?>)+/gi, '<br><br>'); 
 
@@ -899,7 +939,6 @@ async function parseRSSItems(text, rssUrl) {
     
     const translatableSources = ["https://242310604.hs-sites-na2.com", "https://timesofindia.indiatimes.com"];
     
-    // 🚀 ULTRA FAST LOAD TRICK: अगर भाषा मैच करती है तो ट्रांसलेशन स्किप करें
     let skipTranslation = false;
     if (selectedLanguage === "en" && rssUrl.includes("timesofindia")) skipTranslation = true;
     if (selectedLanguage === "hi" && rssUrl.includes("hs-sites")) skipTranslation = true;
@@ -916,10 +955,11 @@ async function parseRSSItems(text, rssUrl) {
     return items;
 }
 
-async function fetchFeedsData() {
+async function fetchFeedsData(useInitialTime = false) {
     const urls = rssFeeds[selectedFeedIndex].urls;
     let allItems = [];
-    const ts = new Date().getTime(); 
+    // अगर App खुलते समय पहली फेचिंग है तो window.appStartTime यूज करें ताकि कैश हिट हो।
+    const ts = useInitialTime ? window.appStartTime : new Date().getTime(); 
     const fetchPromises = urls.map(async (rssUrl) => {
         // Bypass Server & Proxy cache
         const targetUrl = rssUrl + (rssUrl.includes('?') ? '&' : '?') + "_t=" + ts;
@@ -929,7 +969,8 @@ async function fetchFeedsData() {
     });
     const results = await Promise.all(fetchPromises);
     results.forEach(items => allItems = allItems.concat(items));
-    allItems.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+    // यहाँ तारीख को पूरी तरह से सुरक्षित सॉर्ट किया गया है
+    allItems.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
     return allItems;
 }
 
@@ -937,43 +978,13 @@ function injectNewItems(newArticles) {
     if (isShowingOnlyUnread) return; 
 
     const container = document.getElementById('newsContainer');
-    const existingCards = document.querySelectorAll('.news-card');
-    
-    existingCards.forEach(card => {
-        let oldIndex = parseInt(card.getAttribute('data-index'));
-        card.setAttribute('data-index', oldIndex + newArticles.length);
-    });
-
     let wasAtTop = (currentIndex === 0);
-    currentIndex += newArticles.length; 
 
-    for (let i = newArticles.length - 1; i >= 0; i--) {
-        let article = newArticles[i];
-        let index = i;
-
-        let newsCard = document.createElement('div');
-        newsCard.className = 'news-card';
-        newsCard.setAttribute('data-index', index);
-        newsCard.style.transform = `translateY(${(index - currentIndex) * 100}%)`;
-
-        let imgHTML = article.image ? `<img class="feed-img" src="${article.image}" loading="lazy">` : '';
-        let titleHTML = article.title ? `<h2 class="feed-title">${article.title}</h2>` : '';
-        let descriptionHTML = article.description ? `<div class="feed-desc">${article.description}</div>` : '';
-
-        newsCard.innerHTML = `
-          <div class="top-section">${imgHTML}${titleHTML}</div>
-          <div class="bottom-section">${descriptionHTML}</div>
-          <div class="publish-time">${getTimeAgo(article.pubDate)}</div>
-          <div class="action-bar">
-            <div class="action-btn" onclick="shareToWhatsApp(this)"><i class="fab fa-whatsapp" style="color: #25D366;"></i><span1 style="font-size:9px;">Share</span1></div>
-            <div class="action-btn" onclick="toggleLike(this)"><i class="fas ${isLiked(article.link) ? 'fa-heart' : 'fa-heart-circle-plus'}" style="color: #e74c3c;"></i><span1 class="save-text" style="font-size:9px;">${isLiked(article.link) ? 'Saved' : 'Save'}</span1></div>
-          </div>
-        `;
-        newsCard.setAttribute("data-url", article.link || '');
-        container.insertBefore(newsCard, container.firstChild);
-    }
-
-    articles = [...newArticles, ...articles];
+    // दोनों ऐरे को मिलाएं और एक बार फिर से सॉर्ट करें ताकि कैश वाली और नई डेट्स सही से अरेंज हो जाएं
+    let mergedArticles = [...newArticles, ...articles];
+    mergedArticles.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
+    
+    articles = mergedArticles;
     localStorage.setItem(`cachedFeeds_${selectedFeedIndex}`, JSON.stringify(articles.slice(0, 40)));
     
     unreadCount = calculateUnreadCount(articles);
@@ -983,23 +994,49 @@ function injectNewItems(newArticles) {
     const tabName = activeTabBtn ? activeTabBtn.innerText : 'इस सेक्शन';
 
     if (wasAtTop) {
-        const oldActive = document.querySelector('.news-card.active');
-        if (oldActive) oldActive.classList.remove('active');
-
-        currentIndex = 0;
-        const newActive = document.querySelector('.news-card[data-index="0"]');
-        if (newActive) newActive.classList.add('active');
-
-        container.offsetHeight; 
-        updateSlide();
-        
-        showToast(`${tabName} में ${newArticles.length} नई ख़बरें अपडेट हो गईं!`, "fas fa-bolt", "#00d2ff", 3500);
+        // अगर यूजर टॉप पर है तो पूरा कंटेनर दोबारा रेंडर करें
+        displayNews();
+        showToast(`${newArticles.length} नई ख़बरें अपडेट हो गईं!`, "fas fa-check-circle", "#2ecc71", 3500);
     } else {
+        // अगर यूजर नीचे पढ़ रहा है तो नई खबरों को DOM में ऊपर जोड़ दें (बिना डिस्टर्ब किए)
+        currentIndex += newArticles.length; 
+        
+        // पुरानी खबरों का इंडेक्स अपडेट करें
+        const existingCards = document.querySelectorAll('.news-card');
+        existingCards.forEach(card => {
+            let oldIndex = parseInt(card.getAttribute('data-index'));
+            card.setAttribute('data-index', oldIndex + newArticles.length);
+        });
+
+        for (let i = newArticles.length - 1; i >= 0; i--) {
+            let article = newArticles[i];
+            let index = i;
+
+            let newsCard = document.createElement('div');
+            newsCard.className = 'news-card';
+            newsCard.setAttribute('data-index', index);
+            newsCard.style.transform = `translateY(${(index - currentIndex) * 100}%)`;
+
+            let imgHTML = article.image ? `<img class="feed-img" src="${article.image}" loading="lazy">` : '';
+            let titleHTML = article.title ? `<h2 class="feed-title">${article.title}</h2>` : '';
+            let descriptionHTML = article.description ? `<div class="feed-desc">${article.description}</div>` : '';
+
+            newsCard.innerHTML = `
+              <div class="top-section">${imgHTML}${titleHTML}</div>
+              <div class="bottom-section">${descriptionHTML}</div>
+              <div class="publish-time">${getTimeAgo(article.pubDate)}</div>
+              <div class="action-bar">
+                <div class="action-btn" onclick="shareToWhatsApp(this)"><i class="fab fa-whatsapp" style="color: #25D366;"></i><span1 style="font-size:9px;">Share</span1></div>
+                <div class="action-btn" onclick="toggleLike(this)"><i class="fas ${isLiked(article.link) ? 'fa-heart' : 'fa-heart-circle-plus'}" style="color: #e74c3c;"></i><span1 class="save-text" style="font-size:9px;">${isLiked(article.link) ? 'Saved' : 'Save'}</span1></div>
+              </div>
+            `;
+            newsCard.setAttribute("data-url", article.link || '');
+            container.insertBefore(newsCard, container.firstChild);
+        }
         updateSlide();
         showToast(`${tabName} में ${newArticles.length} नई ख़बरें आईं! ऊपर स्वाइप करें`, "fas fa-arrow-up", "#00d2ff", 3500);
     }
-    
-    autoFitText(); // बैकग्राउंड में फिट करें
+    autoFitText(); 
 }
 
 function appendNewItemsToBottom(newArticles) {
@@ -1071,6 +1108,11 @@ async function loadNews() {
   if (cachedData) {
       try {
           articles = JSON.parse(cachedData);
+          // ⚠️ सबसे अहम फिक्स: लोकल स्टोरेज से आने वाली डेट को तुरंत 'Date' ऑब्जेक्ट बना दें।
+          articles.forEach(a => {
+              a.pubDate = new Date(a.pubDate);
+          });
+          
           document.getElementById("skeletonLoader").style.display = "none";
           document.getElementById("newsContainer").style.display = "block";
           insertCustomCards();
@@ -1081,11 +1123,13 @@ async function loadNews() {
           unreadCount = calculateUnreadCount(articles);
           updateUnreadBadge();
           
-          checkNetworkAndShowToast();
+          // कैश लोड होने के बाद ताज़ी खबर सिंक हो रही है (परमानेंट Toast दिखाएं)
+          checkNetworkAndShowToast(true);
       } catch (e) { console.error("Cache read error", e); }
   } else {
       document.getElementById("skeletonLoader").style.display = "block";
       document.getElementById("newsContainer").style.display = "none";
+      checkNetworkAndShowToast(true);
   }
 
   try {
@@ -1100,7 +1144,7 @@ async function loadNews() {
                 text = await window.earlyFeeds[rssUrl];
                 delete window.earlyFeeds[rssUrl];
             } else {
-                const ts = new Date().getTime();
+                const ts = window.appStartTime;
                 const targetUrl = rssUrl + (rssUrl.includes('?') ? '&' : '?') + "_t=" + ts;
                 const proxyUrl = `https://sweet-base-34f7.kgfads100.workers.dev/?url=${encodeURIComponent(targetUrl)}`;
                 text = await fetch(proxyUrl, {cache: "no-store"}).then(r => r.text());
@@ -1129,7 +1173,7 @@ async function loadNews() {
         });
 
         await Promise.all(fetchPromises);
-        allItemsCollected.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+        allItemsCollected.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
         
         // Final Fix: Refresh view with properly sorted items
         articles = [...allItemsCollected];
@@ -1139,17 +1183,20 @@ async function loadNews() {
         localStorage.setItem(`cachedFeeds_${selectedFeedIndex}`, JSON.stringify(allItemsCollected.slice(0, 40)));
         
         updateTopTabBadges();
-        if(!loadedFromCache) checkNetworkAndShowToast();
+        showToast("सभी ख़बरें अप-टू-डेट हैं!", "fas fa-check-circle", "#2ecc71", 3000);
         
     } 
     else if (loadedFromCache) {
-        const allItems = await fetchFeedsData();
+        // बैकग्राउंड में नई खबर लायेगा
+        const allItems = await fetchFeedsData(false);
         let existingLinks = new Set(articles.map(a => a.link));
         let newArticles = allItems.filter(a => !existingLinks.has(a.link) && a.link && !a.link.startsWith('go:'));
 
         if (newArticles.length > 0) {
             injectNewItems(newArticles);
+            // injectNewItems खुद toast दिखाएगा
         } else {
+            // जैसे ही सिंक खत्म हो, परमानेंट Toast को 3 सेकंड वाले में बदल दें
             showToast("सभी ख़बरें अप-टू-डेट हैं!", "fas fa-check-circle", "#2ecc71", 3000);
         }
         
@@ -1158,7 +1205,7 @@ async function loadNews() {
 
   } catch (error) {
     console.error("Error loading RSS Feeds", error);
-    if (!loadedFromCache) checkNetworkAndShowToast(); 
+    showToast("सिंक फ़ेल हो गया", "fas fa-exclamation-circle", "#e74c3c", 3000);
   } finally {
       document.getElementById("skeletonLoader").style.display = "none";
       document.getElementById("newsContainer").style.display = "block";
@@ -1168,7 +1215,7 @@ async function loadNews() {
 setInterval(async () => {
     if (selectedFeedIndex === 2 || !navigator.onLine || isShowingOnlyUnread) return;
     try {
-        const allItems = await fetchFeedsData();
+        const allItems = await fetchFeedsData(false);
         let existingLinks = new Set(articles.map(a => a.link));
         let newArticles = allItems.filter(a => !existingLinks.has(a.link) && a.link && !a.link.startsWith('go:'));
 
@@ -1182,7 +1229,7 @@ setInterval(async () => {
 async function getCachedTranslation(text, lang) {
   if (!text || text.trim() === "") return "";
   try {
-      // 🚀 Timeout Protection: अगर API हैंग हुआ, तो तुरंत ओरिजिनल टेक्स्ट दे देगा (3 सेकंड की लिमिट)
+      // Timeout Protection: अगर API हैंग हुआ, तो तुरंत ओरिजिनल टेक्स्ट दे देगा (3 सेकंड की लिमिट)
       return await Promise.race([
           googleTranslate(text, lang),
           new Promise(resolve => setTimeout(() => resolve(text), 3000))
@@ -1324,10 +1371,13 @@ function displayNews() {
     let titleHTML = article.title ? `<h2 class="feed-title">${article.title}</h2>` : '';
     let descriptionHTML = article.description ? `<div class="feed-desc">${article.description}</div>` : '';
 
+    // Date ऑब्जेक्ट को वापस स्ट्रिंग में बदलें ताकि getTimeAgo सही चले
+    let displayTime = getTimeAgo(article.pubDate);
+
     newsCard.innerHTML = `
       <div class="top-section">${imgHTML}${titleHTML}</div>
       <div class="bottom-section">${descriptionHTML}</div>
-      <div class="publish-time">${getTimeAgo(article.pubDate)}</div>
+      <div class="publish-time">${displayTime}</div>
       <div class="action-bar">
         <div class="action-btn" onclick="shareToWhatsApp(this)"><i class="fab fa-whatsapp" style="color: #25D366;"></i><span1 style="font-size:9px;">Share</span1></div>
         <div class="action-btn" onclick="toggleLike(this)"><i class="fas ${isLiked(article.link) ? 'fa-heart' : 'fa-heart-circle-plus'}" style="color: #e74c3c;"></i><span1 class="save-text" style="font-size:9px;">${isLiked(article.link) ? 'Saved' : 'Save'}</span1></div>
@@ -1389,9 +1439,12 @@ function toggleLike(btnElement) {
     }
 }
 
-function getTimeAgo(dateString) {
+function getTimeAgo(dateInput) {
     const now = new Date();
-    const publishedDate = new Date(dateString);
+    // यदि dateInput पहले से Date ऑब्जेक्ट है तो सीधा यूज़ करें
+    const publishedDate = (dateInput instanceof Date) ? dateInput : new Date(dateInput);
+    if(isNaN(publishedDate.getTime()) || publishedDate.getTime() === 0) return ""; 
+
     const secondsAgo = Math.floor((now - publishedDate) / 1000);
 
     const intervals = { year: 31536000, month: 2592000, week: 604800, day: 86400, hour: 3600, minute: 60, second: 1 };
