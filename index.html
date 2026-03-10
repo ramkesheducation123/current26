@@ -12,9 +12,9 @@
         const proxyBase = "https://sweet-base-34f7.kgfads100.workers.dev/?url=";
         const u1 = "https://242310604.hs-sites-na2.com/tag/fact/rss.xml";
         const u2 = "https://242310604.hs-sites-na2.com/tag/national/rss.xml";
-        const cb = "&_t=" + new Date().getTime(); 
-        window.earlyFeeds[u1] = fetch(proxyBase + encodeURIComponent(u1) + cb, {cache: "no-store"}).then(r => r.text());
-        window.earlyFeeds[u2] = fetch(proxyBase + encodeURIComponent(u2) + cb, {cache: "no-store"}).then(r => r.text());
+        const ts = new Date().getTime(); // Origin Cache bypass
+        window.earlyFeeds[u1] = fetch(proxyBase + encodeURIComponent(u1 + "?_t=" + ts), {cache: "no-store"}).then(r => r.text());
+        window.earlyFeeds[u2] = fetch(proxyBase + encodeURIComponent(u2 + "?_t=" + ts), {cache: "no-store"}).then(r => r.text());
     } catch(e) {}
 </script>
   
@@ -849,13 +849,22 @@ async function parseRSSItems(text, rssUrl) {
     let items = Array.from(xml.querySelectorAll("item")).map(item => {
         let title = item.querySelector("title")?.textContent || "";
         let link = item.querySelector("link")?.textContent || "";
-        let pubDate = item.querySelector("pubDate") ? new Date(item.querySelector("pubDate").textContent) : new Date(0);
         
+        // सुरक्षित Date Parsing
+        let pubDateNode = item.querySelector("pubDate") || item.getElementsByTagName("dc:date")[0] || item.getElementsByTagName("date")[0] || item.querySelector("updated");
+        let pubDateText = pubDateNode ? pubDateNode.textContent : "";
+        let pubDate = pubDateText ? new Date(pubDateText) : new Date();
+        
+        // सुरक्षित Content Parsing (DOMException से बचाने के लिए)
         let descRaw = item.querySelector("description")?.textContent || "";
-        let contentRaw = item.querySelector("content\\:encoded, encoded")?.textContent || "";
+        let contentNode = item.getElementsByTagName("content:encoded")[0] || item.getElementsByTagName("encoded")[0];
+        let contentRaw = contentNode ? contentNode.textContent : "";
 
         let image = item.querySelector("enclosure")?.getAttribute("url") || "";
-        if (!image) image = item.querySelector("media\\:content, content")?.getAttribute("url") || "";
+        if (!image) {
+            let mediaNode = item.getElementsByTagName("media:content")[0] || item.getElementsByTagName("content")[0];
+            if (mediaNode) image = mediaNode.getAttribute("url");
+        }
         
         let tempDiv = document.createElement("div");
         let rawContent = descRaw;
@@ -881,7 +890,7 @@ async function parseRSSItems(text, rssUrl) {
             el.replaceWith(span);
         });
 
-        // 🌟 साफ़ HTML (ताकि ul, ol, li सुरक्षित रहें)
+        // 🌟 साफ़ HTML (ताकि ul, ol, li सुरक्षित रहें)
         let cleanDescHTML = tempDiv.innerHTML.trim();
         cleanDescHTML = cleanDescHTML.replace(/<br\s*[\/]?>(\s*<br\s*[\/]?>)+/gi, '<br><br>'); 
 
@@ -889,7 +898,13 @@ async function parseRSSItems(text, rssUrl) {
     });
     
     const translatableSources = ["https://242310604.hs-sites-na2.com", "https://timesofindia.indiatimes.com"];
-    if (translatableSources.some(src => rssUrl.includes(src))) {
+    
+    // 🚀 ULTRA FAST LOAD TRICK: अगर भाषा मैच करती है तो ट्रांसलेशन स्किप करें
+    let skipTranslation = false;
+    if (selectedLanguage === "en" && rssUrl.includes("timesofindia")) skipTranslation = true;
+    if (selectedLanguage === "hi" && rssUrl.includes("hs-sites")) skipTranslation = true;
+
+    if (!skipTranslation && translatableSources.some(src => rssUrl.includes(src))) {
         items = await Promise.all(
             items.map(async item => {
                 item.title = await getCachedTranslation(item.title, selectedLanguage);
@@ -904,9 +919,11 @@ async function parseRSSItems(text, rssUrl) {
 async function fetchFeedsData() {
     const urls = rssFeeds[selectedFeedIndex].urls;
     let allItems = [];
-    const cb = "&_t=" + new Date().getTime(); 
+    const ts = new Date().getTime(); 
     const fetchPromises = urls.map(async (rssUrl) => {
-        const proxyUrl = `https://sweet-base-34f7.kgfads100.workers.dev/?url=${encodeURIComponent(rssUrl)}${cb}`;
+        // Bypass Server & Proxy cache
+        const targetUrl = rssUrl + (rssUrl.includes('?') ? '&' : '?') + "_t=" + ts;
+        const proxyUrl = `https://sweet-base-34f7.kgfads100.workers.dev/?url=${encodeURIComponent(targetUrl)}`;
         const text = await fetch(proxyUrl, {cache: "no-store"}).then(r => r.text());
         return await parseRSSItems(text, rssUrl);
     });
@@ -1083,8 +1100,9 @@ async function loadNews() {
                 text = await window.earlyFeeds[rssUrl];
                 delete window.earlyFeeds[rssUrl];
             } else {
-                const cb = "&_t=" + new Date().getTime(); 
-                const proxyUrl = `https://sweet-base-34f7.kgfads100.workers.dev/?url=${encodeURIComponent(rssUrl)}${cb}`;
+                const ts = new Date().getTime();
+                const targetUrl = rssUrl + (rssUrl.includes('?') ? '&' : '?') + "_t=" + ts;
+                const proxyUrl = `https://sweet-base-34f7.kgfads100.workers.dev/?url=${encodeURIComponent(targetUrl)}`;
                 text = await fetch(proxyUrl, {cache: "no-store"}).then(r => r.text());
             }
 
@@ -1112,6 +1130,12 @@ async function loadNews() {
 
         await Promise.all(fetchPromises);
         allItemsCollected.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+        
+        // Final Fix: Refresh view with properly sorted items
+        articles = [...allItemsCollected];
+        displayNews();
+        autoFitText();
+        
         localStorage.setItem(`cachedFeeds_${selectedFeedIndex}`, JSON.stringify(allItemsCollected.slice(0, 40)));
         
         updateTopTabBadges();
@@ -1157,8 +1181,15 @@ setInterval(async () => {
 
 async function getCachedTranslation(text, lang) {
   if (!text || text.trim() === "") return "";
-  const translated = await googleTranslate(text, lang);
-  return translated || text;
+  try {
+      // 🚀 Timeout Protection: अगर API हैंग हुआ, तो तुरंत ओरिजिनल टेक्स्ट दे देगा (3 सेकंड की लिमिट)
+      return await Promise.race([
+          googleTranslate(text, lang),
+          new Promise(resolve => setTimeout(() => resolve(text), 3000))
+      ]);
+  } catch {
+      return text;
+  }
 }
 
 async function googleTranslate(text, lang) {
@@ -1171,7 +1202,7 @@ async function googleTranslate(text, lang) {
     translated = translated.replace(/'/g, "'").replace(/"/g, '"').replace(/undefined/g, "").replace(/\s+/g, " ").trim();
 
     if (translated.split(" ").length < 3) translated = await backupTranslate(text, lang);
-    return translated;
+    return translated || text;
   } catch (err) { return text; }
 }
 
@@ -1516,7 +1547,6 @@ function shareToWhatsApp(btnElement) {
     window.location.href = `whatsapp://send?text=${encodeURIComponent(shareMessage)}`;
 } 
 
-// 🌟 NEW: Background Progressive Auto-Fit Text 🌟
 function fitCardText(card) {
     if (card.classList.contains('font-fitted')) return;
     const bottomSection = card.querySelector('.bottom-section');
@@ -1524,7 +1554,7 @@ function fitCardText(card) {
     
     if (!bottomSection || !desc) return;
 
-    if (bottomSection.clientHeight === 0) return; // अगर कार्ड अभी रेंडर नहीं हुआ है
+    if (bottomSection.clientHeight === 0) return; 
 
     desc.style.display = 'block';
     desc.style.webkitLineClamp = 'unset';
@@ -1566,28 +1596,25 @@ function fitCardText(card) {
         desc.style.overflow = 'hidden';
     }
     
-    card.classList.add('font-fitted'); // फिट हो गया, मार्क करें
+    card.classList.add('font-fitted'); 
 }
 
 function autoFitText() {
     const activeCard = document.querySelector('.news-card.active');
     if (!activeCard) return;
 
-    // 1. तुरंत एक्टिव और अगले कार्ड को फिट करें ताकि यूज़र को कोई डिले न दिखे
     const priorityCards = [activeCard];
     const nextCard = activeCard.nextElementSibling;
     if (nextCard && nextCard.classList.contains('news-card')) priorityCards.push(nextCard);
 
     priorityCards.forEach(card => fitCardText(card));
 
-    // 2. बाकी बचे हुए कार्ड्स को बैकग्राउंड में बिना हैंग किये फिट करें
     setTimeout(() => {
         const allUnfittedCards = document.querySelectorAll('.news-card:not(.font-fitted)');
         allUnfittedCards.forEach(card => fitCardText(card));
-    }, 400); // मेन प्रोसेस के बाद रन करें
+    }, 400); 
 }
 
-// रिसाइज होने पर सभी कार्ड्स को दोबारा फिट करें
 window.addEventListener('resize', () => {
     document.querySelectorAll('.news-card').forEach(c => c.classList.remove('font-fitted'));
     autoFitText();
