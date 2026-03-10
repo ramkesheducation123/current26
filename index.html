@@ -11,11 +11,22 @@
     window.earlyFeeds = {};
     try {
         const proxyBase = "https://sweet-base-34f7.kgfads100.workers.dev/?url=";
-        const u1 = "https://242310604.hs-sites-na2.com/tag/fact/rss.xml";
-        const u2 = "https://242310604.hs-sites-na2.com/tag/national/rss.xml";
+        // 🚀 SMART FIX: सिर्फ वही URL प्री-फेच करें जिस टैब पर यूज़र है
+        const savedTab = parseInt(localStorage.getItem("selectedFeed")) || 0;
         const ts = window.appStartTime; 
-        window.earlyFeeds[u1] = fetch(proxyBase + encodeURIComponent(u1 + "?_t=" + ts), {cache: "no-store"}).then(r => r.text());
-        window.earlyFeeds[u2] = fetch(proxyBase + encodeURIComponent(u2 + "?_t=" + ts), {cache: "no-store"}).then(r => r.text());
+
+        const tabUrls = [
+            ["https://242310604.hs-sites-na2.com/tag/fact/rss.xml", "https://242310604.hs-sites-na2.com/tag/national/rss.xml"],
+            ["https://timesofindia.indiatimes.com/rssfeedstopstories.cms"],
+            [] // Saved Tab has no URLs
+        ];
+        
+        if (tabUrls[savedTab]) {
+            tabUrls[savedTab].forEach(url => {
+                const targetUrl = url + (url.includes('?') ? '&' : '?') + "_t=" + ts;
+                window.earlyFeeds[url] = fetch(proxyBase + encodeURIComponent(targetUrl), {cache: "no-store"}).then(r => r.text());
+            });
+        }
     } catch(e) {}
 </script>
   
@@ -463,6 +474,14 @@ let allArticlesBackup = [];
 let isReturningSession = localStorage.getItem("isReturningSession") === "true";
 localStorage.setItem("isReturningSession", "true"); 
 
+// 🚀 SMART FIX: Abort Controller for Instant Tab Switching
+let fetchAborter = null;
+function getNewSignal() {
+    if (fetchAborter) fetchAborter.abort(); // Cancel any ongoing fetch instantly
+    fetchAborter = new AbortController();
+    return fetchAborter.signal;
+}
+
 window.toastTimeout = null;
 function showToast(msg, iconClass, color, duration = 3500) {
     const toast = document.getElementById("networkToast");
@@ -592,6 +611,7 @@ function showPrevFlip() {
               showToast("कोई नई खबर नहीं मिली", "fas fa-info-circle", "#f1c40f", 3000);
           }
       }).catch(e => {
+          if (e.name === 'AbortError') return;
           showToast("नेटवर्क त्रुटि", "fas fa-exclamation-triangle", "#ff4d4d", 3000);
       });
 
@@ -759,7 +779,9 @@ let selectedFeedIndex = parseInt(localStorage.getItem("selectedFeed")) || 0;
 let selectedLanguage = localStorage.getItem("selectedLanguage") || "en"; 
 
 function selectFeed(index) {
+  if (selectedFeedIndex === index && articles.length > 0) return; // Prevent redundant clicks
   selectedFeedIndex = index;
+  localStorage.setItem("selectedFeed", index); // 🚀 SMART FIX: Save Tab state immediately for fast reloading
   updateTabUI();
   refreshNewsFeed();
 }
@@ -886,7 +908,7 @@ async function parseRSSItems(text, rssUrl) {
         let title = item.querySelector("title")?.textContent || "";
         let link = item.querySelector("link")?.textContent || "";
         
-        // सुरक्षित Date Parsing (अगर Date न हो तो उसे 0 epoch मानें ताकि वो टॉप पर न कूदे)
+        // सुरक्षित Date Parsing
         let pubDateNode = item.querySelector("pubDate") || item.getElementsByTagName("dc:date")[0] || item.getElementsByTagName("date")[0] || item.querySelector("updated");
         let pubDateText = pubDateNode ? pubDateNode.textContent.trim() : "";
         let pubDate = new Date(0); 
@@ -895,7 +917,6 @@ async function parseRSSItems(text, rssUrl) {
             if(!isNaN(parsed.getTime())) pubDate = parsed;
         }
         
-        // सुरक्षित Content Parsing (DOMException से बचाने के लिए)
         let descRaw = item.querySelector("description")?.textContent || "";
         let contentNode = item.getElementsByTagName("content:encoded")[0] || item.getElementsByTagName("encoded")[0];
         let contentRaw = contentNode ? contentNode.textContent : "";
@@ -920,17 +941,14 @@ async function parseRSSItems(text, rssUrl) {
             if (imgTag) image = imgTag.src;
         }
 
-        // फालतू टैग्स हटाएं (Images, Iframes, Scripts) 
         tempDiv.querySelectorAll('img, iframe, script, style, figure, video, audio').forEach(el => el.remove());
         
-        // लिंक्स को नार्मल टेक्स्ट में बदलें
         tempDiv.querySelectorAll('a').forEach(el => {
             let span = document.createElement('span');
             span.innerHTML = el.innerHTML;
             el.replaceWith(span);
         });
 
-        // साफ़ HTML 
         let cleanDescHTML = tempDiv.innerHTML.trim();
         cleanDescHTML = cleanDescHTML.replace(/<br\s*[\/]?>(\s*<br\s*[\/]?>)+/gi, '<br><br>'); 
 
@@ -955,23 +973,29 @@ async function parseRSSItems(text, rssUrl) {
     return items;
 }
 
+// 🚀 SMART FIX: सिर्फ करंट टैब को सिंक करेगा और अगर टैब बदला तो पुराना सिंक तुरंत रोक देगा
 async function fetchFeedsData(useInitialTime = false) {
     const urls = rssFeeds[selectedFeedIndex].urls;
     let allItems = [];
-    // अगर App खुलते समय पहली फेचिंग है तो window.appStartTime यूज करें ताकि कैश हिट हो।
     const ts = useInitialTime ? window.appStartTime : new Date().getTime(); 
-    const fetchPromises = urls.map(async (rssUrl) => {
-        // Bypass Server & Proxy cache
-        const targetUrl = rssUrl + (rssUrl.includes('?') ? '&' : '?') + "_t=" + ts;
-        const proxyUrl = `https://sweet-base-34f7.kgfads100.workers.dev/?url=${encodeURIComponent(targetUrl)}`;
-        const text = await fetch(proxyUrl, {cache: "no-store"}).then(r => r.text());
-        return await parseRSSItems(text, rssUrl);
-    });
-    const results = await Promise.all(fetchPromises);
-    results.forEach(items => allItems = allItems.concat(items));
-    // यहाँ तारीख को पूरी तरह से सुरक्षित सॉर्ट किया गया है
-    allItems.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
-    return allItems;
+    
+    const signal = getNewSignal(); // Abort previous background calls
+    
+    try {
+        const fetchPromises = urls.map(async (rssUrl) => {
+            const targetUrl = rssUrl + (rssUrl.includes('?') ? '&' : '?') + "_t=" + ts;
+            const proxyUrl = `https://sweet-base-34f7.kgfads100.workers.dev/?url=${encodeURIComponent(targetUrl)}`;
+            const text = await fetch(proxyUrl, {cache: "no-store", signal}).then(r => r.text());
+            return await parseRSSItems(text, rssUrl);
+        });
+        const results = await Promise.all(fetchPromises);
+        results.forEach(items => allItems = allItems.concat(items));
+        allItems.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
+        return allItems;
+    } catch(error) {
+        if (error.name === 'AbortError') return []; // If aborted, return empty silently
+        throw error;
+    }
 }
 
 function injectNewItems(newArticles) {
@@ -980,7 +1004,6 @@ function injectNewItems(newArticles) {
     const container = document.getElementById('newsContainer');
     let wasAtTop = (currentIndex === 0);
 
-    // दोनों ऐरे को मिलाएं और एक बार फिर से सॉर्ट करें ताकि कैश वाली और नई डेट्स सही से अरेंज हो जाएं
     let mergedArticles = [...newArticles, ...articles];
     mergedArticles.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
     
@@ -994,14 +1017,11 @@ function injectNewItems(newArticles) {
     const tabName = activeTabBtn ? activeTabBtn.innerText : 'इस सेक्शन';
 
     if (wasAtTop) {
-        // अगर यूजर टॉप पर है तो पूरा कंटेनर दोबारा रेंडर करें
         displayNews();
         showToast(`${newArticles.length} नई ख़बरें अपडेट हो गईं!`, "fas fa-check-circle", "#2ecc71", 3500);
     } else {
-        // अगर यूजर नीचे पढ़ रहा है तो नई खबरों को DOM में ऊपर जोड़ दें (बिना डिस्टर्ब किए)
         currentIndex += newArticles.length; 
         
-        // पुरानी खबरों का इंडेक्स अपडेट करें
         const existingCards = document.querySelectorAll('.news-card');
         existingCards.forEach(card => {
             let oldIndex = parseInt(card.getAttribute('data-index'));
@@ -1108,7 +1128,6 @@ async function loadNews() {
   if (cachedData) {
       try {
           articles = JSON.parse(cachedData);
-          // ⚠️ सबसे अहम फिक्स: लोकल स्टोरेज से आने वाली डेट को तुरंत 'Date' ऑब्जेक्ट बना दें।
           articles.forEach(a => {
               a.pubDate = new Date(a.pubDate);
           });
@@ -1123,7 +1142,6 @@ async function loadNews() {
           unreadCount = calculateUnreadCount(articles);
           updateUnreadBadge();
           
-          // कैश लोड होने के बाद ताज़ी खबर सिंक हो रही है (परमानेंट Toast दिखाएं)
           checkNetworkAndShowToast(true);
       } catch (e) { console.error("Cache read error", e); }
   } else {
@@ -1137,6 +1155,8 @@ async function loadNews() {
         let isFirstFeedRendered = false;
         const urls = rssFeeds[selectedFeedIndex].urls;
         let allItemsCollected = [];
+        
+        const signal = getNewSignal(); // 🚀 Abort previous downloads if tab changed fast
 
         const fetchPromises = urls.map(async (rssUrl) => {
             let text;
@@ -1147,7 +1167,7 @@ async function loadNews() {
                 const ts = window.appStartTime;
                 const targetUrl = rssUrl + (rssUrl.includes('?') ? '&' : '?') + "_t=" + ts;
                 const proxyUrl = `https://sweet-base-34f7.kgfads100.workers.dev/?url=${encodeURIComponent(targetUrl)}`;
-                text = await fetch(proxyUrl, {cache: "no-store"}).then(r => r.text());
+                text = await fetch(proxyUrl, {cache: "no-store", signal}).then(r => r.text());
             }
 
             let items = await parseRSSItems(text, rssUrl);
@@ -1175,7 +1195,6 @@ async function loadNews() {
         await Promise.all(fetchPromises);
         allItemsCollected.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
         
-        // Final Fix: Refresh view with properly sorted items
         articles = [...allItemsCollected];
         displayNews();
         autoFitText();
@@ -1187,16 +1206,13 @@ async function loadNews() {
         
     } 
     else if (loadedFromCache) {
-        // बैकग्राउंड में नई खबर लायेगा
         const allItems = await fetchFeedsData(false);
         let existingLinks = new Set(articles.map(a => a.link));
         let newArticles = allItems.filter(a => !existingLinks.has(a.link) && a.link && !a.link.startsWith('go:'));
 
         if (newArticles.length > 0) {
             injectNewItems(newArticles);
-            // injectNewItems खुद toast दिखाएगा
         } else {
-            // जैसे ही सिंक खत्म हो, परमानेंट Toast को 3 सेकंड वाले में बदल दें
             showToast("सभी ख़बरें अप-टू-डेट हैं!", "fas fa-check-circle", "#2ecc71", 3000);
         }
         
@@ -1204,6 +1220,7 @@ async function loadNews() {
     }
 
   } catch (error) {
+    if (error.name === 'AbortError') return; // 🚀 Tab switch silently aborted, no error popup
     console.error("Error loading RSS Feeds", error);
     showToast("सिंक फ़ेल हो गया", "fas fa-exclamation-circle", "#e74c3c", 3000);
   } finally {
@@ -1212,6 +1229,7 @@ async function loadNews() {
   }
 }
 
+// Background tab-sync check
 setInterval(async () => {
     if (selectedFeedIndex === 2 || !navigator.onLine || isShowingOnlyUnread) return;
     try {
@@ -1229,7 +1247,6 @@ setInterval(async () => {
 async function getCachedTranslation(text, lang) {
   if (!text || text.trim() === "") return "";
   try {
-      // Timeout Protection: अगर API हैंग हुआ, तो तुरंत ओरिजिनल टेक्स्ट दे देगा (3 सेकंड की लिमिट)
       return await Promise.race([
           googleTranslate(text, lang),
           new Promise(resolve => setTimeout(() => resolve(text), 3000))
@@ -1371,7 +1388,6 @@ function displayNews() {
     let titleHTML = article.title ? `<h2 class="feed-title">${article.title}</h2>` : '';
     let descriptionHTML = article.description ? `<div class="feed-desc">${article.description}</div>` : '';
 
-    // Date ऑब्जेक्ट को वापस स्ट्रिंग में बदलें ताकि getTimeAgo सही चले
     let displayTime = getTimeAgo(article.pubDate);
 
     newsCard.innerHTML = `
@@ -1441,7 +1457,6 @@ function toggleLike(btnElement) {
 
 function getTimeAgo(dateInput) {
     const now = new Date();
-    // यदि dateInput पहले से Date ऑब्जेक्ट है तो सीधा यूज़ करें
     const publishedDate = (dateInput instanceof Date) ? dateInput : new Date(dateInput);
     if(isNaN(publishedDate.getTime()) || publishedDate.getTime() === 0) return ""; 
 
@@ -1612,7 +1627,7 @@ function fitCardText(card) {
     desc.style.display = 'block';
     desc.style.webkitLineClamp = 'unset';
 
-    let maxSize = 18; 
+    let maxSize = 17; 
     let minSize = 10; 
     let currentSize = maxSize;
 
