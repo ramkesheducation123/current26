@@ -4,6 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
+    <link rel="preconnect" href="https://sweet-base-34f7.kgfads100.workers.dev">
+    <link rel="dns-prefetch" href="https://sweet-base-34f7.kgfads100.workers.dev">
+<script>
+    window.earlyFeeds = {};
+    try {
+        const proxyBase = "https://sweet-base-34f7.kgfads100.workers.dev/?url=";
+        const u1 = "https://242310604.hs-sites-na2.com/tag/fact/rss.xml";
+        const u2 = "https://242310604.hs-sites-na2.com/tag/national/rss.xml";
+        const cb = "&_t=" + new Date().getTime(); 
+        window.earlyFeeds[u1] = fetch(proxyBase + encodeURIComponent(u1) + cb, {cache: "no-store"}).then(r => r.text());
+        window.earlyFeeds[u2] = fetch(proxyBase + encodeURIComponent(u2) + cb, {cache: "no-store"}).then(r => r.text());
+    } catch(e) {}
+</script>
   
     <style>
     A {text-decoration: none;}
@@ -65,10 +78,9 @@
         transform-origin: bottom right;
         backface-visibility: hidden;
         transform-style: preserve-3d;
-        will-change: transform, opacity; /* Hardware acceleration */
+        will-change: transform, opacity; 
     }
 
-    /* --- नया टॉप सेक्शन (इमेज और टाइटल के लिए) --- */
     .top-section {
         position: relative;
         width: 100%;
@@ -103,12 +115,11 @@
         z-index: 2;
     }
 
-    /* --- नया बॉटम सेक्शन (डिस्क्रिप्शन के लिए) --- */
     .bottom-section {
         flex: 1; 
         width: 100%;
         background: #fff;
-        padding: 20px 15px 105px 15px; 
+        padding: 5px 15px 125px 15px; 
         box-sizing: border-box;
         overflow: hidden; 
     }
@@ -117,10 +128,17 @@
         color: #000;
         margin: 0;
         width: 100%;
-        height: 100%; 
         line-height: 1.6;
         font-family: Noto Serif Devanagari !important;
-        overflow: hidden;
+    }
+    
+    .feed-desc ul, .feed-desc ol {
+        margin: 5px 0;
+        padding-left: 15px;
+    }
+    .feed-desc li {
+        margin-bottom: 4px;
+        line-height: 1.6;
     }
 
     .news-flip-up { animation: pageFlipUp 0.30s ease forwards; }
@@ -184,11 +202,11 @@
 
     .action-bar {
         position: absolute;
-        bottom: 68px;
+        bottom: 66px;
         gap:15px;
         left: 15px; 
         display: flex; font-size:10px;
-        background:#fff;
+        background:transparent;
         justify-content: space-around;
         align-items: center;
         padding: 3px 12px;
@@ -200,7 +218,7 @@
         display: flex; flex-direction: column; align-items: center;
         cursor: pointer; color: #000; transition: transform 0.2s;
     }
-    .action-btn i { font-size: 18px; margin-bottom: 5px; }
+    .action-btn i { font-size: 20px; margin-bottom: 5px; }
     
     .skeleton-container { padding: 14px; margin-top:-20px; }
     .skeleton-card {
@@ -265,14 +283,14 @@
     }
 
     #tabWrapper { position: fixed; top: 0; width: 100%; z-index: 100000; display: flex; align-items: center; background: transparent; transition: top 0.4s ease-in-out; }
-    .tabs { display: flex; flex: 1; min-width:100%; background: yellow; margin-top:-4px; overflow:hidden; padding: 15px 0px; border-radius:0px 5px 5px 0px; gap: 13px; box-shadow: 0 2px 10px rgba(0,0,0,0.5), 0 0 0 1px #fff inset; justify-content: center; transition: transform 0.4s ease; }
+    .tabs { display: flex; flex: 1; min-width:100%; background: yellow; margin-top:-4px; overflow:hidden; padding: 15px 0px; border-radius:0px 5px 5px 0px; gap: 6px; box-shadow: 0 2px 10px rgba(0,0,0,0.5), 0 0 0 1px #fff inset; justify-content: center; transition: transform 0.4s ease; }
     .tabs button { box-shadow: 0 2px 10px rgba(0,0,0,0.5), 0 0 0 1px #fff inset; font-weight: bold; padding: 5px 14px; font-family:kadwa; background: #e0e0e0; border: none; border-radius: 5px; font-size: 10px; cursor: pointer; transition: background 0.3s; }
     .tabs button:hover { background: #dcdcdc; }
     .translate-btn { display: flex; align-items: center; justify-content: center; padding: 4px 10px !important; background: #fff !important; color: #333; }
     .translate-btn:hover { background: #f0f0f0 !important; }
     .tab-hidden .tabs { transform: translateY(-100%); opacity: 0; pointer-events: none; }
     #tabs button.active { color: white; background-color: #007bff; }
-    #toggleTabs { position: fixed; right: -4px; top: 450px; width: 28px; height: 56px; background: linear-gradient(135deg, #ff3b3b, #d90429); color: #fff; display: flex; justify-content: center; align-items: center; border-radius: 12px 0 0 12px; box-shadow: -4px 0 12px rgba(217, 4, 41, 0.3), inset 1px 0 0 rgba(255, 255, 255, 0.2); cursor: pointer; z-index: 100000; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); user-select: none; }
+    #toggleTabs { position: fixed; right: -5px; top: 450px; width: 28px; height: 56px; background: linear-gradient(135deg, #ff3b3b, #d90429); color: #fff; display: flex; justify-content: center; align-items: center; border-radius: 12px 0 0 12px; box-shadow: -4px 0 12px rgba(217, 4, 41, 0.3), inset 1px 0 0 rgba(255, 255, 255, 0.2); cursor: pointer; z-index: 100000; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); user-select: none; }
     #toggleTabs:hover { width: 32px; background: linear-gradient(135deg, #ff4f4f, #e60026); }
     #toggleIcon { display: flex; align-items: center; justify-content: center; transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
     .tab-hidden #toggleIcon { transform: rotate(180deg); }
@@ -292,7 +310,6 @@
     .text-error { color: red !important; animation: shake 0.3s ease-in-out; }
     @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } }
 
-    /* 🌟 NEW: Network Status Toast UI 🌟 */
     .network-toast {
         position: fixed;
         bottom: -60px;
@@ -347,21 +364,17 @@
     <span111>Current Affairs</span111>
   </div>
  <div class="tab middle" data-url="go:cmagazine" data-code="add">
-    
     <div id="middleCircle" class="middle-circle">
-      
       <div id="defaultContent" style="display: flex; flex-direction: column; align-items: center;">
         <i class="fas fa-book-open" style="color:#000; font-size: 16px;"></i>
         <span style="font-size: 10px; font-weight: 900; font-family: kadwa; color:#000; margin-top:3px;">PYP</span>
       </div>
-
       <div id="unreadContent" style="display: none; flex-direction: column; align-items: center; justify-content: center; line-height: 1.6;">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" style="width: 15px; height: 15px; fill: #fff; margin-bottom: 2px;">
           <path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L525.6 386.7c39.6-40.6 66.4-86.1 79.9-118.4c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C465.5 68.8 400.8 32 320 32c-68.2 0-125 26.3-169.3 60.8L38.8 5.1zm151 118.3C226 97.7 269.5 80 320 80c65.2 0 118.8 29.6 159.9 67.7C518.4 183.5 545 226 558.6 256c-12.6 28-36.6 68.3-70.9 100.9l-53.8-42.2c9.1-17.6 14.2-37.5 14.2-58.7c0-70.7-57.3-128-128-128c-32.2 0-61.7 11.9-84.2 31.5l-46.1-36.1zM394.9 284.2l-81.5-63.9c4.2-8.5 6.6-18.2 6.6-28.3c0-35.3-28.7-64-64-64c-27.7 0-51.1 17.7-60.6 42.3l-45-35.3c15.8-32.9 49.3-55 89.6-55c53 0 96 43 96 96c0 15.6-3.8 30.3-10.4 43.1zM118.3 186.2l45.4 35.6c-21.4 20-39.7 44.5-54 68.1c-4.3 7.1-4.3 15.9 0 23.1c11.6 19.3 33.6 50.9 66.6 84.4l-42.4 35.3C90.2 388.6 57 334.7 42.2 301.7c-3.2-7.1-3.2-15 0-22.1c12.3-27.6 37.1-66.2 76.1-93.4zM256 384c-53 0-96-43-96-96c0-10.4 1.7-20.4 4.7-29.8L126.3 228.1c-16 23.3-29.4 48.7-39.5 73.6c14.6 34.6 45.4 85 91 127C224.2 469 288.1 504 368 504c35 0 68.5-9.3 99.2-25.2l-45.7-35.8c-49.8 26.6-105.7 41-165.5 41zm82.8-43.1l-61.8-48.4c-6.1 2.3-12.7 3.5-19.5 3.5c-35.3 0-64-28.7-64-64c0-5 .8-9.8 2.2-14.3l-59-46.2c-1.4 6.6-2.2 13.4-2.2 20.4c0 70.7 57.3 128 128 128c25.4 0 49.1-7.4 69.1-20l-12.8-10z"/>
         </svg>
         <span id="uCountText" style="font-size: 13px; font-weight: 900; color: #fff;">0</span>
       </div>
-
     </div>
   </div>
   <div class="tab" data-url="go:quiz" data-code="quiz">
@@ -375,7 +388,7 @@
   </div>
 </div>
 
-<div id="loadingScreen"><div style="color:white; position:absolute; letter-spacing:1.5px; font-size:9px; margin-top:115px;">Fetching Latest Feed</div>
+<div id="loadingScreen"><div style="color:white; position:absolute; letter-spacing:1.5px; font-size:9px; margin-top:115px;">Loading... Please Wait</div>
     <div class="spinner"></div>
 </div>
 
@@ -385,7 +398,7 @@
         <ol><li> डेली करेंट अफेयर्स की <strong>अगली फीड</strong> को पढ़ने के लिए <strong>"ऊपर सरकाएं"</strong></li>
         <li> डेली करेंट अफेयर्स की <strong>पिछली फीड</strong> को पढ़ने के लिए <strong>"नीचे सरकाएं"</strong></li>
         <li> पसंदीदा फीड को Save करने के लिए <i Style="color:red;" class="fas fa-heart-circle-plus"></i> icon पर Tap करें</li></ol>
-        <p style=" font-size:13px; margin-top:10px; background:rgb(0,0,0,0.3); padding:5px 10px; border-radius:5px;">सभी प्रतियोगी परीक्षाओं (UPSC, MPPSC, SSC, बैंकिंग, रेलवे, पुलिस, शिक्षक पात्रता परीक्षा (TET) आदि) के लिए सम्पूर्ण करेंट अफेयर्स पढ़ें एक ही जगह विशेष तथ्यों के साथ</p>
+        <p style=" font-size:13px; margin-top:10px; background:rgb(0,0,0,0.3); padding:5px 10px; border-radius:5px;">सभी प्रतियोगी परीक्षाओं के लिए सम्पूर्ण करेंट अफेयर्स पढ़ें</p>
         <div class="popup2-footer">
             <input type="checkbox" id="consentCheckbox">
             <label for="consentCheckbox" id="consentLabel">हम समझ गए</label>
@@ -438,10 +451,29 @@ let startY = 0, endY = 0, startX = 0, endX = 0;
 let lastTouchY = 0;
 let currentIndex = 0;
 let articles = []; 
-let totalSlidesBeforeRefresh = 20;
+let totalSlidesBeforeRefresh = 30;
 let readArticles = JSON.parse(localStorage.getItem('readNewsLinks') || '[]');
 let unreadCount = 0;
 const MIN_SWIPE = 60; 
+
+let isShowingOnlyUnread = false;
+let allArticlesBackup = [];
+
+let isReturningSession = localStorage.getItem("isReturningSession") === "true";
+localStorage.setItem("isReturningSession", "true"); 
+
+window.toastTimeout = null;
+function showToast(msg, iconClass, color, duration = 3500) {
+    const toast = document.getElementById("networkToast");
+    if (!toast) return;
+    toast.querySelector("span").innerText = msg;
+    toast.querySelector("i").className = iconClass;
+    toast.querySelector("i").style.color = color;
+    toast.classList.add("show");
+    
+    if(window.toastTimeout) clearTimeout(window.toastTimeout);
+    window.toastTimeout = setTimeout(() => toast.classList.remove("show"), duration);
+}
 
 document.addEventListener("touchstart", e => {
   const t = e.touches[0];
@@ -500,7 +532,10 @@ function handleVerticalSwipe() {
 }
 
 function showNextFlip() {
-  if (currentIndex >= articles.length - 1) return;
+  if (currentIndex >= articles.length - 1) {
+      if (isShowingOnlyUnread) restoreAllNews();
+      return;
+  }
 
   const oldCard = document.querySelector(".news-card.active");
   const nextCard = document.querySelector(`.news-card[data-index="${currentIndex + 1}"]`);
@@ -523,15 +558,37 @@ function showNextFlip() {
     nextCard.classList.remove("news-appear");
     nextCard.style.opacity = "1";
     updateSlide();
-    if (currentIndex >= totalSlidesBeforeRefresh) showRefreshPopup();
     
-    if (typeof isAudioPlaying !== 'undefined' && isAudioPlaying) playCurrentNewsAudio();
-    else if (typeof updateAudioUI === 'function') updateAudioUI();
+    if (!isShowingOnlyUnread && currentIndex >= totalSlidesBeforeRefresh) showRefreshPopup();
   }, 700);
 }
 
 function showPrevFlip() {
-  if (currentIndex <= 0) return;
+  if (currentIndex <= 0) {
+      if (selectedFeedIndex === 2 || !navigator.onLine || isShowingOnlyUnread) return;
+
+      const activeTabBtn = document.querySelector('#tabs button.active');
+      const tabName = activeTabBtn ? activeTabBtn.innerText : 'इस सेक्शन';
+      
+      showToast(`${tabName} में नई ख़बरें खोज रहे हैं...`, "fas fa-sync fa-spin", "#3498db", 2000);
+
+      fetchFeedsData().then(allItems => {
+          let existingLinks = new Set(articles.map(a => a.link));
+          let newArticles = allItems.filter(a => !existingLinks.has(a.link) && a.link && !a.link.startsWith('go:'));
+
+          if (newArticles.length > 0) {
+              injectNewItems(newArticles);
+          } else {
+              setTimeout(() => {
+                  showToast("कोई नई खबर नहीं मिली", "fas fa-info-circle", "#f1c40f", 3000);
+              }, 1500);
+          }
+      }).catch(e => {
+          showToast("नेटवर्क त्रुटि", "fas fa-exclamation-triangle", "#ff4d4d", 3000);
+      });
+
+      return; 
+  }
 
   const oldCard = document.querySelector(".news-card.active");
   const prevCard = document.querySelector(`.news-card[data-index="${currentIndex - 1}"]`);
@@ -554,15 +611,13 @@ function showPrevFlip() {
     prevCard.classList.remove("news-appear");
     prevCard.style.opacity = "1";
     updateSlide();
-    
-    if (typeof isAudioPlaying !== 'undefined' && isAudioPlaying) playCurrentNewsAudio();
-    else if (typeof updateAudioUI === 'function') updateAudioUI();
   }, 700);
 }
 
 function updateSlide() {
   const cards = document.querySelectorAll(".news-card");
-  cards.forEach((card, index) => {
+  cards.forEach((card) => {
+    const index = parseInt(card.getAttribute('data-index'));
     card.style.transition = 'transform 0.5s ease';
     card.style.transform = `translateY(${(index - currentIndex) * 100}%)`;
   });
@@ -573,7 +628,70 @@ document.addEventListener("DOMContentLoaded", () => {
   loadNews();
 });
 
+function showOnlyUnread() {
+    isShowingOnlyUnread = true;
+    allArticlesBackup = [...articles]; 
+    
+    articles = articles.filter(a => {
+        if (!a.link || a.link.startsWith('go:')) return false; 
+        return !readArticles.includes(a.link);
+    });
+    
+    if (articles.length === 0) {
+        restoreAllNews();
+        return;
+    }
+    
+    const container = document.getElementById('newsContainer');
+    container.style.transition = 'transform 0.3s ease';
+    container.style.transform = 'translateY(100%)';
+    
+    setTimeout(() => {
+        displayNews();
+        container.style.transform = 'translateY(0%)';
+        showToast("सिर्फ बिना पढ़ी हुई ख़बरें दिखाई जा रही हैं।", "fas fa-filter", "#f1c40f", 3500);
+    }, 300);
+}
+
+function restoreAllNews() {
+    isShowingOnlyUnread = false;
+    
+    const overlay = document.createElement("div");
+    overlay.id = "successTickOverlay";
+    overlay.style = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(255, 255, 255, 0.95);
+        display: flex; flex-direction: column;
+        justify-content: center; align-items: center;
+        z-index: 999999; opacity: 0;
+        animation: fadeInOutOverlay 2.2s forwards;
+        backdrop-filter: blur(6px); user-select: none;
+    `;
+    overlay.innerHTML = `
+        <i class="fas fa-check-circle" style="font-size: 85px; color: #2ecc71; margin-bottom: 20px; text-shadow: 0 4px 15px rgba(46, 204, 113, 0.4); animation: popInTick 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);"></i>
+        <h2 style="color: #333; font-family: 'Noto Serif Devanagari', sans-serif; font-size: 26px; font-weight: 800; margin:0; text-align:center;">बहुत बढ़िया!</h2>
+        <p style="color: #666; font-family: 'Noto Serif Devanagari', sans-serif; font-size: 14px; text-align:center; margin-top:10px; font-weight: bold;">आपने सभी नई ख़बरें पढ़ ली हैं।<br>सभी ख़बरें रीस्टोर हो रही हैं...</p>
+    `;
+
+    if (!document.getElementById("tickAnimStyles")) {
+        const style = document.createElement("style");
+        style.id = "tickAnimStyles";
+        style.textContent = `
+            @keyframes popInTick { 0% { transform: scale(0); opacity: 0; } 80% { transform: scale(1.15); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+            @keyframes fadeInOutOverlay { 0% { opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; } }
+        `;
+        document.head.appendChild(style);
+    }
+    document.body.appendChild(overlay);
+
+    setTimeout(() => {
+        if (overlay.parentNode) overlay.remove();
+        refreshNewsFeed();
+    }, 2200);
+}
+
 function refreshNewsFeed() {
+    isShowingOnlyUnread = false;
     hideRefreshPopup();
     document.getElementById("loadingScreen")?.style.setProperty("visibility", "visible");
     document.getElementById("loader")?.style.setProperty("display", "block");
@@ -594,23 +712,9 @@ function refreshNewsFeed() {
 }
 
 const rssFeeds = [
-  {
-    name: "ट्रेंडिंग",
-    urls: [
-     "https://242310604.hs-sites-na2.com/tag/fact/rss.xml",
-       "https://242310604.hs-sites-na2.com/tag/national/rss.xml"
-    ]
-  },
-  {
-    name: "देश/विदेश",
-    urls: [
-      "https://timesofindia.indiatimes.com/rssfeedstopstories.cms"
-    ]
-  },
-  {
-    name: "Saved Feed",
-    urls: []
-  }
+  { name: "ट्रेंडिंग", urls: ["https://242310604.hs-sites-na2.com/tag/fact/rss.xml", "https://242310604.hs-sites-na2.com/tag/national/rss.xml"] },
+  { name: "देश/विदेश", urls: ["https://timesofindia.indiatimes.com/rssfeedstopstories.cms"] },
+  { name: "Saved Feed", urls: [] }
 ];
 
 let selectedFeedIndex = parseInt(localStorage.getItem("selectedFeed")) || 0;
@@ -627,6 +731,52 @@ function updateTabUI() {
   buttons.forEach((btn, idx) => {
     btn.classList.toggle("active", idx === selectedFeedIndex);
   });
+}
+
+function calculateUnreadCount(articlesArray) {
+    const now = Date.now();
+    const LIMIT = isReturningSession ? (24 * 60 * 60 * 1000) : (7 * 24 * 60 * 60 * 1000);
+    let count = 0;
+    articlesArray.forEach(a => {
+        if (!a.link || a.link.startsWith('go:')) return;
+        const isNotRead = !readArticles.includes(a.link);
+        const pubTime = new Date(a.pubDate).getTime();
+        if ((now - pubTime) <= LIMIT && isNotRead) count++;
+    });
+    return count;
+}
+
+function updateTopTabBadges() {
+    const tabsBtns = document.querySelectorAll("#tabs button");
+    [0, 1].forEach(index => {
+        let count = 0;
+        if (index === selectedFeedIndex) {
+            count = unreadCount;
+        } else {
+            let cached = localStorage.getItem(`cachedFeeds_${index}`);
+            if (cached) {
+                try {
+                    let parsed = JSON.parse(cached);
+                    count = calculateUnreadCount(parsed);
+                } catch(e){}
+            }
+        }
+        
+        let btn = tabsBtns[index];
+        if (btn) {
+            let badge = btn.querySelector('.tab-badge');
+            if (count > 0) {
+                if (!badge) {
+                    btn.style.position = 'relative';
+                    btn.insertAdjacentHTML('beforeend', `<span class="tab-badge" style="background:#ff3b3b;color:#fff;border-radius:10px;padding:2px 5px;font-size:8px;position:absolute;top:-3px;right:-1px;box-shadow:0 2px 4px rgba(0,0,0,0.3); z-index:10; line-height: 1;">${count > 99 ? '99+' : count}</span>`);
+                } else {
+                    badge.innerText = count > 99 ? '99+' : count;
+                }
+            } else {
+                if (badge) badge.remove();
+            }
+        }
+    });
 }
 
 function updateUnreadBadge() {
@@ -652,6 +802,8 @@ function updateUnreadBadge() {
         defaultContent.style.display = 'flex';
         circle.style.animation = 'none';
     }
+    
+    updateTopTabBadges();
 }
 
 function markAsRead(index) {
@@ -661,15 +813,15 @@ function markAsRead(index) {
     if (article.link && !article.link.startsWith('go:')) {
         if (!readArticles.includes(article.link)) {
             readArticles.push(article.link);
-            if (readArticles.length > 500) readArticles.shift();
+            if (readArticles.length > 700) readArticles.shift();
             localStorage.setItem('readNewsLinks', JSON.stringify(readArticles));
             
-            const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+            const LIMIT = isReturningSession ? (24 * 60 * 60 * 1000) : (7 * 24 * 60 * 60 * 1000);
             const now = Date.now();
             const pubTime = new Date(article.pubDate).getTime();
-            const isWithin24Hrs = (now - pubTime) <= ONE_DAY_MS;
+            const isWithinTime = (now - pubTime) <= LIMIT;
             
-            if (isWithin24Hrs && unreadCount > 0) {
+            if (isWithinTime && unreadCount > 0) {
                 unreadCount--;
                 requestAnimationFrame(() => updateUnreadBadge());
             }
@@ -677,31 +829,197 @@ function markAsRead(index) {
     }
 }
 
-// 🌟 NEW: Network Status Function 🌟
 function checkNetworkAndShowToast() {
-    const toast = document.getElementById("networkToast");
-    const span = toast.querySelector("span");
-    const icon = toast.querySelector("i");
-    
     if (!navigator.onLine) {
-        span.innerText = "आप ऑफ़लाइन हैं। सेव की गई न्यूज़ दिखा रहे हैं।";
-        icon.className = "fas fa-wifi-slash";
-        icon.style.color = "#ff4d4d";
+        showToast("आप ऑफ़लाइन हैं। सेव की गई न्यूज़ दिखा रहे हैं।", "fas fa-wifi-slash", "#ff4d4d");
     } else {
         const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
         if (conn && (conn.effectiveType === 'slow-2g' || conn.effectiveType === '2g')) {
-            span.innerText = "धीमा इंटरनेट कनेक्शन...";
-            icon.className = "fas fa-spinner fa-spin";
-            icon.style.color = "#f39c12";
+            showToast("धीमा इंटरनेट कनेक्शन...", "fas fa-spinner fa-spin", "#f39c12");
         } else {
-            span.innerText = "ताज़ा ख़बरें सिंक हो रही हैं...";
-            icon.className = "fas fa-bolt";
-            icon.style.color = "#2ecc71";
+            showToast("ताज़ा ख़बरें सिंक हो रही हैं...", "fas fa-bolt", "#2ecc71");
         }
     }
+}
+
+async function parseRSSItems(text, rssUrl) {
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(text, "text/xml");
+
+    let items = Array.from(xml.querySelectorAll("item")).map(item => {
+        let title = item.querySelector("title")?.textContent || "";
+        let link = item.querySelector("link")?.textContent || "";
+        let pubDate = item.querySelector("pubDate") ? new Date(item.querySelector("pubDate").textContent) : new Date(0);
+        
+        let descRaw = item.querySelector("description")?.textContent || "";
+        let contentRaw = item.querySelector("content\\:encoded, encoded")?.textContent || "";
+
+        let image = item.querySelector("enclosure")?.getAttribute("url") || "";
+        if (!image) image = item.querySelector("media\\:content, content")?.getAttribute("url") || "";
+        
+        let tempDiv = document.createElement("div");
+        let rawContent = descRaw;
+        
+        tempDiv.innerHTML = rawContent;
+        if (!tempDiv.textContent.trim() || tempDiv.textContent.trim().length < 20) {
+            rawContent = contentRaw;
+            tempDiv.innerHTML = rawContent;
+        }
+
+        if (!image) {
+            let imgTag = tempDiv.querySelector('img');
+            if (imgTag) image = imgTag.src;
+        }
+
+        // फालतू टैग्स हटाएं (Images, Iframes, Scripts) 
+        tempDiv.querySelectorAll('img, iframe, script, style, figure, video, audio').forEach(el => el.remove());
+        
+        // लिंक्स को नार्मल टेक्स्ट में बदलें
+        tempDiv.querySelectorAll('a').forEach(el => {
+            let span = document.createElement('span');
+            span.innerHTML = el.innerHTML;
+            el.replaceWith(span);
+        });
+
+        // 🌟 साफ़ HTML (ताकि ul, ol, li सुरक्षित रहें)
+        let cleanDescHTML = tempDiv.innerHTML.trim();
+        cleanDescHTML = cleanDescHTML.replace(/<br\s*[\/]?>(\s*<br\s*[\/]?>)+/gi, '<br><br>'); 
+
+        return { title, description: cleanDescHTML, link, pubDate, image };
+    });
     
-    toast.classList.add("show");
-    setTimeout(() => toast.classList.remove("show"), 3500);
+    const translatableSources = ["https://242310604.hs-sites-na2.com", "https://timesofindia.indiatimes.com"];
+    if (translatableSources.some(src => rssUrl.includes(src))) {
+        items = await Promise.all(
+            items.map(async item => {
+                item.title = await getCachedTranslation(item.title, selectedLanguage);
+                item.description = await getCachedTranslation(item.description, selectedLanguage);
+                return item;
+            })
+        );
+    }
+    return items;
+}
+
+async function fetchFeedsData() {
+    const urls = rssFeeds[selectedFeedIndex].urls;
+    let allItems = [];
+    const cb = "&_t=" + new Date().getTime(); 
+    const fetchPromises = urls.map(async (rssUrl) => {
+        const proxyUrl = `https://sweet-base-34f7.kgfads100.workers.dev/?url=${encodeURIComponent(rssUrl)}${cb}`;
+        const text = await fetch(proxyUrl, {cache: "no-store"}).then(r => r.text());
+        return await parseRSSItems(text, rssUrl);
+    });
+    const results = await Promise.all(fetchPromises);
+    results.forEach(items => allItems = allItems.concat(items));
+    allItems.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+    return allItems;
+}
+
+function injectNewItems(newArticles) {
+    if (isShowingOnlyUnread) return; 
+
+    const container = document.getElementById('newsContainer');
+    const existingCards = document.querySelectorAll('.news-card');
+    
+    existingCards.forEach(card => {
+        let oldIndex = parseInt(card.getAttribute('data-index'));
+        card.setAttribute('data-index', oldIndex + newArticles.length);
+    });
+
+    let wasAtTop = (currentIndex === 0);
+    currentIndex += newArticles.length; 
+
+    for (let i = newArticles.length - 1; i >= 0; i--) {
+        let article = newArticles[i];
+        let index = i;
+
+        let newsCard = document.createElement('div');
+        newsCard.className = 'news-card';
+        newsCard.setAttribute('data-index', index);
+        newsCard.style.transform = `translateY(${(index - currentIndex) * 100}%)`;
+
+        let imgHTML = article.image ? `<img class="feed-img" src="${article.image}" loading="lazy">` : '';
+        let titleHTML = article.title ? `<h2 class="feed-title">${article.title}</h2>` : '';
+        let descriptionHTML = article.description ? `<div class="feed-desc">${article.description}</div>` : '';
+
+        newsCard.innerHTML = `
+          <div class="top-section">${imgHTML}${titleHTML}</div>
+          <div class="bottom-section">${descriptionHTML}</div>
+          <div class="publish-time">${getTimeAgo(article.pubDate)}</div>
+          <div class="action-bar">
+            <div class="action-btn" onclick="shareToWhatsApp(this)"><i class="fab fa-whatsapp" style="color: #25D366;"></i><span1 style="font-size:9px;">Share</span1></div>
+            <div class="action-btn" onclick="toggleLike(this)"><i class="fas ${isLiked(article.link) ? 'fa-heart' : 'fa-heart-circle-plus'}" style="color: #e74c3c;"></i><span1 class="save-text" style="font-size:9px;">${isLiked(article.link) ? 'Saved' : 'Save'}</span1></div>
+          </div>
+        `;
+        newsCard.setAttribute("data-url", article.link || '');
+        container.insertBefore(newsCard, container.firstChild);
+    }
+
+    articles = [...newArticles, ...articles];
+    localStorage.setItem(`cachedFeeds_${selectedFeedIndex}`, JSON.stringify(articles.slice(0, 40)));
+    
+    unreadCount = calculateUnreadCount(articles);
+    updateUnreadBadge();
+
+    const activeTabBtn = document.querySelector('#tabs button.active');
+    const tabName = activeTabBtn ? activeTabBtn.innerText : 'इस सेक्शन';
+
+    if (wasAtTop) {
+        const oldActive = document.querySelector('.news-card.active');
+        if (oldActive) oldActive.classList.remove('active');
+
+        currentIndex = 0;
+        const newActive = document.querySelector('.news-card[data-index="0"]');
+        if (newActive) newActive.classList.add('active');
+
+        container.offsetHeight; 
+        updateSlide();
+        
+        showToast(`${tabName} में ${newArticles.length} नई ख़बरें अपडेट हो गईं!`, "fas fa-bolt", "#00d2ff", 3500);
+    } else {
+        updateSlide();
+        showToast(`${tabName} में ${newArticles.length} नई ख़बरें आईं! ऊपर स्वाइप करें`, "fas fa-arrow-up", "#00d2ff", 3500);
+    }
+    
+    autoFitText(); // बैकग्राउंड में फिट करें
+}
+
+function appendNewItemsToBottom(newArticles) {
+    if (isShowingOnlyUnread) return;
+
+    const container = document.getElementById('newsContainer');
+    let startIndex = articles.length;
+
+    newArticles.forEach((article, i) => {
+        let index = startIndex + i;
+        let newsCard = document.createElement('div');
+        newsCard.className = 'news-card';
+        newsCard.setAttribute('data-index', index);
+        newsCard.style.transform = `translateY(${(index - currentIndex) * 100}%)`;
+
+        let imgHTML = article.image ? `<img class="feed-img" src="${article.image}" loading="lazy">` : '';
+        let titleHTML = article.title ? `<h2 class="feed-title">${article.title}</h2>` : '';
+        let descriptionHTML = article.description ? `<div class="feed-desc">${article.description}</div>` : '';
+
+        newsCard.innerHTML = `
+          <div class="top-section">${imgHTML}${titleHTML}</div>
+          <div class="bottom-section">${descriptionHTML}</div>
+          <div class="publish-time">${getTimeAgo(article.pubDate)}</div>
+          <div class="action-bar">
+            <div class="action-btn" onclick="shareToWhatsApp(this)"><i class="fab fa-whatsapp" style="color: #25D366;"></i><span1 style="font-size:9px;">Share</span1></div>
+            <div class="action-btn" onclick="toggleLike(this)"><i class="fas ${isLiked(article.link) ? 'fa-heart' : 'fa-heart-circle-plus'}" style="color: #e74c3c;"></i><span1 class="save-text" style="font-size:9px;">${isLiked(article.link) ? 'Saved' : 'Save'}</span1></div>
+          </div>
+        `;
+        newsCard.setAttribute("data-url", article.link || '');
+        container.appendChild(newsCard);
+    });
+
+    articles = articles.concat(newArticles);
+    unreadCount = calculateUnreadCount(articles);
+    updateUnreadBadge();
+    
+    autoFitText();
 }
 
 async function loadNews() {
@@ -715,6 +1033,7 @@ async function loadNews() {
         container.innerHTML = "";
         container.appendChild(noLikes);
         noLikes.style.display = "block";
+        document.getElementById("skeletonLoader").style.display = "none";
         return;
     } else {
         noLikes.style.display = "none";
@@ -724,13 +1043,12 @@ async function loadNews() {
     updateUnreadBadge();
 
     displayNews();
-    setTimeout(autoFitText, 150);
+    document.getElementById("skeletonLoader").style.display = "none";
+    document.getElementById("newsContainer").style.display = "block";
+    autoFitText();
     return;
   }
 
-  const urls = rssFeeds[selectedFeedIndex].urls;
-  
-  // 🌟 NEW: INSTANT CACHE LOAD 🌟
   let loadedFromCache = false;
   const cachedData = localStorage.getItem(`cachedFeeds_${selectedFeedIndex}`);
   if (cachedData) {
@@ -740,8 +1058,12 @@ async function loadNews() {
           document.getElementById("newsContainer").style.display = "block";
           insertCustomCards();
           displayNews();
-          setTimeout(autoFitText, 150);
+          autoFitText();
           loadedFromCache = true;
+          
+          unreadCount = calculateUnreadCount(articles);
+          updateUnreadBadge();
+          
           checkNetworkAndShowToast();
       } catch (e) { console.error("Cache read error", e); }
   } else {
@@ -749,108 +1071,89 @@ async function loadNews() {
       document.getElementById("newsContainer").style.display = "none";
   }
 
-  // 🌟 NEW: PARALLEL FETCHING API FOR 2x SPEED 🌟
   try {
-    let allItems = [];
-    
-    const fetchPromises = urls.map(async (rssUrl) => {
-        const proxyUrl = `https://sweet-base-34f7.kgfads100.workers.dev/?url=${encodeURIComponent(rssUrl)}`;
-        const response = await fetch(proxyUrl);
-        const text = await response.text();
-        const parser = new DOMParser();
-        const xml = parser.parseFromString(text, "text/xml");
+    if (!loadedFromCache && selectedFeedIndex !== 2) {
+        let isFirstFeedRendered = false;
+        const urls = rssFeeds[selectedFeedIndex].urls;
+        let allItemsCollected = [];
 
-        let items = Array.from(xml.querySelectorAll("item")).map(item => {
-            let title = item.querySelector("title")?.textContent || "";
-            let link = item.querySelector("link")?.textContent || "";
-            let pubDate = item.querySelector("pubDate") ? new Date(item.querySelector("pubDate").textContent) : new Date(0);
-            
-            let descRaw = item.querySelector("description")?.textContent || "";
-            let contentRaw = item.querySelector("content\\:encoded, encoded")?.textContent || "";
-            let fullHtml = descRaw + " " + contentRaw;
-
-            let image = item.querySelector("enclosure")?.getAttribute("url") || "";
-            if (!image) image = item.querySelector("media\\:content, content")?.getAttribute("url") || "";
-            if (!image) {
-                const imgMatch = fullHtml.match(/<img[^>]+src="([^">]+)"/i);
-                if (imgMatch && imgMatch[1]) image = imgMatch[1];
+        const fetchPromises = urls.map(async (rssUrl) => {
+            let text;
+            if (window.earlyFeeds && window.earlyFeeds[rssUrl]) {
+                text = await window.earlyFeeds[rssUrl];
+                delete window.earlyFeeds[rssUrl];
+            } else {
+                const cb = "&_t=" + new Date().getTime(); 
+                const proxyUrl = `https://sweet-base-34f7.kgfads100.workers.dev/?url=${encodeURIComponent(rssUrl)}${cb}`;
+                text = await fetch(proxyUrl, {cache: "no-store"}).then(r => r.text());
             }
 
-            let tempDiv = document.createElement("div");
-            tempDiv.innerHTML = descRaw;
-            let cleanDesc = tempDiv.textContent || tempDiv.innerText || "";
-            if (!cleanDesc.trim()) {
-                tempDiv.innerHTML = contentRaw;
-                cleanDesc = tempDiv.textContent || tempDiv.innerText || "";
-            }
-            cleanDesc = cleanDesc.replace(/\s+/g, ' ').trim();
+            let items = await parseRSSItems(text, rssUrl);
 
-            return { title, description: cleanDesc, link, pubDate, image };
+            if (!isFirstFeedRendered && items.length > 0) {
+                isFirstFeedRendered = true;
+                document.getElementById("skeletonLoader").style.display = "none";
+                document.getElementById("newsContainer").style.display = "block";
+
+                articles = items;
+                allItemsCollected = [...items];
+                insertCustomCards();
+                displayNews();
+                autoFitText();
+
+                unreadCount = calculateUnreadCount(articles);
+                updateUnreadBadge();
+
+            } else if (items.length > 0) {
+                appendNewItemsToBottom(items);
+                allItemsCollected = allItemsCollected.concat(items);
+            }
         });
+
+        await Promise.all(fetchPromises);
+        allItemsCollected.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+        localStorage.setItem(`cachedFeeds_${selectedFeedIndex}`, JSON.stringify(allItemsCollected.slice(0, 40)));
         
-        const translatableSources = ["https://242310604.hs-sites-na2.com", "https://timesofindia.indiatimes.com"];
-        if (translatableSources.some(src => rssUrl.includes(src))) {
-            if(!loadedFromCache) showTranslatingMessage();
-            items = await Promise.all(
-                items.map(async item => {
-                    item.title = await getCachedTranslation(item.title, selectedLanguage);
-                    item.description = await getCachedTranslation(item.description, selectedLanguage);
-                    return item;
-                })
-            );
-            hideTranslatingMessage();
+        updateTopTabBadges();
+        if(!loadedFromCache) checkNetworkAndShowToast();
+        
+    } 
+    else if (loadedFromCache) {
+        const allItems = await fetchFeedsData();
+        let existingLinks = new Set(articles.map(a => a.link));
+        let newArticles = allItems.filter(a => !existingLinks.has(a.link) && a.link && !a.link.startsWith('go:'));
+
+        if (newArticles.length > 0) {
+            injectNewItems(newArticles);
+        } else {
+            showToast("सभी ख़बरें अप-टू-डेट हैं!", "fas fa-check-circle", "#2ecc71", 3000);
         }
-        return items;
-    });
-
-    const results = await Promise.all(fetchPromises);
-    results.forEach(items => allItems = allItems.concat(items));
-
-    allItems.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
-    articles = allItems;
-    
-    // 🌟 NEW: Update Cache Background 🌟
-    localStorage.setItem(`cachedFeeds_${selectedFeedIndex}`, JSON.stringify(articles.slice(0, 40)));
-
-    if (selectedFeedIndex === 0 || selectedFeedIndex === 1) {
-        const ONE_DAY_MS = 24 * 60 * 60 * 1000;
-        const now = Date.now();
-        const isFirstVisit = !localStorage.getItem("hasVisitedBefore");
         
-        unreadCount = articles.filter(a => {
-            if (!a.link || a.link.startsWith('go:')) return false;
-            const isNotRead = typeof readArticles !== 'undefined' ? !readArticles.includes(a.link) : true;
-            if (isFirstVisit) return isNotRead;
-            else {
-                const pubTime = new Date(a.pubDate).getTime();
-                const isWithin24Hrs = (now - pubTime) <= ONE_DAY_MS;
-                return isWithin24Hrs && isNotRead;
-            }
-        }).length;
-
-        if (isFirstVisit && articles.length > 0) localStorage.setItem("hasVisitedBefore", "true");
-    } else {
-        unreadCount = 0; 
-    }
-    
-    updateUnreadBadge();
-    setTimeout(() => { if(typeof markAsRead === 'function') markAsRead(0); }, 500);
-
-    // Re-render only if we didn't load from cache initially (or if we want to seamlessly update)
-    if (!loadedFromCache) {
-        insertCustomCards();
-        displayNews();
-        setTimeout(autoFitText, 150);
+        updateTopTabBadges(); 
     }
 
   } catch (error) {
     console.error("Error loading RSS Feeds", error);
-    if (!loadedFromCache) checkNetworkAndShowToast(); // Show error if completely failed and no cache
+    if (!loadedFromCache) checkNetworkAndShowToast(); 
   } finally {
-    document.getElementById("skeletonLoader").style.display = "none";
-    document.getElementById("newsContainer").style.display = "block";
+      document.getElementById("skeletonLoader").style.display = "none";
+      document.getElementById("newsContainer").style.display = "block";
   }
 }
+
+setInterval(async () => {
+    if (selectedFeedIndex === 2 || !navigator.onLine || isShowingOnlyUnread) return;
+    try {
+        const allItems = await fetchFeedsData();
+        let existingLinks = new Set(articles.map(a => a.link));
+        let newArticles = allItems.filter(a => !existingLinks.has(a.link) && a.link && !a.link.startsWith('go:'));
+
+        if (newArticles.length > 0) {
+            injectNewItems(newArticles);
+        }
+        updateTopTabBadges();
+    } catch (e) {}
+}, 120000); 
 
 async function getCachedTranslation(text, lang) {
   if (!text || text.trim() === "") return "";
@@ -931,25 +1234,20 @@ function changeLanguage(lang, popup) {
   localStorage.setItem("selectedLanguage", lang);
   selectedLanguage = lang;
   popup.remove();
-  showTranslatingMessage();
-  setTimeout(() => { loadNews(); }, 500);
-}
+  
+  [0, 1].forEach(i => localStorage.removeItem('cachedFeeds_' + i));
 
-function showTranslatingMessage() {
-  let msg = document.createElement("div");
-  msg.id = "translatingMsg";
-  msg.style.position = "fixed";
-  msg.style.background = "transparent";
-  msg.style.color = "#fff";
-  document.body.appendChild(msg);
-}
-
-function hideTranslatingMessage() {
-  const msg = document.getElementById("translatingMsg");
-  if (msg) msg.remove();
+  document.getElementById("skeletonLoader").style.display = "block";
+  document.getElementById("newsContainer").style.display = "none";
+  
+  showToast("भाषा बदली जा रही है... कृपया प्रतीक्षा करें", "fas fa-language fa-spin", "#3498db", 8000);
+  
+  setTimeout(() => { refreshNewsFeed(); }, 300);
 }
 
 function insertCustomCards() {
+    if (isShowingOnlyUnread) return; 
+
     const customCards = [
         { image: 'https://files.cdn-files-a.com/uploads/10456964/normal_69535f33277ed.png', link: 'go:cumagazine', pubDate: new Date() },
         { image: 'https://m2.getsitecontrol.com/images/273034/08fa5e9b171cf9fb5f7ce513fa1b8c4f_351164357.png', link: 'go:cuseries', pubDate: new Date() }
@@ -959,8 +1257,7 @@ function insertCustomCards() {
         let insertedIndexes = new Set(); 
         customCards.forEach(card => {
             let randomIndex;
-            do {
-                randomIndex = Math.floor(Math.random() * 15) + 1; 
+            do { randomIndex = Math.floor(Math.random() * 15) + 1; 
             } while (insertedIndexes.has(randomIndex)); 
             insertedIndexes.add(randomIndex);
             articles.splice(randomIndex, 0, card); 
@@ -992,28 +1289,17 @@ function displayNews() {
       return; 
     }
     
-let imgHTML = article.image ? `<img class="feed-img" src="${article.image}" loading="lazy">` : '';
+    let imgHTML = article.image ? `<img class="feed-img" src="${article.image}" loading="lazy">` : '';
     let titleHTML = article.title ? `<h2 class="feed-title">${article.title}</h2>` : '';
-    let descriptionHTML = article.description ? `<p class="feed-desc">${article.description}</p>` : '';
+    let descriptionHTML = article.description ? `<div class="feed-desc">${article.description}</div>` : '';
 
     newsCard.innerHTML = `
-      <div class="top-section">
-        ${imgHTML}
-        ${titleHTML}
-      </div>
-      <div class="bottom-section">
-        ${descriptionHTML}
-      </div>
+      <div class="top-section">${imgHTML}${titleHTML}</div>
+      <div class="bottom-section">${descriptionHTML}</div>
       <div class="publish-time">${getTimeAgo(article.pubDate)}</div>
-    <div class="action-bar">
-        <div class="action-btn" onclick="shareToWhatsApp(${index})">
-          <i class="fab fa-whatsapp" style="color: #25D366;"></i>
-          <span1 style="font-size:9px;">Share</span1>
-        </div>
-        <div class="action-btn" onclick="toggleLike(${index})">
-          <i class="fas ${isLiked(article.link) ? 'fa-heart' : 'fa-heart-circle-plus'}" style="color: #e74c3c;"></i>
-          <span1 class="save-text" style="font-size:9px;"">${isLiked(article.link) ? 'Saved' : 'Save'}</span1>
-        </div>
+      <div class="action-bar">
+        <div class="action-btn" onclick="shareToWhatsApp(this)"><i class="fab fa-whatsapp" style="color: #25D366;"></i><span1 style="font-size:9px;">Share</span1></div>
+        <div class="action-btn" onclick="toggleLike(this)"><i class="fas ${isLiked(article.link) ? 'fa-heart' : 'fa-heart-circle-plus'}" style="color: #e74c3c;"></i><span1 class="save-text" style="font-size:9px;">${isLiked(article.link) ? 'Saved' : 'Save'}</span1></div>
       </div>
     `;
 
@@ -1031,8 +1317,11 @@ function isLiked(link) {
     return liked.some(item => item.link === link);
 }
 
-function toggleLike(index) {
+function toggleLike(btnElement) {
+    const card = btnElement.closest('.news-card');
+    const index = parseInt(card.getAttribute('data-index'));
     const article = articles[index];
+    
     if (!article || !article.link) return;
 
     let liked = JSON.parse(localStorage.getItem("likedFeeds") || "[]");
@@ -1046,12 +1335,10 @@ function toggleLike(index) {
     }
 
     localStorage.setItem("likedFeeds", JSON.stringify(liked));
-
-    const newsCard = document.querySelector(`.news-card[data-index="${index}"]`);
     
-    if (newsCard) {
-        const iconEl = newsCard.querySelector('.action-btn i.fa-heart, .action-btn i.fa-heart-circle-plus');
-        const textEl = newsCard.querySelector('.save-text');
+    if (card) {
+        const iconEl = card.querySelector('.action-btn i.fa-heart, .action-btn i.fa-heart-circle-plus');
+        const textEl = card.querySelector('.save-text');
 
         if (iconEl && textEl) {
             if (exists) {
@@ -1148,7 +1435,14 @@ window.addEventListener('DOMContentLoaded', () => {
 tabs.forEach(tab => {
   const code = tab.getAttribute('data-code');
   if (code !== persistentTabCode) {
-    tab.addEventListener('click', () => {
+    tab.addEventListener('click', (e) => {
+        if (tab.classList.contains('middle') && unreadCount > 0 && !isShowingOnlyUnread) {
+            e.preventDefault();
+            e.stopPropagation();
+            showOnlyUnread();
+            return;
+        }
+        
       tab.classList.add('active');
       setTimeout(() => { tab.classList.remove('active'); }, 3000);
       const url = tab.getAttribute('data-url');
@@ -1179,7 +1473,7 @@ window.onload = () => { autoHideTabs(); };
 
 if ("serviceWorker" in navigator) {
   const swCode = `
-    const CACHE_NAME = "auto-cache-v20";
+    const CACHE_NAME = "auto-cache-v21";
     self.addEventListener("install", e => { self.skipWaiting(); });
     self.addEventListener("activate", e => {
       e.waitUntil(caches.keys().then(keys => {
@@ -1207,7 +1501,9 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register(swURL);
 }
 
-function shareToWhatsApp(index) {
+function shareToWhatsApp(btnElement) {
+    const card = btnElement.closest('.news-card');
+    const index = parseInt(card.getAttribute('data-index'));
     const article = articles[index];
     if (!article) return;
     const myAppLink = "https://cutt.ly/OrKg4bdu"; 
@@ -1220,49 +1516,85 @@ function shareToWhatsApp(index) {
     window.location.href = `whatsapp://send?text=${encodeURIComponent(shareMessage)}`;
 } 
 
-// 🌟 NEW: Optimized DOM Reflow 🌟
+// 🌟 NEW: Background Progressive Auto-Fit Text 🌟
+function fitCardText(card) {
+    if (card.classList.contains('font-fitted')) return;
+    const bottomSection = card.querySelector('.bottom-section');
+    const desc = card.querySelector('.feed-desc');
+    
+    if (!bottomSection || !desc) return;
+
+    if (bottomSection.clientHeight === 0) return; // अगर कार्ड अभी रेंडर नहीं हुआ है
+
+    desc.style.display = 'block';
+    desc.style.webkitLineClamp = 'unset';
+
+    let maxSize = 18; 
+    let minSize = 10; 
+    let currentSize = maxSize;
+
+    const availableHeight = bottomSection.clientHeight - 140; 
+    if (availableHeight <= 0) return;
+
+    const applyFontSize = (size) => {
+        desc.style.setProperty('font-size', size + 'px', 'important');
+        desc.style.setProperty('line-height', '1.6', 'important');
+        
+        const elements = desc.querySelectorAll('*');
+        elements.forEach(el => {
+            el.style.setProperty('font-size', size + 'px', 'important');
+            el.style.setProperty('line-height', '1.6', 'important');
+        });
+    };
+
+    applyFontSize(currentSize);
+
+    const checkOverflow = () => {
+        return desc.scrollHeight > availableHeight;
+    };
+
+    while (checkOverflow() && currentSize > minSize) {
+        currentSize -= 0.5; 
+        applyFontSize(currentSize);
+    }
+
+    if (checkOverflow()) {
+        const maxLines = Math.floor(availableHeight / (minSize * 1.6));
+        desc.style.display = '-webkit-box';
+        desc.style.webkitLineClamp = String(maxLines > 0 ? maxLines : 1);
+        desc.style.webkitBoxOrient = 'vertical';
+        desc.style.overflow = 'hidden';
+    }
+    
+    card.classList.add('font-fitted'); // फिट हो गया, मार्क करें
+}
+
 function autoFitText() {
     const activeCard = document.querySelector('.news-card.active');
     if (!activeCard) return;
 
-    const cardsToProcess = [activeCard];
+    // 1. तुरंत एक्टिव और अगले कार्ड को फिट करें ताकि यूज़र को कोई डिले न दिखे
+    const priorityCards = [activeCard];
     const nextCard = activeCard.nextElementSibling;
-    if (nextCard && nextCard.classList.contains('news-card')) cardsToProcess.push(nextCard);
+    if (nextCard && nextCard.classList.contains('news-card')) priorityCards.push(nextCard);
 
-    cardsToProcess.forEach(card => {
-        const paragraphs = card.querySelectorAll('p');
-        const spans = card.querySelectorAll('span');
-        
-        let maxSize = 19; 
-        let minSize = 10; 
-        let currentSize = maxSize;
+    priorityCards.forEach(card => fitCardText(card));
 
-        const applyFontSize = (size) => {
-            paragraphs.forEach(p => p.style.setProperty('font-size', size + 'px', 'important'));
-            spans.forEach(span => span.style.setProperty('font-size', size + 'px', 'important'));
-        };
-
-        applyFontSize(currentSize);
-
-        const checkOverflow = () => {
-            if (card.scrollHeight > card.clientHeight) return true;
-            let isOverflowing = false;
-            paragraphs.forEach(p => {
-                if (p.scrollHeight > p.clientHeight) isOverflowing = true;
-            });
-            return isOverflowing;
-        };
-
-        while (checkOverflow() && currentSize > minSize) {
-            currentSize -= 0.5; 
-            applyFontSize(currentSize);
-        }
-    });
+    // 2. बाकी बचे हुए कार्ड्स को बैकग्राउंड में बिना हैंग किये फिट करें
+    setTimeout(() => {
+        const allUnfittedCards = document.querySelectorAll('.news-card:not(.font-fitted)');
+        allUnfittedCards.forEach(card => fitCardText(card));
+    }, 400); // मेन प्रोसेस के बाद रन करें
 }
 
+// रिसाइज होने पर सभी कार्ड्स को दोबारा फिट करें
+window.addEventListener('resize', () => {
+    document.querySelectorAll('.news-card').forEach(c => c.classList.remove('font-fitted'));
+    autoFitText();
+});
+
 window.addEventListener('load', autoFitText);
-window.addEventListener('resize', autoFitText);
-setTimeout(autoFitText, 500); 
+setTimeout(autoFitText, 500);
 </script>
 
 </body>
