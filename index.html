@@ -11,14 +11,13 @@
     window.earlyFeeds = {};
     try {
         const proxyBase = "https://sweet-base-34f7.kgfads100.workers.dev/?url=";
-        // 🚀 SMART FIX: सिर्फ वही URL प्री-फेच करें जिस टैब पर यूज़र है
         const savedTab = parseInt(localStorage.getItem("selectedFeed")) || 0;
         const ts = window.appStartTime; 
 
         const tabUrls = [
             ["https://242310604.hs-sites-na2.com/tag/fact/rss.xml", "https://242310604.hs-sites-na2.com/tag/national/rss.xml"],
             ["https://timesofindia.indiatimes.com/rssfeedstopstories.cms"],
-            [] // Saved Tab has no URLs
+            [] 
         ];
         
         if (tabUrls[savedTab]) {
@@ -474,10 +473,9 @@ let allArticlesBackup = [];
 let isReturningSession = localStorage.getItem("isReturningSession") === "true";
 localStorage.setItem("isReturningSession", "true"); 
 
-// 🚀 SMART FIX: Abort Controller for Instant Tab Switching
 let fetchAborter = null;
 function getNewSignal() {
-    if (fetchAborter) fetchAborter.abort(); // Cancel any ongoing fetch instantly
+    if (fetchAborter) fetchAborter.abort(); 
     fetchAborter = new AbortController();
     return fetchAborter.signal;
 }
@@ -493,7 +491,6 @@ function showToast(msg, iconClass, color, duration = 3500) {
     
     if(window.toastTimeout) clearTimeout(window.toastTimeout);
     
-    // अगर duration 0 है, तो Toast तब तक रहेगा जब तक हम उसे खुद न हटाएँ
     if (duration > 0) {
         window.toastTimeout = setTimeout(() => toast.classList.remove("show"), duration);
     }
@@ -599,7 +596,7 @@ function showPrevFlip() {
       const activeTabBtn = document.querySelector('#tabs button.active');
       const tabName = activeTabBtn ? activeTabBtn.innerText : 'इस सेक्शन';
       
-      showToast(`${tabName} में नई ख़बरें खोज रहे हैं...`, "fas fa-sync fa-spin", "#3498db", 0); // Infinite Toast
+      showToast(`${tabName} में नई ख़बरें खोज रहे हैं...`, "fas fa-sync fa-spin", "#3498db", 0);
 
       fetchFeedsData(false).then(allItems => {
           let existingLinks = new Set(articles.map(a => a.link));
@@ -684,7 +681,6 @@ function showOnlyUnread() {
 function restoreAllNews() {
     isShowingOnlyUnread = false;
     
-    // 🌟 Premium Success Sound Effect (No external file needed, instant play using Web Audio API)
     try {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         if (AudioContext) {
@@ -695,13 +691,12 @@ function restoreAllNews() {
             osc.connect(gainNode);
             gainNode.connect(ctx.destination);
             
-            osc.type = 'sine'; // Soft, clean tone
+            osc.type = 'sine'; 
             
-            // Ascending notes for a "Level Up / Success" feeling (C major arpeggio)
-            osc.frequency.setValueAtTime(523.25, ctx.currentTime);       // C5
-            osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.08); // E5
-            osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.16); // G5
-            osc.frequency.setValueAtTime(1046.50, ctx.currentTime + 0.24); // C6
+            osc.frequency.setValueAtTime(523.25, ctx.currentTime);       
+            osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.08); 
+            osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.16); 
+            osc.frequency.setValueAtTime(1046.50, ctx.currentTime + 0.24); 
             
             gainNode.gain.setValueAtTime(0, ctx.currentTime);
             gainNode.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.03);
@@ -711,8 +706,7 @@ function restoreAllNews() {
             osc.start(ctx.currentTime);
             osc.stop(ctx.currentTime + 0.8);
         }
-    } catch(e) { console.log("Audio play error", e); }
-    // ----------------------------------------------------
+    } catch(e) {}
 
     const overlay = document.createElement("div");
     overlay.id = "successTickOverlay";
@@ -745,7 +739,7 @@ function restoreAllNews() {
     setTimeout(() => {
         if (overlay.parentNode) overlay.remove();
         refreshNewsFeed();
-    }, 2200);
+    }, 3200);
 }
 
 function refreshNewsFeed() {
@@ -779,9 +773,9 @@ let selectedFeedIndex = parseInt(localStorage.getItem("selectedFeed")) || 0;
 let selectedLanguage = localStorage.getItem("selectedLanguage") || "en"; 
 
 function selectFeed(index) {
-  if (selectedFeedIndex === index && articles.length > 0) return; // Prevent redundant clicks
+  if (selectedFeedIndex === index && articles.length > 0) return; 
   selectedFeedIndex = index;
-  localStorage.setItem("selectedFeed", index); // 🚀 SMART FIX: Save Tab state immediately for fast reloading
+  localStorage.setItem("selectedFeed", index); 
   updateTabUI();
   refreshNewsFeed();
 }
@@ -817,7 +811,6 @@ function updateTopTabBadges() {
             if (cached) {
                 try {
                     let parsed = JSON.parse(cached);
-                    // 캐श की हुई तारीखों को Date में बदलें
                     parsed.forEach(p => p.pubDate = new Date(p.pubDate));
                     count = calculateUnreadCount(parsed);
                 } catch(e){}
@@ -895,7 +888,6 @@ function checkNetworkAndShowToast(isSyncing = false) {
     if (!navigator.onLine) {
         showToast("आप ऑफ़लाइन हैं। सेव की गई न्यूज़ दिखा रहे हैं।", "fas fa-wifi-slash", "#ff4d4d");
     } else if (isSyncing) {
-        // यह तब तक दिखाएगा जब तक hideToast न चले या नया Toast न आए
         showToast("नई खबर सिंक हो रही है...", "fas fa-sync fa-spin", "#f39c12", 0);
     }
 }
@@ -908,7 +900,6 @@ async function parseRSSItems(text, rssUrl) {
         let title = item.querySelector("title")?.textContent || "";
         let link = item.querySelector("link")?.textContent || "";
         
-        // सुरक्षित Date Parsing
         let pubDateNode = item.querySelector("pubDate") || item.getElementsByTagName("dc:date")[0] || item.getElementsByTagName("date")[0] || item.querySelector("updated");
         let pubDateText = pubDateNode ? pubDateNode.textContent.trim() : "";
         let pubDate = new Date(0); 
@@ -973,13 +964,12 @@ async function parseRSSItems(text, rssUrl) {
     return items;
 }
 
-// 🚀 SMART FIX: सिर्फ करंट टैब को सिंक करेगा और अगर टैब बदला तो पुराना सिंक तुरंत रोक देगा
 async function fetchFeedsData(useInitialTime = false) {
     const urls = rssFeeds[selectedFeedIndex].urls;
     let allItems = [];
     const ts = useInitialTime ? window.appStartTime : new Date().getTime(); 
     
-    const signal = getNewSignal(); // Abort previous background calls
+    const signal = getNewSignal(); 
     
     try {
         const fetchPromises = urls.map(async (rssUrl) => {
@@ -993,8 +983,44 @@ async function fetchFeedsData(useInitialTime = false) {
         allItems.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
         return allItems;
     } catch(error) {
-        if (error.name === 'AbortError') return []; // If aborted, return empty silently
+        if (error.name === 'AbortError') return []; 
         throw error;
+    }
+}
+
+// 🚀 SMART FIX: Custom Cards रैंडम लोकेशन (इंडेक्स 2 के बाद) पर ही आएँगे, टॉप पर नहीं।
+function insertCustomCards() {
+    if (isShowingOnlyUnread) return; 
+
+    // पुराने कस्टम कार्ड्स हटाएँ ताकि डुप्लीकेट न बनें
+    articles = articles.filter(a => !a.isCustom);
+
+    const customCards = [
+        { image: 'https://files.cdn-files-a.com/uploads/10456964/normal_69535f33277ed.png', link: 'go:cumagazine', isCustom: true },
+        { image: 'https://m2.getsitecontrol.com/images/273034/08fa5e9b171cf9fb5f7ce513fa1b8c4f_351164357.png', link: 'go:cuseries', isCustom: true }
+    ];
+
+    if (articles.length > 5) {
+        let insertedIndexes = new Set(); 
+        let maxIndex = Math.min(15, articles.length);
+        
+        customCards.forEach(card => {
+            let randomIndex;
+            do { 
+                // हमेशा Index 2 या उसके बाद ही डालेगा (पहली 2 ताज़ा ख़बरें हमेशा टॉप पर रहेंगी)
+                randomIndex = Math.floor(Math.random() * (maxIndex - 2)) + 2; 
+            } while (insertedIndexes.has(randomIndex)); 
+            insertedIndexes.add(randomIndex);
+            
+            let newCard = { ...card };
+            if(articles[randomIndex - 1] && articles[randomIndex - 1].pubDate) {
+                newCard.pubDate = new Date(articles[randomIndex - 1].pubDate.getTime() - 1);
+            } else {
+                newCard.pubDate = new Date();
+            }
+
+            articles.splice(randomIndex, 0, newCard); 
+        });
     }
 }
 
@@ -1004,22 +1030,28 @@ function injectNewItems(newArticles) {
     const container = document.getElementById('newsContainer');
     let wasAtTop = (currentIndex === 0);
 
-    let mergedArticles = [...newArticles, ...articles];
-    mergedArticles.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
-    
-    articles = mergedArticles;
-    localStorage.setItem(`cachedFeeds_${selectedFeedIndex}`, JSON.stringify(articles.slice(0, 40)));
-    
-    unreadCount = calculateUnreadCount(articles);
-    updateUnreadBadge();
-
-    const activeTabBtn = document.querySelector('#tabs button.active');
-    const tabName = activeTabBtn ? activeTabBtn.innerText : 'इस सेक्शन';
-
     if (wasAtTop) {
+        let realArticles = articles.filter(a => !a.isCustom);
+        let mergedArticles = [...newArticles, ...realArticles];
+        mergedArticles.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
+        
+        articles = mergedArticles;
+        
+        // 🚀 PROTECT CACHE: बिना कस्टम कार्ड्स के रियल न्यूज़ को ही सेव करें
+        localStorage.setItem(`cachedFeeds_${selectedFeedIndex}`, JSON.stringify(articles.slice(0, 40)));
+        
+        insertCustomCards();
         displayNews();
         showToast(`${newArticles.length} नई ख़बरें अपडेट हो गईं!`, "fas fa-check-circle", "#2ecc71", 3500);
+        autoFitText();
     } else {
+        // अगर यूज़र नीचे स्क्रॉल कर रहा है, तो बिना री-सॉर्ट किए सिर्फ़ ऊपर न्यूज़ जोड़ दें
+        newArticles.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
+        articles = [...newArticles, ...articles];
+        
+        const cacheSafe = articles.filter(a => !a.isCustom).slice(0, 40);
+        localStorage.setItem(`cachedFeeds_${selectedFeedIndex}`, JSON.stringify(cacheSafe));
+        
         currentIndex += newArticles.length; 
         
         const existingCards = document.querySelectorAll('.news-card');
@@ -1054,9 +1086,15 @@ function injectNewItems(newArticles) {
             container.insertBefore(newsCard, container.firstChild);
         }
         updateSlide();
+        
+        const activeTabBtn = document.querySelector('#tabs button.active');
+        const tabName = activeTabBtn ? activeTabBtn.innerText : 'इस सेक्शन';
         showToast(`${tabName} में ${newArticles.length} नई ख़बरें आईं! ऊपर स्वाइप करें`, "fas fa-arrow-up", "#00d2ff", 3500);
+        autoFitText(); 
     }
-    autoFitText(); 
+    
+    unreadCount = calculateUnreadCount(articles);
+    updateUnreadBadge();
 }
 
 function appendNewItemsToBottom(newArticles) {
@@ -1156,7 +1194,7 @@ async function loadNews() {
         const urls = rssFeeds[selectedFeedIndex].urls;
         let allItemsCollected = [];
         
-        const signal = getNewSignal(); // 🚀 Abort previous downloads if tab changed fast
+        const signal = getNewSignal(); 
 
         const fetchPromises = urls.map(async (rssUrl) => {
             let text;
@@ -1196,10 +1234,12 @@ async function loadNews() {
         allItemsCollected.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
         
         articles = [...allItemsCollected];
+        
+        localStorage.setItem(`cachedFeeds_${selectedFeedIndex}`, JSON.stringify(articles.slice(0, 40)));
+        
+        insertCustomCards(); // 🚀 Insert custom cards randomly
         displayNews();
         autoFitText();
-        
-        localStorage.setItem(`cachedFeeds_${selectedFeedIndex}`, JSON.stringify(allItemsCollected.slice(0, 40)));
         
         updateTopTabBadges();
         showToast("सभी ख़बरें अप-टू-डेट हैं!", "fas fa-check-circle", "#2ecc71", 3000);
@@ -1220,7 +1260,7 @@ async function loadNews() {
     }
 
   } catch (error) {
-    if (error.name === 'AbortError') return; // 🚀 Tab switch silently aborted, no error popup
+    if (error.name === 'AbortError') return; 
     console.error("Error loading RSS Feeds", error);
     showToast("सिंक फ़ेल हो गया", "fas fa-exclamation-circle", "#e74c3c", 3000);
   } finally {
@@ -1229,7 +1269,6 @@ async function loadNews() {
   }
 }
 
-// Background tab-sync check
 setInterval(async () => {
     if (selectedFeedIndex === 2 || !navigator.onLine || isShowingOnlyUnread) return;
     try {
@@ -1340,26 +1379,6 @@ function changeLanguage(lang, popup) {
   setTimeout(() => { refreshNewsFeed(); }, 300);
 }
 
-function insertCustomCards() {
-    if (isShowingOnlyUnread) return; 
-
-    const customCards = [
-        { image: 'https://files.cdn-files-a.com/uploads/10456964/normal_69535f33277ed.png', link: 'go:cumagazine', pubDate: new Date() },
-        { image: 'https://m2.getsitecontrol.com/images/273034/08fa5e9b171cf9fb5f7ce513fa1b8c4f_351164357.png', link: 'go:cuseries', pubDate: new Date() }
-    ];
-
-    if (articles.length > 30) {
-        let insertedIndexes = new Set(); 
-        customCards.forEach(card => {
-            let randomIndex;
-            do { randomIndex = Math.floor(Math.random() * 15) + 1; 
-            } while (insertedIndexes.has(randomIndex)); 
-            insertedIndexes.add(randomIndex);
-            articles.splice(randomIndex, 0, card); 
-        });
-    }
-}
-
 function displayNews() {
   const container = document.getElementById('newsContainer');
   container.innerHTML = '';
@@ -1372,12 +1391,7 @@ function displayNews() {
     }
     newsCard.style.transform = `translateY(${index * 100}%)`;
 
-    const customImages = [  
-        "https://files.cdn-files-a.com/uploads/10456964/normal_69535f33277ed.png",
-        "https://m2.getsitecontrol.com/images/273034/08fa5e9b171cf9fb5f7ce513fa1b8c4f_351164357.png"
-    ];
-
-    if (customImages.includes(article.image)) {
+    if (article.isCustom) {
       newsCard.classList.add("custom-card");
       newsCard.innerHTML = `<img src="${article.image}" onclick="location.href='${article.link}'" style="width:100%;height:100%;display:block;cursor:pointer;">`;
       container.appendChild(newsCard);
