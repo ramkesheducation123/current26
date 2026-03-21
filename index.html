@@ -675,6 +675,7 @@ function showOnlyUnread() {
         displayNews();
         container.style.transform = 'translateY(0%)';
         showToast("सिर्फ बिना पढ़ी हुई ख़बरें दिखाई जा रही हैं।", "fas fa-filter", "#f1c40f", 3500);
+        autoFitText(); // 🚀 FIX: Auto adjust text size when unread feeds load
     }, 300);
 }
 
@@ -739,7 +740,7 @@ function restoreAllNews() {
     setTimeout(() => {
         if (overlay.parentNode) overlay.remove();
         refreshNewsFeed();
-    }, 3200);
+    }, 3500);
 }
 
 function refreshNewsFeed() {
@@ -988,11 +989,9 @@ async function fetchFeedsData(useInitialTime = false) {
     }
 }
 
-// 🚀 SMART FIX: Custom Cards रैंडम लोकेशन (इंडेक्स 2 के बाद) पर ही आएँगे, टॉप पर नहीं।
 function insertCustomCards() {
     if (isShowingOnlyUnread) return; 
 
-    // पुराने कस्टम कार्ड्स हटाएँ ताकि डुप्लीकेट न बनें
     articles = articles.filter(a => !a.isCustom);
 
     const customCards = [
@@ -1007,7 +1006,6 @@ function insertCustomCards() {
         customCards.forEach(card => {
             let randomIndex;
             do { 
-                // हमेशा Index 2 या उसके बाद ही डालेगा (पहली 2 ताज़ा ख़बरें हमेशा टॉप पर रहेंगी)
                 randomIndex = Math.floor(Math.random() * (maxIndex - 2)) + 2; 
             } while (insertedIndexes.has(randomIndex)); 
             insertedIndexes.add(randomIndex);
@@ -1037,7 +1035,6 @@ function injectNewItems(newArticles) {
         
         articles = mergedArticles;
         
-        // 🚀 PROTECT CACHE: बिना कस्टम कार्ड्स के रियल न्यूज़ को ही सेव करें
         localStorage.setItem(`cachedFeeds_${selectedFeedIndex}`, JSON.stringify(articles.slice(0, 40)));
         
         insertCustomCards();
@@ -1045,7 +1042,6 @@ function injectNewItems(newArticles) {
         showToast(`${newArticles.length} नई ख़बरें अपडेट हो गईं!`, "fas fa-check-circle", "#2ecc71", 3500);
         autoFitText();
     } else {
-        // अगर यूज़र नीचे स्क्रॉल कर रहा है, तो बिना री-सॉर्ट किए सिर्फ़ ऊपर न्यूज़ जोड़ दें
         newArticles.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
         articles = [...newArticles, ...articles];
         
@@ -1237,7 +1233,7 @@ async function loadNews() {
         
         localStorage.setItem(`cachedFeeds_${selectedFeedIndex}`, JSON.stringify(articles.slice(0, 40)));
         
-        insertCustomCards(); // 🚀 Insert custom cards randomly
+        insertCustomCards(); 
         displayNews();
         autoFitText();
         
@@ -1420,6 +1416,7 @@ function displayNews() {
   
   currentIndex = 0;
   updateSlide();
+  markAsRead(currentIndex); // 🚀 FIX: First new feed is counted as read automatically
 }
 
 function isLiked(link) {
@@ -1641,7 +1638,7 @@ function fitCardText(card) {
     desc.style.display = 'block';
     desc.style.webkitLineClamp = 'unset';
 
-    let maxSize = 17; 
+    let maxSize = 18; 
     let minSize = 10; 
     let currentSize = maxSize;
 
