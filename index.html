@@ -657,9 +657,15 @@ function showOnlyUnread() {
     isShowingOnlyUnread = true;
     allArticlesBackup = [...articles]; 
     
+    // 🚀 FIX: Badge की तरह ही सटीक Time Limit लगाएँ
+    const now = Date.now();
+    const LIMIT = isReturningSession ? (24 * 60 * 60 * 1000) : (7 * 24 * 60 * 60 * 1000);
+    
     articles = articles.filter(a => {
         if (!a.link || a.link.startsWith('go:')) return false; 
-        return !readArticles.includes(a.link);
+        const isNotRead = !readArticles.includes(a.link);
+        const pubTime = new Date(a.pubDate).getTime();
+        return isNotRead && ((now - pubTime) <= LIMIT);
     });
     
     if (articles.length === 0) {
@@ -675,7 +681,7 @@ function showOnlyUnread() {
         displayNews();
         container.style.transform = 'translateY(0%)';
         showToast("सिर्फ बिना पढ़ी हुई ख़बरें दिखाई जा रही हैं।", "fas fa-filter", "#f1c40f", 3500);
-        autoFitText(); // 🚀 FIX: Auto adjust text size when unread feeds load
+        autoFitText(); 
     }, 300);
 }
 
@@ -740,7 +746,7 @@ function restoreAllNews() {
     setTimeout(() => {
         if (overlay.parentNode) overlay.remove();
         refreshNewsFeed();
-    }, 3500);
+    }, 4500);
 }
 
 function refreshNewsFeed() {
@@ -1416,7 +1422,7 @@ function displayNews() {
   
   currentIndex = 0;
   updateSlide();
-  markAsRead(currentIndex); // 🚀 FIX: First new feed is counted as read automatically
+  markAsRead(currentIndex); 
 }
 
 function isLiked(link) {
