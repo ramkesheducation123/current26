@@ -409,7 +409,7 @@
         <ol><li> डेली करेंट अफेयर्स की <strong>अगली फीड</strong> को पढ़ने के लिए <strong>"ऊपर सरकाएं"</strong></li>
         <li> डेली करेंट अफेयर्स की <strong>पिछली फीड</strong> को पढ़ने के लिए <strong>"नीचे सरकाएं"</strong></li>
         <li> पसंदीदा फीड को Save करने के लिए <i Style="color:red;" class="fas fa-heart-circle-plus"></i> icon पर Tap करें</li></ol>
-        <p style=" font-size:13px; margin-top:10px; background:rgb(0,0,0,0.3); padding:5px 10px; border-radius:5px;">सभी प्रतियोगी परीक्षाओं के लिए सम्पूर्ण करेंट अफेयर्स पढ़ें</p>
+        <p style=" font-size:13px; margin-top:10px; background:rgb(0,0,0,0.25); padding:5px 10px; border-radius:5px;">सभी प्रतियोगी परीक्षाओं (UPSC, MPPSC, SSC, बैंकिंग, रेलवे, पुलिस, शिक्षक पात्रता परीक्षा (TET) आदि) के लिए सम्पूर्ण करेंट अफेयर्स पढ़ें एक ही जगह विशेष तथ्यों के साथ</p>
         <div class="popup2-footer">
             <input type="checkbox" id="consentCheckbox">
             <label for="consentCheckbox" id="consentLabel">हम समझ गए</label>
@@ -1001,13 +1001,18 @@ function insertCustomCards() {
     articles = articles.filter(a => !a.isCustom);
 
     const customCards = [
-        { image: 'https://files.cdn-files-a.com/uploads/10456964/normal_69535f33277ed.png', link: 'go:cumagazine', isCustom: true },
+        { image: 'https://m2.getsitecontrol.com/images/273034/bdaa906736fc74b3b1cdad308dc236a5_356015809.png', link: 'go:cumagazine', isCustom: true },
+        { image: 'https://m2.getsitecontrol.com/images/273034/4ee565b84420532a0a2298429f694684_356015924.png', link: 'go:mock', isCustom: true },
+        { image: 'https://m2.getsitecontrol.com/images/273034/2b50ba425da2143bf1eb20e62c143daa_328022635.jpg', link: '#', isCustom: true },
+        { image: 'https://m2.getsitecontrol.com/images/273034/f295daf4ab7c67c19c35deda3bd0385b_328022680.jpg', link: '#', isCustom: true },
+        { image: 'https://m2.getsitecontrol.com/images/273034/465ca799c11b2bdb34e179e47a5d90a9_328022772.jpg', link: '#', isCustom: true },
+        { image: 'https://m2.getsitecontrol.com/images/273034/c99e8dc56547c3610477f215ceeaabdc_328022566.jpg', link: '#', isCustom: true },
         { image: 'https://m2.getsitecontrol.com/images/273034/08fa5e9b171cf9fb5f7ce513fa1b8c4f_351164357.png', link: 'go:cuseries', isCustom: true }
     ];
 
     if (articles.length > 5) {
         let insertedIndexes = new Set(); 
-        let maxIndex = Math.min(15, articles.length);
+        let maxIndex = Math.min(25, articles.length);
         
         customCards.forEach(card => {
             let randomIndex;
