@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
     <script>
-        // WebView Error Catcher - ताकि ब्लैक स्क्रीन न आए और हमें पता चले कि दिक्कत क्या है
+        // WebView Error Catcher
         window.onerror = function(msg, url, line) {
             if(window.hasShownError) return;
             window.hasShownError = true;
@@ -413,7 +413,7 @@ function showPrevFlip() {
   if (currentIndex <= 0) {
       if (selectedFeedIndex === 2 || isUnreadFilterActive || !navigator.onLine) return; vibrate([15]); showToast("नई ख़बरें खोज रहे हैं...", "fas fa-sync fa-spin");
       const now = Date.now(); const lastFetch = window.lastFetchTimes[selectedFeedIndex] || 0;
-      if (now - lastFetch > 5 * 60 * 1000) { fetchFeedsData(false).then(allItems => { window.lastFetchTimes[selectedFeedIndex] = Date.now(); safeSetItem('lastFetchTimes', JSON.stringify(window.lastFetchTimes)); let existingLinks = new Set(allFetchedArticles.map(a => a.link)); let newArticles = allItems.filter(a => !existingLinks.has(a.link) && a.link && !a.link.indexOf('go:') === 0); if (newArticles.length > 0) injectNewItems(newArticles); else showToast("कोई नई खबर नहीं मिली", "fas fa-check-circle", "#34c759"); }); } else { showToast("आप पहले से ही अपडेटेड हैं", "fas fa-check-circle", "#34c759"); } return; 
+      if (now - lastFetch > 5 * 60 * 1000) { fetchFeedsData(false).then(allItems => { window.lastFetchTimes[selectedFeedIndex] = Date.now(); safeSetItem('lastFetchTimes', JSON.stringify(window.lastFetchTimes)); let existingLinks = new Set(allFetchedArticles.map(a => a.link)); let newArticles = allItems.filter(a => !existingLinks.has(a.link) && a.link && a.link.indexOf('go:') !== 0); if (newArticles.length > 0) injectNewItems(newArticles); else showToast("कोई नई खबर नहीं मिली", "fas fa-check-circle", "#34c759"); }); } else { showToast("आप पहले से ही अपडेटेड हैं", "fas fa-check-circle", "#34c759"); } return; 
   }
   stopAudio(); vibrate([10]); currentIndex--; markAsRead(currentIndex); updateSlide(); if (tutorialStep === 1) finishTutorial();
 }
@@ -447,26 +447,43 @@ function updateSlide() {
   });
 }
 
+// ==========================================
+// AUDIO SYSTEM (CRASH FIX FOR APP CREATOR 24)
+// ==========================================
 let currentSpeech = null; let readingCard = null; let wordSpans = []; let availableVoices = [];
-function loadVoices() { availableVoices = window.speechSynthesis.getVoices(); } window.speechSynthesis.onvoiceschanged = loadVoices;
+
+function loadVoices() {
+    try { if ('speechSynthesis' in window && window.speechSynthesis) { availableVoices = window.speechSynthesis.getVoices(); } } catch(e) {}
+}
+try { if ('speechSynthesis' in window && window.speechSynthesis) window.speechSynthesis.onvoiceschanged = loadVoices; } catch(e) {}
 
 function stopAudio() {
-    if(window.speechSynthesis) window.speechSynthesis.cancel();
+    try { if('speechSynthesis' in window && window.speechSynthesis) window.speechSynthesis.cancel(); } catch(e) {}
     if(readingCard) { Array.from(readingCard.querySelectorAll('.tts-word')).forEach(s => s.classList.remove('active-word')); const btn = readingCard.querySelector('.btn-audio'); if(btn) btn.innerHTML = '<i class="fas fa-volume-up"></i>'; const wave = readingCard.querySelector('.audio-wave'); if(wave) wave.classList.remove('playing'); readingCard = null; }
 }
 
 function toggleAudio(btn) {
-    vibrate([15]); const card = btn.closest('.news-card'); if (window.speechSynthesis.speaking && readingCard === card) { stopAudio(); return; } stopAudio(); 
+    vibrate([15]);
+    if (!('speechSynthesis' in window) || !window.speechSynthesis) { showToast("ऑडियो सपोर्ट उपलब्ध नहीं है", "fas fa-volume-mute", "#ff2d55"); return; }
+    
+    const card = btn.closest('.news-card'); if (window.speechSynthesis.speaking && readingCard === card) { stopAudio(); return; } stopAudio(); 
     readingCard = card; btn.innerHTML = '<i class="fas fa-stop" style="color:var(--brand-color)"></i>'; const wave = card.querySelector('.audio-wave'); if(wave) wave.classList.add('playing');
+    
     const titleEl = card.querySelector('.feed-title'); const descEl = card.querySelector('.feed-desc');
     if (!card.dataset.ttsReady) {
         let fullText = "";
         const processElement = (el) => { const walker = document.createTreeWalker(el, NodeFilter.SHOW_ALL, null, false); const nodes = []; while(walker.nextNode()) { if (walker.currentNode.nodeType === Node.TEXT_NODE || walker.currentNode.nodeName === 'BR') { nodes.push(walker.currentNode); } } nodes.forEach(node => { if (node.nodeName === 'BR') { fullText += " "; return; } const text = node.nodeValue; if (!text.trim()) { fullText += text; return; } const fragment = document.createDocumentFragment(); const regex = /(\S+)|(\s+)/g; let match; while ((match = regex.exec(text)) !== null) { if (match[1]) { const span = document.createElement('span'); span.className = 'tts-word'; span.textContent = match[1]; span.dataset.start = fullText.length; fragment.appendChild(span); fullText += match[1]; } else if (match[2]) { fragment.appendChild(document.createTextNode(match[2])); fullText += match[2]; } } node.parentNode.replaceChild(fragment, node); }); };
         processElement(titleEl); fullText += ". "; processElement(descEl); card.dataset.fullText = fullText; card.dataset.ttsReady = "true";
     }
+    
     const fullText = card.dataset.fullText; wordSpans = Array.from(card.querySelectorAll('.tts-word')); wordSpans.forEach(s => s.classList.remove('active-word'));
     currentSpeech = new SpeechSynthesisUtterance(fullText); const langCode = selectedLanguage === 'hi' ? 'hi-IN' : 'en-IN'; currentSpeech.lang = langCode;
-    if(!availableVoices.length) loadVoices(); let bestVoice = availableVoices.find(v => v.lang.indexOf(langCode) !== -1 && (v.name.indexOf("Google") !== -1 || v.name.indexOf("Natural") !== -1 || v.name.indexOf("Premium") !== -1)); if(!bestVoice) bestVoice = availableVoices.find(v => v.lang.indexOf(langCode) !== -1); if(bestVoice) currentSpeech.voice = bestVoice;
+    
+    if(!availableVoices.length) loadVoices(); 
+    let bestVoice = availableVoices.find(v => v.lang.indexOf(langCode) !== -1 && (v.name.indexOf("Google") !== -1 || v.name.indexOf("Natural") !== -1 || v.name.indexOf("Premium") !== -1)); 
+    if(!bestVoice) bestVoice = availableVoices.find(v => v.lang.indexOf(langCode) !== -1); 
+    if(bestVoice) currentSpeech.voice = bestVoice;
+    
     currentSpeech.rate = 0.95; currentSpeech.pitch = 1.0; let currentActiveIndex = -1;
     currentSpeech.onboundary = (e) => { const charIndex = e.charIndex; requestAnimationFrame(() => { let targetIndex = -1; for (let i = 0; i < wordSpans.length; i++) { const start = parseInt(wordSpans[i].dataset.start); if (start <= charIndex) { targetIndex = i; } else { break; } } if (targetIndex !== -1 && targetIndex !== currentActiveIndex) { if (currentActiveIndex !== -1 && wordSpans[currentActiveIndex]) { wordSpans[currentActiveIndex].classList.remove('active-word'); } wordSpans[targetIndex].classList.add('active-word'); currentActiveIndex = targetIndex; } }); };
     currentSpeech.onend = () => stopAudio(); currentSpeech.onerror = () => stopAudio(); window.speechSynthesis.speak(currentSpeech);
