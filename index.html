@@ -451,42 +451,135 @@ function updateSlide() {
 // AUDIO SYSTEM (CRASH FIX FOR APP CREATOR 24)
 // ==========================================
 let currentSpeech = null; let readingCard = null; let wordSpans = []; let availableVoices = [];
+let audioQueue = []; let currentAudioElement = null; // Manual Audio Queue
 
-function loadVoices() {
-    try { if ('speechSynthesis' in window && window.speechSynthesis) { availableVoices = window.speechSynthesis.getVoices(); } } catch(e) {}
-}
-try { if ('speechSynthesis' in window && window.speechSynthesis) window.speechSynthesis.onvoiceschanged = loadVoices; } catch(e) {}
+function loadVoices() { try { if ('speechSynthesis' in window) availableVoices = window.speechSynthesis.getVoices(); } catch(e) {} }
+try { if ('speechSynthesis' in window) window.speechSynthesis.onvoiceschanged = loadVoices; } catch(e) {}
 
 function stopAudio() {
-    try { if('speechSynthesis' in window && window.speechSynthesis) window.speechSynthesis.cancel(); } catch(e) {}
-    if(readingCard) { Array.from(readingCard.querySelectorAll('.tts-word')).forEach(s => s.classList.remove('active-word')); const btn = readingCard.querySelector('.btn-audio'); if(btn) btn.innerHTML = '<i class="fas fa-volume-up"></i>'; const wave = readingCard.querySelector('.audio-wave'); if(wave) wave.classList.remove('playing'); readingCard = null; }
+    try { if('speechSynthesis' in window) window.speechSynthesis.cancel(); } catch(e) {}
+    if(currentAudioElement) { currentAudioElement.pause(); currentAudioElement = null; }
+    audioQueue = []; // Queue साफ़ करें
+    
+    if(readingCard) { 
+        Array.from(readingCard.querySelectorAll('.tts-word')).forEach(s => s.classList.remove('active-word')); 
+        const btn = readingCard.querySelector('.btn-audio'); 
+        if(btn) btn.innerHTML = '<i class="fas fa-volume-up"></i>'; 
+        const wave = readingCard.querySelector('.audio-wave'); 
+        if(wave) wave.classList.remove('playing'); 
+        readingCard = null; 
+    }
 }
 
 function toggleAudio(btn) {
-    vibrate([15]);
-    if (!('speechSynthesis' in window) || !window.speechSynthesis) { showToast("ऑडियो सपोर्ट उपलब्ध नहीं है", "fas fa-volume-mute", "#ff2d55"); return; }
+    vibrate([15]); 
+    const card = btn.closest('.news-card'); 
     
-    const card = btn.closest('.news-card'); if (window.speechSynthesis.speaking && readingCard === card) { stopAudio(); return; } stopAudio(); 
-    readingCard = card; btn.innerHTML = '<i class="fas fa-stop" style="color:var(--brand-color)"></i>'; const wave = card.querySelector('.audio-wave'); if(wave) wave.classList.add('playing');
+    if (readingCard === card) { stopAudio(); return; } 
+    stopAudio(); 
     
-    const titleEl = card.querySelector('.feed-title'); const descEl = card.querySelector('.feed-desc');
+    readingCard = card; 
+    btn.innerHTML = '<i class="fas fa-stop" style="color:var(--brand-color)"></i>'; 
+    const wave = card.querySelector('.audio-wave'); 
+    if(wave) wave.classList.add('playing');
+    
+    const titleEl = card.querySelector('.feed-title'); 
+    const descEl = card.querySelector('.feed-desc');
+    
     if (!card.dataset.ttsReady) {
         let fullText = "";
-        const processElement = (el) => { const walker = document.createTreeWalker(el, NodeFilter.SHOW_ALL, null, false); const nodes = []; while(walker.nextNode()) { if (walker.currentNode.nodeType === Node.TEXT_NODE || walker.currentNode.nodeName === 'BR') { nodes.push(walker.currentNode); } } nodes.forEach(node => { if (node.nodeName === 'BR') { fullText += " "; return; } const text = node.nodeValue; if (!text.trim()) { fullText += text; return; } const fragment = document.createDocumentFragment(); const regex = /(\S+)|(\s+)/g; let match; while ((match = regex.exec(text)) !== null) { if (match[1]) { const span = document.createElement('span'); span.className = 'tts-word'; span.textContent = match[1]; span.dataset.start = fullText.length; fragment.appendChild(span); fullText += match[1]; } else if (match[2]) { fragment.appendChild(document.createTextNode(match[2])); fullText += match[2]; } } node.parentNode.replaceChild(fragment, node); }); };
-        processElement(titleEl); fullText += ". "; processElement(descEl); card.dataset.fullText = fullText; card.dataset.ttsReady = "true";
+        const processElement = (el) => { 
+            const walker = document.createTreeWalker(el, NodeFilter.SHOW_ALL, null, false); 
+            const nodes = []; 
+            while(walker.nextNode()) { if (walker.currentNode.nodeType === Node.TEXT_NODE || walker.currentNode.nodeName === 'BR') nodes.push(walker.currentNode); } 
+            nodes.forEach(node => { 
+                if (node.nodeName === 'BR') { fullText += " "; return; } 
+                const text = node.nodeValue; if (!text.trim()) { fullText += text; return; } 
+                const fragment = document.createDocumentFragment(); const regex = /(\S+)|(\s+)/g; let match; 
+                while ((match = regex.exec(text)) !== null) { 
+                    if (match[1]) { const span = document.createElement('span'); span.className = 'tts-word'; span.textContent = match[1]; span.dataset.start = fullText.length; fragment.appendChild(span); fullText += match[1]; } 
+                    else if (match[2]) { fragment.appendChild(document.createTextNode(match[2])); fullText += match[2]; } 
+                } 
+                node.parentNode.replaceChild(fragment, node); 
+            }); 
+        };
+        processElement(titleEl); fullText += ". "; processElement(descEl); 
+        card.dataset.fullText = fullText.trim(); 
+        card.dataset.ttsReady = "true";
     }
     
-    const fullText = card.dataset.fullText; wordSpans = Array.from(card.querySelectorAll('.tts-word')); wordSpans.forEach(s => s.classList.remove('active-word'));
-    currentSpeech = new SpeechSynthesisUtterance(fullText); const langCode = selectedLanguage === 'hi' ? 'hi-IN' : 'en-IN'; currentSpeech.lang = langCode;
+    const fullText = card.dataset.fullText; 
+    const langCode = selectedLanguage === 'hi' ? 'hi-IN' : 'en-IN'; 
+    wordSpans = Array.from(card.querySelectorAll('.tts-word')); 
+    wordSpans.forEach(s => s.classList.remove('active-word'));
+
+    // 1. कोशिश करें कि मोबाइल का अपना इंजन चले (इसमें हाईलाइटिंग काम करेगी)
+    try {
+        if ('speechSynthesis' in window && window.speechSynthesis && availableVoices.length > 0) {
+            currentSpeech = new SpeechSynthesisUtterance(fullText); 
+            currentSpeech.lang = langCode;
+            let bestVoice = availableVoices.find(v => v.lang.indexOf(langCode) !== -1 && (v.name.indexOf("Google") !== -1 || v.name.indexOf("Natural") !== -1 || v.name.indexOf("Premium") !== -1)); 
+            if(!bestVoice) bestVoice = availableVoices.find(v => v.lang.indexOf(langCode) !== -1); 
+            if(bestVoice) currentSpeech.voice = bestVoice;
+            currentSpeech.rate = 0.95; currentSpeech.pitch = 1.0; let currentActiveIndex = -1;
+            
+            currentSpeech.onboundary = (e) => { 
+                const charIndex = e.charIndex; 
+                requestAnimationFrame(() => { 
+                    let targetIndex = -1; 
+                    for (let i = 0; i < wordSpans.length; i++) { 
+                        const start = parseInt(wordSpans[i].dataset.start); 
+                        if (start <= charIndex) { targetIndex = i; } else { break; } 
+                    } 
+                    if (targetIndex !== -1 && targetIndex !== currentActiveIndex) { 
+                        if (currentActiveIndex !== -1 && wordSpans[currentActiveIndex]) wordSpans[currentActiveIndex].classList.remove('active-word'); 
+                        wordSpans[targetIndex].classList.add('active-word'); currentActiveIndex = targetIndex; 
+                    } 
+                }); 
+            };
+            currentSpeech.onend = () => stopAudio(); 
+            currentSpeech.onerror = () => playWithUniversalAPI(fullText, selectedLanguage); // फेल होने पर API चलाएं
+            window.speechSynthesis.speak(currentSpeech);
+            return;
+        }
+    } catch(e) {}
     
-    if(!availableVoices.length) loadVoices(); 
-    let bestVoice = availableVoices.find(v => v.lang.indexOf(langCode) !== -1 && (v.name.indexOf("Google") !== -1 || v.name.indexOf("Natural") !== -1 || v.name.indexOf("Premium") !== -1)); 
-    if(!bestVoice) bestVoice = availableVoices.find(v => v.lang.indexOf(langCode) !== -1); 
-    if(bestVoice) currentSpeech.voice = bestVoice;
+    // 2. अगर इनबिल्ट इंजन फेल हो जाए, तो Universal API इस्तेमाल करें
+    playWithUniversalAPI(fullText, selectedLanguage);
+}
+
+// मैन्युअल ऑडियो फंक्शन (Google API + HTML5 Audio)
+function playWithUniversalAPI(text, lang) {
+    // API की लिमिट 200 शब्द है, इसलिए टेक्स्ट को छोटे टुकड़ों में बाँटते हैं
+    let words = text.split(" ");
+    let chunks = [];
+    let currentChunk = "";
     
-    currentSpeech.rate = 0.95; currentSpeech.pitch = 1.0; let currentActiveIndex = -1;
-    currentSpeech.onboundary = (e) => { const charIndex = e.charIndex; requestAnimationFrame(() => { let targetIndex = -1; for (let i = 0; i < wordSpans.length; i++) { const start = parseInt(wordSpans[i].dataset.start); if (start <= charIndex) { targetIndex = i; } else { break; } } if (targetIndex !== -1 && targetIndex !== currentActiveIndex) { if (currentActiveIndex !== -1 && wordSpans[currentActiveIndex]) { wordSpans[currentActiveIndex].classList.remove('active-word'); } wordSpans[targetIndex].classList.add('active-word'); currentActiveIndex = targetIndex; } }); };
-    currentSpeech.onend = () => stopAudio(); currentSpeech.onerror = () => stopAudio(); window.speechSynthesis.speak(currentSpeech);
+    for (let i = 0; i < words.length; i++) {
+        if ((currentChunk + words[i]).length > 150) { 
+            chunks.push(currentChunk.trim()); 
+            currentChunk = words[i] + " "; 
+        } else { 
+            currentChunk += words[i] + " "; 
+        }
+    }
+    if (currentChunk.trim().length > 0) chunks.push(currentChunk.trim());
+    
+    audioQueue = chunks.map(chunk => `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(chunk)}&tl=${lang}&client=tw-ob`);
+    playNextAudioChunk();
+}
+
+function playNextAudioChunk() {
+    if (audioQueue.length === 0) { stopAudio(); return; }
+    let url = audioQueue.shift();
+    currentAudioElement = new Audio(url);
+    currentAudioElement.onended = playNextAudioChunk;
+    currentAudioElement.onerror = playNextAudioChunk; // कोई लाइन फेल हो तो अगली पढ़ें
+    currentAudioElement.play().catch(e => {
+        // कुछ ब्राउज़र बिना क्लिक के ऑडियो ब्लॉक करते हैं
+        showToast("Audio Player Error", "fas fa-volume-mute");
+        stopAudio();
+    });
 }
 
 function openGlassPopup(id) { document.getElementById("glassOverlay").classList.add('show'); document.getElementById(id).classList.add('show'); vibrate([10]); }
