@@ -451,15 +451,25 @@ function updateSlide() {
 // AUDIO SYSTEM (CRASH FIX FOR APP CREATOR 24)
 // ==========================================
 let currentSpeech = null; let readingCard = null; let wordSpans = []; let availableVoices = [];
-let audioQueue = []; let currentAudioElement = null; // Manual Audio Queue
+let audioQueue = []; 
+
+// 1. एक ही ग्लोबल ऑडियो प्लेयर बनाएँ (ताकि WebView इसे 'Autoplay' समझ कर ब्लॉक न करे)
+let universalAudioPlayer = new Audio(); 
 
 function loadVoices() { try { if ('speechSynthesis' in window) availableVoices = window.speechSynthesis.getVoices(); } catch(e) {} }
 try { if ('speechSynthesis' in window) window.speechSynthesis.onvoiceschanged = loadVoices; } catch(e) {}
 
+// 2. इवेंट्स को सिर्फ एक बार जोड़ें
+universalAudioPlayer.onended = playNextAudioChunk;
+universalAudioPlayer.onerror = playNextAudioChunk; // अगर कोई लिंक फेल हो तो अगला चलाएं
+
 function stopAudio() {
     try { if('speechSynthesis' in window) window.speechSynthesis.cancel(); } catch(e) {}
-    if(currentAudioElement) { currentAudioElement.pause(); currentAudioElement = null; }
-    audioQueue = []; // Queue साफ़ करें
+    
+    // मैन्युअल ऑडियो प्लेयर को रोकें
+    universalAudioPlayer.pause(); 
+    universalAudioPlayer.src = ""; 
+    audioQueue = []; 
     
     if(readingCard) { 
         Array.from(readingCard.querySelectorAll('.tts-word')).forEach(s => s.classList.remove('active-word')); 
@@ -513,7 +523,7 @@ function toggleAudio(btn) {
     wordSpans = Array.from(card.querySelectorAll('.tts-word')); 
     wordSpans.forEach(s => s.classList.remove('active-word'));
 
-    // 1. कोशिश करें कि मोबाइल का अपना इंजन चले (इसमें हाईलाइटिंग काम करेगी)
+    // पहले मोबाइल का इनबिल्ट इंजन ट्राई करें
     try {
         if ('speechSynthesis' in window && window.speechSynthesis && availableVoices.length > 0) {
             currentSpeech = new SpeechSynthesisUtterance(fullText); 
@@ -538,19 +548,17 @@ function toggleAudio(btn) {
                 }); 
             };
             currentSpeech.onend = () => stopAudio(); 
-            currentSpeech.onerror = () => playWithUniversalAPI(fullText, selectedLanguage); // फेल होने पर API चलाएं
+            currentSpeech.onerror = () => playWithUniversalAPI(fullText, selectedLanguage); 
             window.speechSynthesis.speak(currentSpeech);
             return;
         }
     } catch(e) {}
     
-    // 2. अगर इनबिल्ट इंजन फेल हो जाए, तो Universal API इस्तेमाल करें
+    // इनबिल्ट इंजन न चलने पर API इस्तेमाल करें
     playWithUniversalAPI(fullText, selectedLanguage);
 }
 
-// मैन्युअल ऑडियो फंक्शन (Google API + HTML5 Audio)
 function playWithUniversalAPI(text, lang) {
-    // API की लिमिट 200 शब्द है, इसलिए टेक्स्ट को छोटे टुकड़ों में बाँटते हैं
     let words = text.split(" ");
     let chunks = [];
     let currentChunk = "";
@@ -572,14 +580,20 @@ function playWithUniversalAPI(text, lang) {
 function playNextAudioChunk() {
     if (audioQueue.length === 0) { stopAudio(); return; }
     let url = audioQueue.shift();
-    currentAudioElement = new Audio(url);
-    currentAudioElement.onended = playNextAudioChunk;
-    currentAudioElement.onerror = playNextAudioChunk; // कोई लाइन फेल हो तो अगली पढ़ें
-    currentAudioElement.play().catch(e => {
-        // कुछ ब्राउज़र बिना क्लिक के ऑडियो ब्लॉक करते हैं
-        showToast("Audio Player Error", "fas fa-volume-mute");
-        stopAudio();
-    });
+    
+    // उसी ऑडियो प्लेयर का सोर्स (src) बदल कर प्ले करें
+    universalAudioPlayer.src = url;
+    universalAudioPlayer.load();
+    
+    let playPromise = universalAudioPlayer.play();
+    
+    if (playPromise !== undefined) {
+        playPromise.catch(e => {
+            // अगर WebView फिर भी बहुत Strict हो
+            showToast("Audio Blocked By App", "fas fa-volume-mute");
+            stopAudio();
+        });
+    }
 }
 
 function openGlassPopup(id) { document.getElementById("glassOverlay").classList.add('show'); document.getElementById(id).classList.add('show'); vibrate([10]); }
