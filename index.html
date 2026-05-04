@@ -16,7 +16,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
     <script>
-        // WebView Error Catcher
         window.onerror = function(msg, url, line) {
             if(window.hasShownError) return;
             window.hasShownError = true;
@@ -30,7 +29,6 @@
             }, 1000);
         };
 
-        // WebView Safe Storage Wrappers
         function safeGetItem(key, defaultValue = null) { try { return localStorage.getItem(key) || defaultValue; } catch(e) { return defaultValue; } }
         function safeSetItem(key, value) { try { localStorage.setItem(key, value); } catch(e) {} }
         function safeRemoveItem(key) { try { localStorage.removeItem(key); } catch(e) {} }
@@ -45,6 +43,7 @@
         window.lastFetchTimes = safeParse('lastFetchTimes', '{}');
         window.translationCache = safeParse('translationCache', '{}');
         
+        // Fast Pre-fetch News Data
         try {
             const proxyBase = "https://sweet-base-34f7.kgfads100.workers.dev/?url=";
             const savedTab = parseInt(safeGetItem("selectedFeed", "0")) || 0;
@@ -65,7 +64,6 @@
     </script>
   
     <style>
-        /* CSS Variables */
         :root {
             --bg-body: #000000; --bg-app: #f4f5f7; --bg-card: #ffffff;
             --text-title: #1a1a1a; --text-desc: #444444; --top-bg: #e0e0e0;
@@ -104,28 +102,15 @@
         .news-container:active { cursor: grabbing; }
         .news-card { width: 100%; height: 100%; position: absolute; top: 0; left: 0; background: var(--bg-card); display: flex; flex-direction: column; transform-style: preserve-3d; backface-visibility: hidden; will-change: transform, opacity; transition: transform 0.4s cubic-bezier(0.25, 1, 0.25, 1), opacity 0.3s ease; }
         
-        .top-section { width: 100%; height: 35%; position: relative; background: var(--top-bg); overflow: hidden; flex-shrink: 0; cursor: pointer;}
-        .top-section::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); transform: translateX(-100%); animation: shimmer 1.5s infinite; z-index: 1; }
+        .top-section { width: 100%; height: 33%; position: relative; background: var(--top-bg); overflow: hidden; flex-shrink: 0; cursor: pointer;}
+        .top-section::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); transform: translateX(-100%); animation: shimmer 0.3s infinite; z-index: 1; }
         .feed-img { width: 100%; height: 100%; object-fit: cover; display: block; position: relative; z-index: 2; opacity: 0; transition: opacity 0.3s ease; -webkit-user-drag: none; }
         .feed-img.loaded { opacity: 1; }
 
-        .audio-wave { position: absolute; bottom: 10px; left: 15px; display: flex; gap: 4px; align-items: flex-end; height: 25px; z-index: 10; opacity: 0; transition: opacity 0.3s; pointer-events: none;}
-        .audio-wave.playing { opacity: 1; }
-        .audio-wave span { display: block; width: 4px; background: #fff5b7; box-shadow: 0 0 5px rgba(0,0,0,0.5); border-radius: 2px; animation: wave 1s infinite ease-in-out; }
-        .audio-wave span:nth-child(1) { animation-delay: 0.0s; height: 10px; }
-        .audio-wave span:nth-child(2) { animation-delay: 0.1s; height: 20px; }
-        .audio-wave span:nth-child(3) { animation-delay: 0.2s; height: 15px; }
-        .audio-wave span:nth-child(4) { animation-delay: 0.3s; height: 25px; }
-        .audio-wave span:nth-child(5) { animation-delay: 0.4s; height: 12px; }
-        @keyframes wave { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(0.4); } }
-
         .bottom-section { flex: 1; width: 100%; background: var(--bg-card); padding: 20px 16px 70px 16px; position: relative; display: flex; flex-direction: column; overflow: hidden; pointer-events: none;}
         
-        .feed-title { font-family: 'Noto Serif Devanagari', serif; font-size: 16px; font-weight: 800; color: var(--text-title); line-height: 1.5; margin: 0 0 5px 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; flex-shrink: 0; pointer-events: auto; }
+        .feed-title { font-family: 'Noto Serif Devanagari', serif; font-size: 16px; font-weight: 800; color: #006DCC !important; line-height: 1.5; margin: 0 0 5px 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; flex-shrink: 0; pointer-events: auto; }
         .feed-desc { font-family: 'Mukta', sans-serif; font-size: 16px; color: var(--text-desc); line-height: 1.55; margin-top: -2px; width: 100%; pointer-events: auto; }
-
-        .tts-word { border-radius: 4px; transition: background 0.1s ease, color 0.1s ease; display: inline; }
-        .tts-word.active-word { background: var(--brand-color); color: #fff !important; box-shadow: 0 2px 6px rgba(255,45,85,0.4); }
 
         .card-footer { position: absolute; bottom: 0; left: 0; width: 100%; height: 50px; background: linear-gradient(to top, var(--bg-card) 75%, transparent); display: flex; justify-content: space-between; align-items: center; padding: 0 16px 2px 16px; z-index: 10; border-top: 1px solid var(--border-light); pointer-events: auto;}
         .publish-info { font-size: 10px; color: var(--text-muted); font-weight: 600; display: flex; align-items: center; gap: 8px; }
@@ -136,8 +121,18 @@
         .action-btn:active { transform: scale(0.85); }
         .action-btn i { font-size: 13px; }
         .btn-whatsapp { color: #25D366 !important; }
-        .btn-audio { color: #007aff !important; }
+        .btn-summary { color: #a200ff !important; background: rgba(162, 0, 255, 0.1) !important; }
         .btn-save.saved { color: var(--brand-color) !important; background: rgba(255,45,85,0.1); }
+
+        /* Premium Sparkle Animation for AI Button */
+        @keyframes magic-sparkle {
+            0%, 100% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 2px rgba(162,0,255,0.3)); }
+            25% { transform: scale(1.1) rotate(-10deg); filter: drop-shadow(0 0 6px rgba(162,0,255,0.8)); }
+            75% { transform: scale(1.1) rotate(10deg); filter: drop-shadow(0 0 6px rgba(162,0,255,0.8)); }
+        }
+        .btn-summary i {
+            animation: magic-sparkle 2s infinite ease-in-out;
+        }
 
         .promo-card { padding: 0; background: #000; display: flex; align-items: center; justify-content: center; cursor: pointer;}
         .promo-card img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.3s ease; -webkit-user-drag: none; }
@@ -145,7 +140,7 @@
         
         .news-card.discovery-card-wrap { background: var(--bg-app); display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: calc(env(safe-area-inset-top, 20px) + 20px) 20px 80px 20px; overflow-y: auto; }
         .discovery-content { width: 100%; max-width: 400px; display: flex; flex-direction: column; }
-        .ad-container { width: 100%; height: 160px; background: var(--bg-card); border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; margin-top:42px; margin-bottom: 5px; position: relative; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.1); border: 1px solid var(--border-light);}
+        .ad-container { width: 100%; height: 160px; background: var(--bg-card); border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; margin-top:45px; margin-bottom: 5px; position: relative; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.1); border: 1px solid var(--border-light);}
         .ad-container::after { content: ''; color: var(--text-muted); font-weight: 800; font-size: 20px; letter-spacing: 1px;}
         .ad-badge { position: absolute; top: 0; left: 0; background: #fbbc05; color: #000; font-size: 11px; font-weight: 800; padding: 3px 8px; border-bottom-right-radius: 8px;}
         .glass-list-title { color: var(--text-title); font-size: 15px; font-weight: 800; margin-bottom: 10px; width: 100%; text-align: left;}
@@ -177,14 +172,14 @@
         .saved-dot { position: absolute; top: 12px; right: 30px; width: 10px; height: 10px; background: var(--brand-color); border-radius: 50%; border: 2px solid var(--bottom-bar); display: none; z-index: 10; }
         .saved-dot.active { display: block; animation: popInBadge 0.4s; }
 
-        .network-toast { position: fixed; top: -60px; left: 50%; transform: translateX(-50%); background: var(--text-title); color: var(--bg-card); padding: 12px 24px; border-radius: 30px; font-size: 14px; font-weight: 600; z-index: 10000; transition: top 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); white-space: nowrap;}
+        .network-toast { position: fixed; top: -60px; left: 50%; transform: translateX(-50%); background: var(--text-title); color: var(--bg-card); padding: 12px 24px; border-radius: 30px; font-size: 14px; font-weight: 600; z-index: 1000000; transition: top 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); white-space: nowrap;}
         .network-toast.show { top: calc(env(safe-area-inset-top, 0px) + 20px); }
 
         .glass-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 999998; display: none; opacity: 0; transition: opacity 0.3s ease; }
         .glass-overlay.show { display: block; opacity: 1; }
         
-        .settings-popup, .share-popup { background: var(--popup-bg); padding: 25px; border-radius: 24px; width: 85%; max-width: 340px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); position: fixed; top: 50%; left: 50%; transform: translate(-50%, -40%); z-index: 999999; opacity: 0; pointer-events: none; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column;}
-        .settings-popup.show, .share-popup.show { opacity: 1; transform: translate(-50%, -50%); pointer-events: auto; }
+        .settings-popup, .summary-popup { background: var(--popup-bg); padding: 25px; border-radius: 24px; width: 85%; max-width: 340px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); position: fixed; top: 50%; left: 50%; transform: translate(-50%, -40%); z-index: 999999; opacity: 0; pointer-events: none; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column;}
+        .settings-popup.show, .summary-popup.show { opacity: 1; transform: translate(-50%, -50%); pointer-events: auto; }
         
         .popup-title { margin: 0 0 20px 0; font-size: 20px; color: var(--popup-text); font-weight: 800; text-align: center;}
         .setting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; color: var(--popup-text); font-weight: 600; font-size: 16px;}
@@ -196,12 +191,12 @@
         input:checked + .slider { background-color: #34c759; }
         input:checked + .slider:before { transform: translateX(22px); }
 
-        .lang-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 5px; margin-bottom: 20px;}
-        .lang-card { background: var(--action-bg); border: 2px solid transparent; border-radius: 16px; padding: 18px 10px; text-align: center; cursor: pointer; transition: all 0.3s; position: relative; }
-        .lang-card .lang-title { font-size: 16px; font-weight: 800; color: var(--text-title); display: block; margin-bottom: 4px;}
-        .lang-card .lang-sub { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+        .lang-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 5px; margin-bottom: 20px;}
+        .lang-card { background: var(--action-bg); border: 2px solid transparent; border-radius: 12px; padding: 12px 5px; text-align: center; cursor: pointer; transition: all 0.3s; position: relative; }
+        .lang-card .lang-title { font-size: 14px; font-weight: 800; color: var(--text-title); display: block; margin-bottom: 2px;}
+        .lang-card .lang-sub { font-size: 11px; font-weight: 600; color: var(--text-muted); }
         .lang-card.active { border-color: var(--brand-color); background: rgba(255,45,85,0.08); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(255,45,85,0.15);}
-        .lang-card.active::after { content: '\f058'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; top: 10px; right: 10px; color: var(--brand-color); font-size: 16px; }
+        .lang-card.active::after { content: '\f058'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; top: 5px; right: 5px; color: var(--brand-color); font-size: 14px; }
 
         .primary-btn { width: 100%; padding: 14px; border: none; border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer; transition: transform 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px;}
         .primary-btn:active { transform: scale(0.96); }
@@ -210,12 +205,12 @@
         .skeleton-card { width: 100%; height: 100%; position: absolute; top: 0; left: 0; background: var(--bg-card); display: flex; flex-direction: column; z-index: 50; }
         .skel-img { width: 100%; height: 42%; background: var(--border-light); animation: pulse 0.5s infinite ease-in-out; }
         .skel-bottom { flex: 1; padding: 20px; display: flex; flex-direction: column; }
-        .skel-title { height: 28px; background: var(--border-light); border-radius: 6px; width: 90%; animation: pulse 0.3s infinite ease-in-out; margin-bottom: 10px;}
+        .skel-title { height: 28px; background: var(--border-light); border-radius: 6px; width: 90%; animation: pulse 0.5s infinite ease-in-out; margin-bottom: 10px;}
         .skel-title.short { width: 60%; margin-bottom: 25px; }
-        .skel-desc { height: 16px; background: var(--border-light); border-radius: 4px; width: 100%; margin-bottom: 10px; animation: pulse 0.3s infinite ease-in-out; }
+        .skel-desc { height: 16px; background: var(--border-light); border-radius: 4px; width: 100%; margin-bottom: 10px; animation: pulse 0.5s infinite ease-in-out; }
         .skel-desc.medium { width: 85%; }
         .skel-desc.short { width: 70%; }
-        @keyframes pulse { 0% { opacity: 0.2; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+        @keyframes pulse { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
 
         .tut-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; pointer-events: none; transition: opacity 0.4s; opacity: 0; display: none; }
         .tut-box {  padding: 35px 25px; margin-top:250px; border-radius: 24px; text-align: center; display: flex; flex-direction: column; align-items: center;}
@@ -236,6 +231,57 @@
         .success-svg { width: 80px; height: 80px; margin-bottom: 20px; }
         .success-circle { stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 3; stroke-miterlimit: 10; stroke: #34c759; fill: none; animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards; }
         .success-check { transform-origin: 50% 50%; stroke-dasharray: 48; stroke-dashoffset: 48; stroke-width: 4; stroke: #34c759; animation: stroke 0.4s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards; }
+
+        /* Premium Glassmorphism AI Summary Styling */
+        .premium-glass-popup {
+            background: rgba(255, 255, 255, 0.85) !important;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.15), 0 0 30px rgba(162, 0, 255, 0.15) !important;
+        }
+        [data-theme="dark"] .premium-glass-popup {
+            background: rgba(28, 28, 30, 0.85) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4), 0 0 30px rgba(162, 0, 255, 0.2) !important;
+        }
+        .summary-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 900;
+            background: -webkit-linear-gradient(45deg, #a200ff, #ff2d55);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 2px;
+        }
+        .summary-bullet {
+            background: var(--bg-card);
+            padding: 10px 15px 10px 20px;
+            border-radius: 5px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: var(--text-title);
+            line-height: 1.6;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+        [data-theme="dark"] .summary-bullet {
+            background: #2c2c2e;
+        }
+        .summary-bullet::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 5px;
+            background: linear-gradient(to bottom, #a200ff, #ff2d55);
+        }
+        .summary-bullet-text {
+            display: block;
+        }
 
     </style>
 </head>
@@ -303,6 +349,7 @@
         <div style="margin-top: 10px; border-top: 1px solid var(--border-light); padding-top: 20px;">
             <h4 style="margin:0 0 10px 0; color: var(--text-muted); font-size:12px; text-transform:uppercase; letter-spacing:1px; text-align:center; font-weight: 800;">Choose Language</h4>
             <div class="lang-grid">
+                <div class="lang-card" id="langOriginal" onclick="changeLanguage('original')"><span class="lang-title">Original</span><span class="lang-sub">मूल भाषा</span></div>
                 <div class="lang-card" id="langHi" onclick="changeLanguage('hi')"><span class="lang-title">हिंदी</span><span class="lang-sub">Hindi</span></div>
                 <div class="lang-card" id="langEn" onclick="changeLanguage('en')"><span class="lang-title">English</span><span class="lang-sub">English</span></div>
             </div>
@@ -310,20 +357,105 @@
         <button class="primary-btn btn-close" onclick="closeAllPopups()">Close</button>
     </div>
 
-    <div id="sharePopup" class="share-popup" style="align-items: center;">
-        <h3 class="popup-title">Share News</h3>
-        <img id="sharePreviewImg" style="width:100%; border-radius:14px; margin-bottom:15px; border: 1px solid var(--border-light); object-fit: contain; max-height: 40vh; box-shadow: 0 8px 16px rgba(0,0,0,0.1);" />
-        <button id="confirmShareBtn" class="primary-btn" style="background:#34c759; color:#fff; box-shadow: 0 4px 15px rgba(52,199,89,0.3);"><i class="fab fa-whatsapp" style="font-size:20px;"></i> Share on WhatsApp</button>
-        <button class="primary-btn btn-close" onclick="closeAllPopups()">Cancel</button>
+    <!-- AI Summary Premium Glass Popup -->
+    <div id="summaryPopup" class="summary-popup premium-glass-popup" style="align-items: flex-start; max-height: 75vh; overflow-y: auto;">
+        <div class="summary-header">
+            <i class="fas fa-wand-magic-sparkles" style="color: #a200ff;"></i> AI सारांश
+        </div>
+        <p style="font-size: 10px; color: var(--text-muted); font-weight: 600; margin-top: 0px; margin-bottom: 12px;">मुख्य बिंदु (Key Highlights)</p>
+        
+        <div id="summaryContent" style="width: 100%;">
+            <!-- Content gets injected via JS -->
+        </div>
+
+        <button class="primary-btn btn-close" onclick="closeAllPopups()" style="margin-top: 15px; background: rgba(0,0,0,0.05); font-size:14px; color: var(--text-title);">Close</button>
     </div>
 </div>
 
 <script>
+// ==============================================================================
+// Premium Feature: AI Smart Summary (Highlights Generator)
+// ==============================================================================
+
+function generateSummary(btnElement) {
+    vibrate([15]);
+    const card = btnElement.closest('.news-card');
+    const index = parseInt(card.getAttribute('data-index'));
+    const article = articles[index];
+    
+    if (!article) return;
+
+    // Show processing toast
+    showToast("AI सारांश बना रहा है...", "fas fa-spinner fa-spin", "#a200ff", 800);
+
+    // Extract text, remove HTML
+    let tempDiv = document.createElement("div");
+    tempDiv.innerHTML = article.description || "";
+    let cleanText = tempDiv.textContent || tempDiv.innerText || "";
+
+    // Split text into valid sentences (handling English and Hindi punctuation)
+    let rawSentences = cleanText.split(/[\.।!?]/).map(s => s.trim());
+    
+    // Filter out very short or broken fragments
+    let validSentences = rawSentences.filter(s => s.split(" ").length > 4);
+
+    // Get up to top 3 points to simulate AI Highlights
+    let highlights = validSentences.slice(0, 3);
+    
+    // Fallback if description is too short
+    if(highlights.length === 0) {
+        highlights = [article.title];
+    }
+
+    // Generate HTML for bullet points
+    let summaryHtml = '';
+    highlights.forEach(h => {
+        summaryHtml += `<div class="summary-bullet"><span class="summary-bullet-text">${h}</span></div>`;
+    });
+
+    // Populate and open Popup
+    document.getElementById("summaryContent").innerHTML = summaryHtml;
+    
+    setTimeout(() => {
+        openGlassPopup('summaryPopup');
+    }, 300);
+}
+
+
+// ==============================================================================
+// Direct Text Share To WhatsApp
+// ==============================================================================
+
+function shareToWhatsApp(btnElement) {
+    vibrate([15]); 
+    const card = btnElement.closest('.news-card'); 
+    const index = parseInt(card.getAttribute('data-index')); 
+    const article = articles[index]; 
+    if (!article) return;
+    
+    // Short description formatting
+    let tempDiv = document.createElement("div"); 
+    tempDiv.innerHTML = article.description || ""; 
+    let cleanDesc = (tempDiv.textContent || tempDiv.innerText || "").substring(0, 250) + "...";
+
+    const customText = "📲 *पूरी खबर पढ़ने के लिए ऐप डाउनलोड करें:*\nhttps://cutt.ly/OrKg4bdu";
+    const shareCaption = `*${article.title}*\n\n${cleanDesc}\n\n${customText}`;
+    
+    // Direct trigger to WhatsApp Instant
+    showToast("Opening WhatsApp...", "fab fa-whatsapp", "#25D366", 1500);
+    window.location.href = `whatsapp://send?text=${encodeURIComponent(shareCaption)}`;
+}
+
+
+// ==============================================================================
+// Global App Logic Starts Here
+// ==============================================================================
 let startY = 0, endY = 0, startX = 0, endX = 0; let lastTouchY = 0; let currentIndex = 0;
 let allFetchedArticles = []; let articles = []; 
 let readArticles = safeParse('readNewsLinks', '[]'); let unreadCount = 0; const MIN_SWIPE = 35; 
 let isReturningSession = safeGetItem("isReturningSession") === "true"; safeSetItem("isReturningSession", "true"); 
 let isUnreadFilterActive = false; let tutorialStep = safeGetItem("swipeTutorialDone") ? -1 : 0; 
+let selectedLanguage = safeGetItem("selectedLanguage", "original"); // Default is ORIGINAL
 
 function vibrate(pattern) { if (navigator.vibrate) navigator.vibrate(pattern || [15]); }
 
@@ -352,7 +484,7 @@ function showSkeleton() {
 
 function clearAppCache() {
     vibrate([20]); 
-    const currentLang = safeGetItem("selectedLanguage", "hi");
+    const currentLang = safeGetItem("selectedLanguage", "original");
     const currentTheme = safeGetItem("theme", "light");
     localStorage.clear();
     safeSetItem("selectedLanguage", currentLang);
@@ -365,6 +497,8 @@ function playSuccessSound() {
     try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const osc = ctx.createOscillator(); const gain = ctx.createGain(); osc.connect(gain); gain.connect(ctx.destination); osc.type = 'sine'; osc.frequency.setValueAtTime(523.25, ctx.currentTime); osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1); osc.frequency.setValueAtTime(1046.50, ctx.currentTime + 0.2); gain.gain.setValueAtTime(0, ctx.currentTime); gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.05); gain.gain.setValueAtTime(0.3, ctx.currentTime + 0.2); gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8); osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.8); } catch(e) {}
 }
 
+function triggerConfetti() { if (typeof confetti === 'function') confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, zIndex: 100005 }); }
+
 let isSuccessShowing = false;
 function showAllReadSuccess() {
     if(isSuccessShowing) return; isSuccessShowing = true; vibrate([30, 50, 30]); playSuccessSound(); triggerConfetti();
@@ -375,7 +509,6 @@ function showAllReadSuccess() {
 function initTutorial() { if (tutorialStep === 0 && articles.length > 1) { document.getElementById("tutorialOverlay").style.display = "flex"; setTimeout(() => document.getElementById("tutorialOverlay").style.opacity = "1", 50); } }
 function progressTutorialToDown() { if (tutorialStep !== 0) return; tutorialStep = 1; const icon = document.getElementById("instructIcon"); const text = document.getElementById("instructText"); icon.className = "fas fa-hand-pointer instruct-icon anim-down"; icon.style.transform = "rotate(180deg)"; text.innerHTML = "पिछली खबर के लिए<br>नीचे स्वाइप करें"; vibrate([15]); }
 function finishTutorial() { if (tutorialStep !== 1) return; tutorialStep = -1; safeSetItem("swipeTutorialDone", "true"); document.getElementById("tutorialOverlay").style.opacity = "0"; setTimeout(() => document.getElementById("tutorialOverlay").style.display = "none", 400); triggerConfetti(); vibrate([20, 30, 20]); showToast("Welcome", "fas fa-star", "#ff3b3b"); }
-function triggerConfetti() { if (typeof confetti === 'function') confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, zIndex: 100005 }); }
 function shakeTutorial() { vibrate([30]); const box = document.getElementById("tutBox"); box.classList.remove("shake-anim"); void box.offsetWidth; box.classList.add("shake-anim"); }
 
 const newsContainer = document.getElementById('newsContainer'); let pullToRefreshActive = false; let lastTapTime = 0; let isDragging = false; let clickPrevented = false; 
@@ -420,14 +553,21 @@ function handleVerticalSwipe() {
   if (tutorialStep === 1) { if (diff > 0) showPrevFlip(); else shakeTutorial(); return; }
   if (diff < 0) showNextFlip(); else showPrevFlip();
 }
-function showNextFlip() { if (currentIndex >= articles.length - 1) { showToast("ताज़ा खबरे लोड हो रही हैं...", "fas fa-sync fa-spin"); return; } stopAudio(); vibrate([10]); currentIndex++; markAsRead(currentIndex); updateSlide(); if (tutorialStep === 0) progressTutorialToDown(); }
+function showNextFlip() { 
+    if (currentIndex >= articles.length - 1) { 
+        showToast("ताज़ा खबरे लोड हो रही हैं...", "fas fa-sync fa-spin"); 
+        return; 
+    } 
+    vibrate([10]); currentIndex++; markAsRead(currentIndex); updateSlide(); 
+    if (tutorialStep === 0) progressTutorialToDown(); 
+}
 function showPrevFlip() {
   if (currentIndex <= 0) {
       if (selectedFeedIndex === 2 || isUnreadFilterActive || !navigator.onLine) return; vibrate([15]); showToast("नई ख़बरें खोज रहे हैं...", "fas fa-sync fa-spin");
       const now = Date.now(); const lastFetch = window.lastFetchTimes[selectedFeedIndex] || 0;
       if (now - lastFetch > 5 * 60 * 1000) { fetchFeedsData(false).then(allItems => { window.lastFetchTimes[selectedFeedIndex] = Date.now(); safeSetItem('lastFetchTimes', JSON.stringify(window.lastFetchTimes)); let existingLinks = new Set(allFetchedArticles.map(a => a.link)); let newArticles = allItems.filter(a => !existingLinks.has(a.link) && a.link && a.link.indexOf('go:') !== 0); if (newArticles.length > 0) injectNewItems(newArticles); else showToast("कोई नई खबर नहीं मिली", "fas fa-check-circle", "#34c759"); }); } else { showToast("आप पहले से ही अपडेटेड हैं", "fas fa-check-circle", "#34c759"); } return; 
   }
-  stopAudio(); vibrate([10]); currentIndex--; markAsRead(currentIndex); updateSlide(); if (tutorialStep === 1) finishTutorial();
+  vibrate([10]); currentIndex--; markAsRead(currentIndex); updateSlide(); if (tutorialStep === 1) finishTutorial();
 }
 function jumpToArticleByLink(link) { const targetIndex = articles.findIndex(a => a.link === link); if(targetIndex !== -1) { currentIndex = targetIndex; markAsRead(currentIndex); updateSlide(); vibrate([15]); } }
 
@@ -439,7 +579,7 @@ function fitCardText(card, attempts) {
     const availableHeight = bottomSection.clientHeight - title.clientHeight - 85; 
     if (availableHeight <= 0) { requestAnimationFrame(() => fitCardText(card, attempts + 1)); return; }
     desc.style.display = 'block'; desc.style.webkitLineClamp = 'unset';
-    let currentSize = 17; let minSize = 12; const applySize = (size) => { desc.style.fontSize = size + 'px'; desc.style.lineHeight = '1.5'; }; applySize(currentSize);
+    let currentSize = 16; let minSize = 12; const applySize = (size) => { desc.style.fontSize = size + 'px'; desc.style.lineHeight = '1.5'; }; applySize(currentSize);
     while (desc.scrollHeight > availableHeight && currentSize > minSize) { currentSize -= 0.5; applySize(currentSize); }
     if (desc.scrollHeight > availableHeight) { const maxLines = Math.floor(availableHeight / (minSize * 1.5)); desc.style.display = '-webkit-box'; desc.style.webkitLineClamp = String(maxLines > 0 ? maxLines : 1); desc.style.webkitBoxOrient = 'vertical'; desc.style.overflow = 'hidden'; }
     card.classList.add('font-fitted');
@@ -448,6 +588,7 @@ function fitCardText(card, attempts) {
 function updateSlide() {
   requestAnimationFrame(() => {
       updateProgressBar(); const cards = document.querySelectorAll(".news-card");
+      
       Array.from(cards).forEach((card) => {
         const index = parseInt(card.getAttribute('data-index')); const diff = index - currentIndex;
         if(Math.abs(diff) > 2) { card.style.display = 'none'; return; } card.style.display = 'flex';
@@ -459,161 +600,93 @@ function updateSlide() {
   });
 }
 
-// ==========================================
-// AUDIO SYSTEM (Fixed Highlighting Issue)
-// ==========================================
-let currentSpeech = null; let readingCard = null; let wordSpans = []; let availableVoices = [];
-let audioQueue = []; 
-
-let universalAudioPlayer = new Audio(); 
-
-function loadVoices() { try { if ('speechSynthesis' in window) availableVoices = window.speechSynthesis.getVoices(); } catch(e) {} }
-try { if ('speechSynthesis' in window) window.speechSynthesis.onvoiceschanged = loadVoices; } catch(e) {}
-
-universalAudioPlayer.onended = playNextAudioChunk;
-universalAudioPlayer.onerror = playNextAudioChunk;
-
-function stopAudio() {
-    try { if('speechSynthesis' in window) window.speechSynthesis.cancel(); } catch(e) {}
-    
-    universalAudioPlayer.pause(); 
-    universalAudioPlayer.src = ""; 
-    audioQueue = []; 
-    
-    if(readingCard) { 
-        Array.from(readingCard.querySelectorAll('.tts-word')).forEach(s => s.classList.remove('active-word')); 
-        const btn = readingCard.querySelector('.btn-audio'); 
-        if(btn) btn.innerHTML = '<i class="fas fa-volume-up"></i>'; 
-        const wave = readingCard.querySelector('.audio-wave'); 
-        if(wave) wave.classList.remove('playing'); 
-        readingCard = null; 
-    }
-}
-
-function toggleAudio(btn) {
-    vibrate([15]); 
-    const card = btn.closest('.news-card'); 
-    
-    if (readingCard === card) { stopAudio(); return; } 
-    stopAudio(); 
-    
-    readingCard = card; 
-    btn.innerHTML = '<i class="fas fa-stop" style="color:var(--brand-color)"></i>'; 
-    const wave = card.querySelector('.audio-wave'); 
-    if(wave) wave.classList.add('playing');
-    
-    const titleEl = card.querySelector('.feed-title'); 
-    const descEl = card.querySelector('.feed-desc');
-    
-    if (!card.dataset.ttsReady) {
-        let fullText = "";
-        const processElement = (el) => { 
-            const walker = document.createTreeWalker(el, NodeFilter.SHOW_ALL, null, false); 
-            const nodes = []; 
-            while(walker.nextNode()) { if (walker.currentNode.nodeType === Node.TEXT_NODE || walker.currentNode.nodeName === 'BR') nodes.push(walker.currentNode); } 
-            nodes.forEach(node => { 
-                if (node.nodeName === 'BR') { fullText += " "; return; } 
-                const text = node.nodeValue; if (!text.trim()) { fullText += text; return; } 
-                const fragment = document.createDocumentFragment(); const regex = /(\S+)|(\s+)/g; let match; 
-                while ((match = regex.exec(text)) !== null) { 
-                    if (match[1]) { const span = document.createElement('span'); span.className = 'tts-word'; span.textContent = match[1]; span.dataset.start = fullText.length; fragment.appendChild(span); fullText += match[1]; } 
-                    else if (match[2]) { fragment.appendChild(document.createTextNode(match[2])); fullText += match[2]; } 
-                } 
-                node.parentNode.replaceChild(fragment, node); 
-            }); 
-        };
-        processElement(titleEl); fullText += ". "; processElement(descEl); 
-        card.dataset.fullText = fullText.trim(); 
-        card.dataset.ttsReady = "true";
-    }
-    
-    const fullText = card.dataset.fullText; 
-    const langCode = selectedLanguage === 'hi' ? 'hi-IN' : 'en-IN'; 
-    wordSpans = Array.from(card.querySelectorAll('.tts-word')); 
-    wordSpans.forEach(s => s.classList.remove('active-word'));
-
-    try {
-        if ('speechSynthesis' in window && window.speechSynthesis && availableVoices.length > 0) {
-            currentSpeech = new SpeechSynthesisUtterance(fullText); 
-            currentSpeech.lang = langCode;
-            let bestVoice = availableVoices.find(v => v.lang.indexOf(langCode) !== -1 && (v.name.indexOf("Google") !== -1 || v.name.indexOf("Natural") !== -1 || v.name.indexOf("Premium") !== -1)); 
-            if(!bestVoice) bestVoice = availableVoices.find(v => v.lang.indexOf(langCode) !== -1); 
-            if(bestVoice) currentSpeech.voice = bestVoice;
-            currentSpeech.rate = 0.95; currentSpeech.pitch = 1.0; let currentActiveIndex = -1;
-            
-            currentSpeech.onboundary = (e) => { 
-                const charIndex = e.charIndex; 
-                requestAnimationFrame(() => { 
-                    let targetIndex = -1; 
-                    for (let i = 0; i < wordSpans.length; i++) { 
-                        const start = parseInt(wordSpans[i].dataset.start);
-                        const wordLen = wordSpans[i].textContent.length;
-                        if (charIndex >= start && charIndex <= start + wordLen) { targetIndex = i; break; } 
-                    } 
-                    if (targetIndex !== -1 && targetIndex !== currentActiveIndex) { 
-                        if (currentActiveIndex !== -1 && wordSpans[currentActiveIndex]) wordSpans[currentActiveIndex].classList.remove('active-word'); 
-                        wordSpans[targetIndex].classList.add('active-word'); currentActiveIndex = targetIndex; 
-                    } 
-                }); 
-            };
-            currentSpeech.onend = () => stopAudio(); 
-            currentSpeech.onerror = () => playWithUniversalAPI(fullText, selectedLanguage); 
-            window.speechSynthesis.speak(currentSpeech);
-            return;
-        }
-    } catch(e) {}
-    
-    playWithUniversalAPI(fullText, selectedLanguage);
-}
-
-function playWithUniversalAPI(text, lang) {
-    let words = text.split(" ");
-    let chunks = [];
-    let currentChunk = "";
-    
-    for (let i = 0; i < words.length; i++) {
-        if ((currentChunk + words[i]).length > 150) { 
-            chunks.push(currentChunk.trim()); 
-            currentChunk = words[i] + " "; 
-        } else { 
-            currentChunk += words[i] + " "; 
-        }
-    }
-    if (currentChunk.trim().length > 0) chunks.push(currentChunk.trim());
-    
-    audioQueue = chunks.map(chunk => `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(chunk)}&tl=${lang}&client=tw-ob`);
-    playNextAudioChunk();
-}
-
-function playNextAudioChunk() {
-    if (audioQueue.length === 0) { stopAudio(); return; }
-    let url = audioQueue.shift();
-    
-    universalAudioPlayer.src = url;
-    universalAudioPlayer.load();
-    
-    let playPromise = universalAudioPlayer.play();
-    
-    if (playPromise !== undefined) {
-        playPromise.catch(e => {
-            showToast("Feature Unlock Soon", "fas fa-volume-mute");
-            stopAudio();
-        });
-    }
-}
-
 function openGlassPopup(id) { document.getElementById("glassOverlay").classList.add('show'); document.getElementById(id).classList.add('show'); vibrate([10]); }
-function closeAllPopups() { document.getElementById("glassOverlay").classList.remove('show'); Array.from(document.querySelectorAll('.settings-popup, .share-popup')).forEach(p => p.classList.remove('show')); }
+function closeAllPopups() { document.getElementById("glassOverlay").classList.remove('show'); Array.from(document.querySelectorAll('.settings-popup, .summary-popup')).forEach(p => p.classList.remove('show')); }
 function showSettingsPopup() { openGlassPopup('settingsPopup'); }
 function toggleDarkMode(checkbox) { vibrate([15]); const theme = checkbox.checked ? 'dark' : 'light'; document.documentElement.setAttribute('data-theme', theme); safeSetItem('theme', theme); }
 
-function updateLangUI() { const isHi = (safeGetItem("selectedLanguage", "hi")) === "hi"; document.getElementById('langHi').classList.toggle('active', isHi); document.getElementById('langEn').classList.toggle('active', !isHi); }
+function updateLangUI() { 
+    const lang = safeGetItem("selectedLanguage", "original");
+    document.getElementById('langOriginal').classList.toggle('active', lang === 'original'); 
+    document.getElementById('langHi').classList.toggle('active', lang === 'hi'); 
+    document.getElementById('langEn').classList.toggle('active', lang === 'en'); 
+}
 
-function changeLanguage(lang) { 
-    vibrate([15]); safeSetItem("selectedLanguage", lang); selectedLanguage = lang; updateLangUI(); closeAllPopups(); 
+// -------------------------------------------------------------------------
+// NEW INSTANT TRANSLATION LOGIC ON SETTING CHANGE
+// -------------------------------------------------------------------------
+async function changeLanguage(lang) { 
+    vibrate([15]); 
+    safeSetItem("selectedLanguage", lang); 
+    selectedLanguage = lang; 
+    updateLangUI(); 
+    closeAllPopups(); 
+    
+    // Clear next-load caches so when user restarts, it fetches fresh
     [0, 1].forEach(i => { safeRemoveItem('cachedFeeds_' + i); window.tabMemoryCache[i] = null; }); 
-    showSkeleton(); // Skeleton loader for fast feedback
-    loadNews(true); 
+    
+    // Get all non-promo items that have an original text preserved
+    let itemsToTranslate = allFetchedArticles.filter(a => !a.isPromo && !a.isDiscovery && a.originalTitle);
+
+    // If User chose 'Original', revert to raw text immediately
+    if (lang === 'original') {
+        itemsToTranslate.forEach(a => {
+            a.title = a.originalTitle;
+            a.description = a.originalDescription;
+        });
+        displayNews(true); // instant update
+        window.tabMemoryCache[selectedFeedIndex] = allFetchedArticles;
+        return;
+    }
+
+    showToast("अनुवाद हो रहा है...", "fas fa-language fa-spin", "#a200ff", 1500);
+
+    // Filter items to translate instantly (Current reading + next 2)
+    let visibleItems = itemsToTranslate.filter(a => articles.indexOf(a) >= currentIndex && articles.indexOf(a) <= currentIndex + 2);
+    if(visibleItems.length === 0) visibleItems = itemsToTranslate.slice(0, 3);
+
+    // Instantly Translate First Batch
+    await Promise.all(visibleItems.map(async item => {
+        item.title = await getCachedTranslation(item.originalTitle, lang);
+        item.description = await getCachedTranslation(item.originalDescription, lang);
+    }));
+
+    // Update UI instantly
+    displayNews(true);
+
+    // Translate the remaining items in background without blocking
+    setTimeout(async () => {
+        let remaining = itemsToTranslate.filter(item => !visibleItems.includes(item));
+        const chunkSize = 5;
+        for (let i = 0; i < remaining.length; i += chunkSize) {
+            const chunk = remaining.slice(i, i + chunkSize);
+            await Promise.all(chunk.map(async item => {
+                item.title = await getCachedTranslation(item.originalTitle, lang);
+                item.description = await getCachedTranslation(item.originalDescription, lang);
+            }));
+            
+            // Re-render only modified text
+            requestAnimationFrame(() => {
+                chunk.forEach(item => {
+                    const idx = articles.indexOf(item);
+                    if (idx !== -1) {
+                        const card = document.querySelector(`.news-card[data-index="${idx}"]`);
+                        if (card) {
+                            const titleEl = card.querySelector('.feed-title');
+                            const descEl = card.querySelector('.feed-desc');
+                            if (titleEl) titleEl.innerText = item.title;
+                            if (descEl) descEl.innerHTML = item.description;
+                            card.classList.remove('font-fitted');
+                            fitCardText(card, 0); // Apply size logic
+                        }
+                    }
+                });
+            });
+            await new Promise(resolve => setTimeout(resolve, 50));
+        }
+        window.tabMemoryCache[selectedFeedIndex] = allFetchedArticles;
+        try { safeSetItem(`cachedFeeds_${selectedFeedIndex}`, JSON.stringify(articles.slice(0, 40))); } catch(e){}
+    }, 50);
 }
 
 function toggleUnreadFilter() { vibrate([15]); isUnreadFilterActive = !isUnreadFilterActive; const btn = document.getElementById("unreadToggleBtn"); if (isUnreadFilterActive) { btn.classList.add("active"); document.getElementById("unreadBtnText").innerText = "All News"; applyUnreadFilter(); } else { btn.classList.remove("active"); document.getElementById("unreadBtnText").innerText = "Unread"; removeUnreadFilter(); } }
@@ -623,20 +696,17 @@ function removeUnreadFilter() { articles = [...allFetchedArticles]; document.get
 function updateSavedBadge() { const dot = document.getElementById("savedRedDot"); if(dot) { if (safeGetItem("hasUnreadSaved") === "true" && selectedFeedIndex !== 2) dot.classList.add("active"); else dot.classList.remove("active"); } }
 
 let selectedFeedIndex = parseInt(safeGetItem("selectedFeed", "0")) || 0; if(selectedFeedIndex > 2) selectedFeedIndex = 0;
-let selectedLanguage = safeGetItem("selectedLanguage", "hi"); 
-
-function updateTabUI() { const tabs = document.querySelectorAll(".bottom-bar .tab"); Array.from(tabs).forEach(t => t.classList.remove('active')); if(tabs[selectedFeedIndex]) tabs[selectedFeedIndex].classList.add('active'); }
 
 function selectBottomTab(index) {
     if (selectedFeedIndex === index) { 
         if (allFetchedArticles.length > 0 && index !== 2) {
-            stopAudio(); vibrate([15]);
+            vibrate([15]);
             showSkeleton();
-            loadNews(true); // Tab refresh feature
+            loadNews(true); 
         }
         return; 
     } 
-    stopAudio(); vibrate([15]); 
+    vibrate([15]); 
     selectedFeedIndex = index; safeSetItem("selectedFeed", index); updateTabUI(); 
     if(isUnreadFilterActive) toggleUnreadFilter(); if(index === 2) { safeSetItem("hasUnreadSaved", "false"); updateSavedBadge(); }
     document.getElementById('noDataBox').style.display = "none"; document.getElementById('newsContainer').innerHTML = '';
@@ -646,6 +716,8 @@ function selectBottomTab(index) {
         showSkeleton(); setTimeout(() => { currentIndex = 0; allFetchedArticles = []; articles = []; loadNews(); }, 50);
     }
 }
+
+function updateTabUI() { const tabs = document.querySelectorAll(".bottom-bar .tab"); Array.from(tabs).forEach(t => t.classList.remove('active')); if(tabs[selectedFeedIndex]) tabs[selectedFeedIndex].classList.add('active'); }
 
 function calculateUnreadCount(articlesArray) { const now = Date.now(); const LIMIT = isReturningSession ? (24 * 60 * 60 * 1000) : (7 * 24 * 60 * 60 * 1000); let count = 0; articlesArray.forEach(a => { if (!a.link || a.link.indexOf('go:') === 0 || a.isPromo || a.isDiscovery) return; if (readArticles.indexOf(a.link) === -1 && (now - new Date(a.pubDate).getTime()) <= LIMIT) count++; }); return count; }
 
@@ -675,7 +747,7 @@ const promoCardsData = [ { image: 'https://files.cdn-files-a.com/uploads/1045696
 async function getCachedTranslation(text, lang) { 
     if (!text || text.trim() === "") return ""; const hash = text.length + "_" + text.substring(0, 15).replace(/\s/g, ''); const cacheKey = lang + "_" + hash;
     if (window.translationCache[cacheKey]) return window.translationCache[cacheKey];
-    try { const translated = await Promise.race([ googleTranslate(text, lang), new Promise(resolve => setTimeout(() => resolve(text), 3000)) ]); if (translated !== text) { window.translationCache[cacheKey] = translated; if(Object.keys(window.translationCache).length > 300) delete window.translationCache[Object.keys(window.translationCache)[0]]; safeSetItem('translationCache', JSON.stringify(window.translationCache)); } return translated; } catch(err) { return text; } 
+    try { const translated = await Promise.race([ googleTranslate(text, lang), new Promise(resolve => setTimeout(() => resolve(text), 2000)) ]); if (translated !== text) { window.translationCache[cacheKey] = translated; if(Object.keys(window.translationCache).length > 300) delete window.translationCache[Object.keys(window.translationCache)[0]]; safeSetItem('translationCache', JSON.stringify(window.translationCache)); } return translated; } catch(err) { return text; } 
 }
 
 async function googleTranslate(text, lang) { try { const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${lang}&dt=t&q=${encodeURIComponent(text)}`); const data = await res.json(); return data[0].map(x => x[0]).join(" ") || text; } catch (err) { return text; } }
@@ -695,14 +767,50 @@ async function parseRSSItems(text, rssUrl) {
         Array.from(tempDiv.querySelectorAll('img, iframe, script, style, figure, video, audio')).forEach(el => el.remove()); Array.from(tempDiv.querySelectorAll('a')).forEach(el => { let span = document.createElement('span'); span.innerHTML = el.innerHTML; el.replaceWith(span); });
         let cleanDescHTML = tempDiv.innerHTML.trim().replace(/<br\s*[\/]?>(\s*<br\s*[\/]?>)+/gi, '<br><br>'); 
         let wordCount = (title + " " + cleanDescHTML).split(/\s+/).length; let readTime = Math.ceil(wordCount / 200);
-        return { title, description: cleanDescHTML, link, pubDate, image: image || 'https://via.placeholder.com/600x400?text=News', readTime };
+        
+        // Save Original Text For Instant Translation
+        return { title, originalTitle: title, description: cleanDescHTML, originalDescription: cleanDescHTML, link, pubDate, image: image || 'https://via.placeholder.com/600x400?text=News', readTime };
     });
     
-    // items = items.slice(0, 15); // Removed to fetch ALL available news in the RSS feed
-    
-    const translatableSources = ["https://242310604.hs-sites-na2.com", "https://timesofindia.indiatimes.com"];
-    let skipTranslation = (selectedLanguage === "en" && rssUrl.indexOf("timesofindia") !== -1) || (selectedLanguage === "hi" && rssUrl.indexOf("hs-sites") !== -1);
-    if (!skipTranslation && translatableSources.some(src => rssUrl.indexOf(src) !== -1)) { const chunkSize = 3; for (let i = 0; i < items.length; i += chunkSize) { const chunk = items.slice(i, i + chunkSize); await Promise.all(chunk.map(async item => { item.title = await getCachedTranslation(item.title, selectedLanguage); item.description = await getCachedTranslation(item.description, selectedLanguage); })); await new Promise(resolve => setTimeout(resolve, 300)); } } 
+    // Only Translate if User has not selected Original
+    if (selectedLanguage !== "original") {
+        const firstBatch = items.slice(0, 2);
+        await Promise.all(firstBatch.map(async item => {
+            item.title = await getCachedTranslation(item.originalTitle, selectedLanguage);
+            item.description = await getCachedTranslation(item.originalDescription, selectedLanguage);
+        }));
+
+        setTimeout(async () => {
+            const remaining = items.slice(2);
+            const chunkSize = 5;
+            for (let i = 0; i < remaining.length; i += chunkSize) {
+                const chunk = remaining.slice(i, i + chunkSize);
+                await Promise.all(chunk.map(async item => {
+                    item.title = await getCachedTranslation(item.originalTitle, selectedLanguage);
+                    item.description = await getCachedTranslation(item.originalDescription, selectedLanguage);
+                }));
+
+                requestAnimationFrame(() => {
+                    chunk.forEach(item => {
+                        const idx = articles.indexOf(item);
+                        if (idx !== -1) {
+                            const card = document.querySelector(`.news-card[data-index="${idx}"]`);
+                            if (card && !item.isPromo && !item.isDiscovery) {
+                                const titleEl = card.querySelector('.feed-title');
+                                const descEl = card.querySelector('.feed-desc');
+                                if (titleEl) titleEl.innerText = item.title;
+                                if (descEl) descEl.innerHTML = item.description;
+                                card.classList.remove('font-fitted');
+                                fitCardText(card, 0);
+                            }
+                        }
+                    });
+                });
+                await new Promise(resolve => setTimeout(resolve, 50));
+            }
+            try { safeSetItem(`cachedFeeds_${selectedFeedIndex}`, JSON.stringify(articles.slice(0, 40))); } catch(e) {}
+        }, 100);
+    }
     return items;
 }
 
@@ -783,7 +891,7 @@ async function loadNews(forceNet) {
     }
   } catch (error) { 
       if(!loadedFromCache) { document.getElementById('newsContainer').innerHTML = ''; document.getElementById("noDataText").innerText = "ख़बरें लोड नहीं हो सकीं"; document.getElementById("noDataBox").style.display = "block"; } 
-      if (!navigator.onLine) showToast("नेटवर्क त्रुटि", "fas fa-wifi"); // Real Network Error Fix
+      if (!navigator.onLine) showToast("नेटवर्क त्रुटि", "fas fa-wifi"); 
   } finally { updateProgressBar(); }
 }
 
@@ -797,13 +905,14 @@ function displayNews(forceRefresh) {
         if (article.isDiscovery) {
           newsCard.classList.add("discovery-card-wrap");
           if (!article.discoveryItems) { let selected = []; let attempts = 0; while(selected.length < 3 && attempts < 100) { let r = Math.floor(Math.random() * articles.length); let item = articles[r]; if (item && !item.isPromo && !item.isDiscovery && selected.indexOf(item) === -1) { selected.push(item); } attempts++; } article.discoveryItems = selected; }
-          let listHTML = ''; article.discoveryItems.forEach(a => { if(a) { listHTML += `<div class="glass-card-item" onclick="jumpToArticleByLink('${a.link}'); event.stopPropagation();"><img src="${a.image}" class="glass-card-img" onerror="this.src='https://via.placeholder.com/150'"><div class="glass-card-info"><h4 class="glass-card-title">${a.title}</h4><span class="glass-card-time"><i class="far fa-clock"></i> ${getTimeAgo(a.pubDate)}</span></div></div>`; } });
+          let listHTML = ''; article.discoveryItems.forEach(a => { if(a) { listHTML += `<div class="glass-card-item" onclick="jumpToArticleByLink('${a.link}'); event.stopPropagation();"><img src="${a.image}" class="glass-card-img" crossorigin="anonymous" onerror="this.src='https://via.placeholder.com/150'"><div class="glass-card-info"><h4 class="glass-card-title">${a.title}</h4><span class="glass-card-time"><i class="far fa-clock"></i> ${getTimeAgo(a.pubDate)}</span></div></div>`; } });
           newsCard.innerHTML = `<div class="discovery-content"><a href="go:mock"><div class="ad-container"><div class="ad-badge">Ad</div> <img src="https://m2.getsitecontrol.com/images/273034/29b7474c09687628186bbd344d63b0d7_355346154.png" style="width:100%;"></div></a><h3 class="glass-list-title">आपके लिए ख़ास ख़बरें</h3><div class="discovery-list">${listHTML}</div></div>`;
         } else if (article.isPromo) { 
-          newsCard.classList.add("promo-card"); newsCard.innerHTML = `<img class="feed-img" data-src="${article.image}" onerror="this.src='https://via.placeholder.com/1080x1920/000/fff?text=Ad'">`; newsCard.onclick = () => { if(article.link && article.link.indexOf('go:') !== 0) window.open(article.link, '_blank'); };
+          newsCard.classList.add("promo-card"); newsCard.innerHTML = `<img class="feed-img" data-src="${article.image}" crossorigin="anonymous" onerror="this.src='https://via.placeholder.com/1080x1920/000/fff?text=Ad'">`; newsCard.onclick = () => { if(article.link && article.link.indexOf('go:') !== 0) window.open(article.link, '_blank'); };
         } else {
           let isLikedFlag = isLiked(article.link); let readTime = article.readTime || 1;
-          newsCard.innerHTML = `<div class="top-section" onclick="openLightbox('${article.image}')"><img class="feed-img" data-src="${article.image}" onerror="this.src='https://via.placeholder.com/600x400?text=News'"><div class="audio-wave"><span></span><span></span><span></span><span></span><span></span></div></div><div class="bottom-section"><h2 class="feed-title">${article.title}</h2><div class="feed-desc">${article.description}</div><div class="card-footer"><div class="publish-info">${getTimeAgo(article.pubDate)} <span class="read-time">${readTime} Min Read</span></div><div class="action-bar"><div class="action-btn btn-audio" onclick="toggleAudio(this)"><i class="fas fa-volume-up"></i></div><div class="action-btn btn-whatsapp" onclick="shareToWhatsApp(this)"><i class="fab fa-whatsapp"></i></div><div class="action-btn btn-save ${isLikedFlag?'saved':''}" onclick="toggleLike(this)"><i class="fas ${isLikedFlag ? 'fa-bookmark' : 'fa-bookmark'}"></i></div></div></div></div>`;
+          
+          newsCard.innerHTML = `<div class="top-section" onclick="openLightbox('${article.image}')"><img class="feed-img" data-src="${article.image}" crossorigin="anonymous" onerror="this.src='https://via.placeholder.com/600x400?text=News'"></div><div class="bottom-section"><h2 class="feed-title">${article.title}</h2><div class="feed-desc">${article.description}</div><div class="card-footer"><div class="publish-info">${getTimeAgo(article.pubDate)} <span class="read-time">${readTime} Min Read</span></div><div class="action-bar"><div class="action-btn btn-summary" onclick="generateSummary(this)"><i class="fas fa-wand-magic-sparkles"></i></div><div class="action-btn btn-whatsapp" onclick="shareToWhatsApp(this)"><i class="fab fa-whatsapp"></i></div><div class="action-btn btn-save ${isLikedFlag?'saved':''}" onclick="toggleLike(this)"><i class="fas ${isLikedFlag ? 'fa-bookmark' : 'fa-bookmark'}"></i></div></div></div></div>`;
           newsCard.setAttribute("data-url", article.link || ''); 
         }
         container.appendChild(newsCard);
@@ -821,44 +930,6 @@ function toggleLike(btnElement) {
     safeSetItem("likedFeeds", JSON.stringify(liked)); if (selectedFeedIndex === 2 && exists) setTimeout(() => { displayNews(true); }, 200);
 }
 function getTimeAgo(dateInput) { const now = Date.now(); const pub = (dateInput instanceof Date) ? dateInput.getTime() : new Date(dateInput).getTime(); if(isNaN(pub) || pub === 0) return ""; const sec = Math.floor((now - pub) / 1000); const intervals = { year: 31536000, month: 2592000, week: 604800, day: 86400, hour: 3600, minute: 60, second: 1 }; for (let k in intervals) { const i = Math.floor(sec / intervals[k]); if (i >= 1) return `${i} ${k}${i > 1 ? 's' : ''} ago`; } return "just now"; }
-
-async function shareToWhatsApp(btnElement) {
-    vibrate([15]); const card = btnElement.closest('.news-card'); const index = parseInt(card.getAttribute('data-index')); const article = articles[index]; if (!article) return;
-    const shareCaption = `*${article.title || ""}*\n\n📲 *Daily Current Affairs पढ़ने के लिए ऐप डाउनलोड करें:*\nhttps://cutt.ly/OrKg4bdu`;
-    showToast("Just a moment...", "fas fa-spinner fa-spin", "#34c759", 2000);
-
-    try {
-        const canvas = document.createElement('canvas'); canvas.width = 540; canvas.height = 760; const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, 540, 760);
-        const bannerImg = await new Promise((resolve) => { const img = new Image(); img.crossOrigin = 'anonymous'; img.onload = () => resolve(img); img.onerror = () => resolve(null); img.src = 'https://m2.getsitecontrol.com/images/273034/c641e1bdfeb4c383158032cef8dba43f_357551277.png'; });
-        if (bannerImg) { ctx.drawImage(bannerImg, 0, 0, bannerImg.width, bannerImg.height / 1, 0, 0, 540, 150); } else { ctx.fillStyle = '#ff2d55'; ctx.fillRect(0, 0, 540, 150); }
-        ctx.fillStyle = '#ff2d55'; ctx.fillRect(0, 200, 540, 5); ctx.textAlign = 'left'; let y = 280;
-        ctx.fillStyle = '#00438d'; ctx.font = '800 28px sans-serif'; const wordsTitle = (article.title || "").split(" "); let line = "";
-        for (let i = 0; i < wordsTitle.length; i++) { let test = line + wordsTitle[i] + " "; if (ctx.measureText(test).width > 460 && i > 0) { ctx.fillText(line, 40, y); line = wordsTitle[i] + " "; y += 38; } else { line = test; } } ctx.fillText(line, 40, y); y += 55;
-        ctx.fillStyle = '#444444'; ctx.font = '400 20px sans-serif'; let tempDiv = document.createElement("div"); tempDiv.innerHTML = article.description || ""; let cleanDesc = (tempDiv.textContent || "").substring(0, 250) + "...";
-        const wordsDesc = cleanDesc.split(" "); line = ""; let descLines = 0;
-        for (let i = 0; i < wordsDesc.length; i++) { let test = line + wordsDesc[i] + " "; if (ctx.measureText(test).width > 460 && i > 0) { ctx.fillText(line, 40, y); line = wordsDesc[i] + " "; y += 30; descLines++; if (descLines >= 5) break; } else { line = test; } } if (descLines < 5) ctx.fillText(line, 40, y);
-        y = 620; ctx.beginPath(); ctx.setLineDash([8, 8]); ctx.moveTo(40, y); ctx.lineTo(500, y); ctx.strokeStyle = '#e0e0e0'; ctx.lineWidth = 2; ctx.stroke(); ctx.setLineDash([]);
-        y += 40; ctx.fillStyle = '#ff2d55'; ctx.beginPath(); ctx.roundRect(40, y-25, 175, 40, 10); ctx.fill(); ctx.fillStyle = '#ffffff'; ctx.font = '800 15px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('Download App', 127, y+2);
-        ctx.fillStyle = '#5f008d'; ctx.font = '700 13px sans-serif'; ctx.textAlign = 'right'; ctx.fillText('Read Full News | Myexamguruji.in', 500, y+2);
-
-        canvas.toBlob(blob => {
-            const file = new File([blob], "way2news.jpg", { type: "image/jpeg" }); const imgUrl = URL.createObjectURL(blob);
-            document.getElementById("networkToast").classList.remove("show"); document.getElementById("sharePreviewImg").src = imgUrl; openGlassPopup("sharePopup");
-            document.getElementById("confirmShareBtn").onclick = async () => { 
-                vibrate([15]); 
-                try { 
-                    if (navigator.canShare && navigator.canShare({ files: [file] })) { 
-                        // Adding title to share helps WhatsApp recognize the rich content.
-                        await navigator.share({ title: article.title, text: shareCaption, files: [file] }); 
-                    } else throw new Error("API not supported"); 
-                } catch (err) { 
-                    if (err.name !== 'AbortError') window.location.href = `whatsapp://send?text=${encodeURIComponent(shareCaption)}`; 
-                } finally { closeAllPopups(); } 
-            };
-        }, 'image/jpeg', 0.85);
-    } catch (error) { window.location.href = `whatsapp://send?text=${encodeURIComponent(shareCaption)}`; }
-}
 
 if ("serviceWorker" in navigator) {
   try {
