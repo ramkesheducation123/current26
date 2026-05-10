@@ -140,7 +140,7 @@
         
         .news-card.discovery-card-wrap { background: var(--bg-app); display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: calc(env(safe-area-inset-top, 20px) + 20px) 20px 80px 20px; overflow-y: auto; }
         .discovery-content { width: 100%; max-width: 400px; display: flex; flex-direction: column; }
-        .ad-container { width: 100%; height: 160px; background: var(--bg-card); border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; margin-top:45px; margin-bottom: 5px; position: relative; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.1); border: 1px solid var(--border-light);}
+        .ad-container { width: 100%; height: 200px; background: var(--bg-card); border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; margin-top:43px; margin-bottom: 5px; position: relative; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.1); border: 1px solid var(--border-light);}
         .ad-container::after { content: ''; color: var(--text-muted); font-weight: 800; font-size: 20px; letter-spacing: 1px;}
         .ad-badge { position: absolute; top: 0; left: 0; background: #fbbc05; color: #000; font-size: 11px; font-weight: 800; padding: 3px 8px; border-bottom-right-radius: 8px;}
         .glass-list-title { color: var(--text-title); font-size: 15px; font-weight: 800; margin-bottom: 10px; width: 100%; text-align: left;}
@@ -742,7 +742,7 @@ function markAsRead(index) {
 }
 
 const rssFeeds = [ { name: "होम", urls: ["https://242310604.hs-sites-na2.com/tag/fact/rss.xml", "https://242310604.hs-sites-na2.com/tag/national/rss.xml"] }, { name: "राष्ट्रीय", urls: ["https://timesofindia.indiatimes.com/rssfeedstopstories.cms"] }, { name: "सेव्ड", urls: [] } ];
-const promoCardsData = [ { image: 'https://files.cdn-files-a.com/uploads/10456964/normal_69535f33277ed.png', link: 'go:cumagazine', isPromo: true }, { image: 'https://m2.getsitecontrol.com/images/273034/08fa5e9b171cf9fb5f7ce513fa1b8c4f_351164357.png', link: 'go:cuseries', isPromo: true } ];
+const promoCardsData = [ { image: 'https://m2.getsitecontrol.com/images/273034/2b50ba425da2143bf1eb20e62c143daa_328022635.jpg', link: 'go:cumagazine', isPromo: true }, { image: 'https://m2.getsitecontrol.com/images/273034/465ca799c11b2bdb34e179e47a5d90a9_328022772.jpg', link: 'go:cuseries', isPromo: true }, { image: 'https://m2.getsitecontrol.com/images/273034/d14691ad787f18ca188ad40f0f327711_328022818.jpg', link: 'go:mock', isPromo: true }];
 
 async function getCachedTranslation(text, lang) { 
     if (!text || text.trim() === "") return ""; const hash = text.length + "_" + text.substring(0, 15).replace(/\s/g, ''); const cacheKey = lang + "_" + hash;
@@ -906,7 +906,7 @@ function displayNews(forceRefresh) {
           newsCard.classList.add("discovery-card-wrap");
           if (!article.discoveryItems) { let selected = []; let attempts = 0; while(selected.length < 3 && attempts < 100) { let r = Math.floor(Math.random() * articles.length); let item = articles[r]; if (item && !item.isPromo && !item.isDiscovery && selected.indexOf(item) === -1) { selected.push(item); } attempts++; } article.discoveryItems = selected; }
           let listHTML = ''; article.discoveryItems.forEach(a => { if(a) { listHTML += `<div class="glass-card-item" onclick="jumpToArticleByLink('${a.link}'); event.stopPropagation();"><img src="${a.image}" class="glass-card-img" crossorigin="anonymous" onerror="this.src='https://via.placeholder.com/150'"><div class="glass-card-info"><h4 class="glass-card-title">${a.title}</h4><span class="glass-card-time"><i class="far fa-clock"></i> ${getTimeAgo(a.pubDate)}</span></div></div>`; } });
-          newsCard.innerHTML = `<div class="discovery-content"><a href="go:mock"><div class="ad-container"><div class="ad-badge">Ad</div> <img src="https://m2.getsitecontrol.com/images/273034/29b7474c09687628186bbd344d63b0d7_355346154.png" style="width:100%;"></div></a><h3 class="glass-list-title">आपके लिए ख़ास ख़बरें</h3><div class="discovery-list">${listHTML}</div></div>`;
+          newsCard.innerHTML = `<div class="discovery-content"><a href="go:cuseries"><div class="ad-container"><div class="ad-badge">Ad</div> <img src="https://m2.getsitecontrol.com/images/273034/ee88c25a2819909cdf25fd9e92b345f6_347361407.png" style="width:100%;"></div></a><h3 class="glass-list-title">आपके लिए ख़ास ख़बरें</h3><div class="discovery-list">${listHTML}</div></div>`;
         } else if (article.isPromo) { 
           newsCard.classList.add("promo-card"); newsCard.innerHTML = `<img class="feed-img" data-src="${article.image}" crossorigin="anonymous" onerror="this.src='https://via.placeholder.com/1080x1920/000/fff?text=Ad'">`; newsCard.onclick = () => { if(article.link && article.link.indexOf('go:') !== 0) window.open(article.link, '_blank'); };
         } else {
